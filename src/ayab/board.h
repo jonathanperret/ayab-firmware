@@ -50,6 +50,8 @@ constexpr uint8_t I2Caddr_sol9_16 = 0x1U; ///< I2C Address of solenoids 9 - 16
 // Determine board type
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 // Arduino Uno
+#elif defined(ARDUINO_UNOR4_WIFI) || defined(ARDUINO_UNOR4_MINIMA)
+// Uno R4
 #else
 #error "untested board"
 #endif
