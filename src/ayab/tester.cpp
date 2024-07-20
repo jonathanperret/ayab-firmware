@@ -55,9 +55,7 @@ void Tester::helpCmd() {
  */
 void Tester::sendCmd() {
   GlobalCom::sendMsg(AYAB_API::testRes, "Called send\n");
-  uint8_t p[] = {0x31, 0x32, 0x33};
-  GlobalCom::send(p, 3);
-  GlobalCom::sendMsg(AYAB_API::testRes, "\n");
+  GlobalCom::sendMsg(AYAB_API::testRes, "123\n");
 }
 
 /*!
