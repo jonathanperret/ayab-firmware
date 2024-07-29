@@ -134,7 +134,6 @@ public:
 
 private:
   PacketSerial_<SLIP, SLIP::END, MAX_MSG_BUFFER_LEN> m_packetSerial;
-  uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = {0};
   uint8_t msgBuffer[MAX_MSG_BUFFER_LEN] = {0};
 
   void h_reqInit(const uint8_t *buffer, size_t size);

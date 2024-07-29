@@ -279,11 +279,6 @@ void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
   /* uint8_t color = buffer[2];  */ // currently unused
   uint8_t flags = buffer[3];
 
-  for (uint8_t i = 0U; i < lenLineBuffer; i++) {
-    // Values have to be inverted because of needle states
-    lineBuffer[i] = ~buffer[i + 4];
-  }
-
   uint8_t crc8 = buffer[lenLineBuffer + 4];
   // Calculate checksum of buffer contents
   if (crc8 != CRC8(buffer, lenLineBuffer + 4)) {
@@ -292,7 +287,7 @@ void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  if (GlobalKnitter::setNextLine(lineNumber, lineBuffer)) {
+  if (GlobalKnitter::setNextLine(lineNumber, buffer + 4)) {
     // Line was accepted
     bool flagLastLine = bitRead(flags, 0U);
     if (flagLastLine) {

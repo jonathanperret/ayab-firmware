@@ -342,7 +342,10 @@ bool Knitter::setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer) {
     if (lineNumber == m_currentLineNumber) {
       m_lineRequested = false;
       GlobalBeeper::finishedLine();
-      memcpy(m_lineBuffer, lineBuffer, MAX_LINE_BUFFER_LEN);
+      for (uint8_t i = 0U; i < MAX_LINE_BUFFER_LEN; i++) {
+        // Values have to be inverted because of needle states
+        m_lineBuffer[i] = ~lineBuffer[i];
+      }
       return true;
     } else {
       // line numbers didn't match -> request again
