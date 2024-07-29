@@ -218,8 +218,6 @@ void Com::h_reqInit(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  memset(lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
-
   Err_t error = GlobalKnitter::initMachine(machineType);
   send_cnfInit(error);
 }
@@ -249,14 +247,13 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
   }
 
   GlobalBeeper::init(beeperEnabled);
-  memset(lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
 
   // Note (August 2020): the return value of this function has changed.
   // Previously, it returned `true` for success and `false` for failure.
   // Now, it returns `0` for success and an informative error code otherwise.
   Err_t error =
       GlobalKnitter::startKnitting(startNeedle, stopNeedle,
-                                   lineBuffer, continuousReportingEnabled);
+                                   continuousReportingEnabled);
   send_cnfStart(error);
 }
 
@@ -295,7 +292,7 @@ void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  if (GlobalKnitter::setNextLine(lineNumber)) {
+  if (GlobalKnitter::setNextLine(lineNumber, lineBuffer)) {
     // Line was accepted
     bool flagLastLine = bitRead(flags, 0U);
     if (flagLastLine) {

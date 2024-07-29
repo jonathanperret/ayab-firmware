@@ -55,11 +55,10 @@ void Knitter::isr() {
 }
 
 Err_t Knitter::startKnitting(uint8_t startNeedle,
-                             uint8_t stopNeedle, uint8_t *pattern_start,
+                             uint8_t stopNeedle,
                              bool continuousReportingEnabled) {
   assert(gKnitterMock != nullptr);
-  return gKnitterMock->startKnitting(startNeedle, stopNeedle,
-                                     pattern_start, continuousReportingEnabled);
+  return gKnitterMock->startKnitting(startNeedle, stopNeedle, continuousReportingEnabled);
 }
 
 Err_t Knitter::initMachine(Machine_t machineType) {
@@ -97,9 +96,9 @@ Machine_t Knitter::getMachineType() {
   return gKnitterMock->getMachineType();
 }
 
-bool Knitter::setNextLine(uint8_t lineNumber) {
+bool Knitter::setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer) {
   assert(gKnitterMock != nullptr);
-  return gKnitterMock->setNextLine(lineNumber);
+  return gKnitterMock->setNextLine(lineNumber, lineBuffer);
 }
 
 void Knitter::setLastLine() {

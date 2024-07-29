@@ -197,9 +197,8 @@ protected:
   void get_to_knit(Machine_t m) {
     EXPECT_CALL(*encodersMock, init);
     get_to_ready(m);
-    uint8_t pattern[] = {1};
     EXPECT_CALL(*beeperMock, ready);
-    ASSERT_EQ(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(m)] - 1, pattern, false), ErrorCode::success);
+    ASSERT_EQ(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(m)] - 1, false), ErrorCode::success);
     expected_dispatch_ready();
 
     // ends in state `OpState::knit`
@@ -277,29 +276,26 @@ TEST_F(KnitterTest, test_isr) {
 }
 
 TEST_F(KnitterTest, test_startKnitting_NoMachine) {
-  uint8_t pattern[] = {1};
   Machine_t m = knitter->getMachineType();
   ASSERT_EQ(m, Machine_t::NoMachine);
   ASSERT_TRUE(knitter->initMachine(m) != ErrorCode::success);
   ASSERT_TRUE(
-      knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(m)] - 1, pattern, false) != ErrorCode::success);
+      knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(m)] - 1, false) != ErrorCode::success);
 
   // test expectations without destroying instance
   ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
 }
 
 TEST_F(KnitterTest, test_startKnitting_invalidMachine) {
-  uint8_t pattern[] = {1};
   ASSERT_TRUE(knitter->initMachine(Machine_t::NoMachine) != ErrorCode::success);
-  ASSERT_TRUE(knitter->startKnitting(0, 1, pattern, false) != ErrorCode::success);
+  ASSERT_TRUE(knitter->startKnitting(0, 1, false) != ErrorCode::success);
 
   // test expectations without destroying instance
   ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
 }
 
 TEST_F(KnitterTest, test_startKnitting_notReady) {
-  uint8_t pattern[] = {1};
-  ASSERT_TRUE(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] - 1, pattern,
+  ASSERT_TRUE(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] - 1,
                                      false) != ErrorCode::success);
 
   // test expectations without destroying instance
@@ -327,18 +323,13 @@ TEST_F(KnitterTest, test_startKnitting_Kh270) {
 }
 
 TEST_F(KnitterTest, test_startKnitting_failures) {
-  uint8_t pattern[] = {1};
   get_to_ready(Machine_t::Kh910);
 
   // `m_stopNeedle` lower than `m_startNeedle`
-  ASSERT_TRUE(knitter->startKnitting(1, 0, pattern, false) != ErrorCode::success);
+  ASSERT_TRUE(knitter->startKnitting(1, 0, false) != ErrorCode::success);
 
   // `m_stopNeedle` out of range
-  ASSERT_TRUE(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)], pattern,
-                                     false) != ErrorCode::success);
-
-  // null pattern
-  ASSERT_TRUE(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] - 1, nullptr,
+  ASSERT_TRUE(knitter->startKnitting(0, NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)],
                                      false) != ErrorCode::success);
 
   // test expectations without destroying instance
@@ -348,8 +339,10 @@ TEST_F(KnitterTest, test_startKnitting_failures) {
 }
 
 TEST_F(KnitterTest, test_setNextLine) {
+  const uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = { };
+
   // set `m_lineRequested`
-  ASSERT_EQ(knitter->setNextLine(1), false);
+  ASSERT_EQ(knitter->setNextLine(1, lineBuffer), false);
 
   expected_dispatch_knit(true);
 
@@ -361,14 +354,14 @@ TEST_F(KnitterTest, test_setNextLine) {
   // wrong line number
   EXPECT_CALL(*beeperMock, finishedLine).Times(0);
   expect_reqLine();
-  ASSERT_EQ(knitter->setNextLine(1), false);
+  ASSERT_EQ(knitter->setNextLine(1, lineBuffer), false);
 
   // correct line number
   EXPECT_CALL(*beeperMock, finishedLine).Times(1);
-  ASSERT_EQ(knitter->setNextLine(0), true);
+  ASSERT_EQ(knitter->setNextLine(0, lineBuffer), true);
 
   // `m_lineRequested` has been set to `false`
-  ASSERT_EQ(knitter->setNextLine(0), false);
+  ASSERT_EQ(knitter->setNextLine(0, lineBuffer), false);
 
   // test expectations without destroying instance
   ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
@@ -380,14 +373,11 @@ TEST_F(KnitterTest, test_setNextLine) {
 TEST_F(KnitterTest, test_knit_Kh910) {
   get_to_ready(Machine_t::Kh910);
 
-  // knit
-  uint8_t pattern[] = {1};
-
   // `m_startNeedle` is greater than `m_pixelToSet`
   EXPECT_CALL(*beeperMock, ready);
   const uint8_t START_NEEDLE = NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] - 2;
   const uint8_t STOP_NEEDLE = NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] - 1;
-  knitter->startKnitting(START_NEEDLE, STOP_NEEDLE, pattern, true);
+  knitter->startKnitting(START_NEEDLE, STOP_NEEDLE, true);
   EXPECT_CALL(*arduinoMock, digitalWrite(LED_PIN_A, LOW)); // green LED off
   expected_dispatch();
 
@@ -424,14 +414,11 @@ TEST_F(KnitterTest, test_knit_Kh910) {
 TEST_F(KnitterTest, test_knit_Kh270) {
   get_to_ready(Machine_t::Kh270);
 
-  // knit
-  uint8_t pattern[] = {1};
-
   // `m_startNeedle` is greater than `m_pixelToSet`
   EXPECT_CALL(*beeperMock, ready);
   const uint8_t START_NEEDLE = NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh270)] - 2;
   const uint8_t STOP_NEEDLE = NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh270)] - 1;
-  knitter->startKnitting(START_NEEDLE, STOP_NEEDLE, pattern, true);
+  knitter->startKnitting(START_NEEDLE, STOP_NEEDLE, true);
   EXPECT_CALL(*arduinoMock, digitalWrite(LED_PIN_A, LOW));
   expected_dispatch();
 
@@ -584,7 +571,8 @@ TEST_F(KnitterTest, test_knit_new_line) {
 
   // set `m_lineRequested` to `false`
   EXPECT_CALL(*beeperMock, finishedLine);
-  knitter->setNextLine(0);
+  const uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = { };
+  knitter->setNextLine(0, lineBuffer);
 
   EXPECT_CALL(*solenoidsMock, setSolenoid);
 

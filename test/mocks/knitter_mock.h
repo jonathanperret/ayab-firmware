@@ -32,8 +32,8 @@ public:
   MOCK_METHOD0(init, void());
   MOCK_METHOD0(setUpInterrupt, void());
   MOCK_METHOD0(isr, void());
-  MOCK_METHOD4(startKnitting, Err_t(uint8_t startNeedle,
-                                    uint8_t stopNeedle, uint8_t *pattern_start,
+  MOCK_METHOD3(startKnitting, Err_t(uint8_t startNeedle,
+                                    uint8_t stopNeedle,
                                     bool continuousReportingEnabled));
   MOCK_METHOD1(initMachine, Err_t(Machine_t machineType));
   MOCK_METHOD0(encodePosition, void());
@@ -42,7 +42,7 @@ public:
   MOCK_METHOD1(indState, void(Err_t error));
   MOCK_METHOD1(getStartOffset, uint8_t(const Direction_t direction));
   MOCK_METHOD0(getMachineType, Machine_t());
-  MOCK_METHOD1(setNextLine, bool(uint8_t lineNumber));
+  MOCK_METHOD2(setNextLine, bool(uint8_t lineNumber, const uint8_t* lineBuffer));
   MOCK_METHOD0(setLastLine, void());
   MOCK_METHOD1(setMachineType, void(Machine_t));
 };

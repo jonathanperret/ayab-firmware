@@ -46,10 +46,10 @@ Err_t GlobalKnitter::initMachine(Machine_t machine) {
 }
 
 Err_t GlobalKnitter::startKnitting(uint8_t startNeedle,
-                                   uint8_t stopNeedle, uint8_t *pattern_start,
+                                   uint8_t stopNeedle,
                                    bool continuousReportingEnabled) {
   return m_instance->startKnitting(startNeedle, stopNeedle,
-                                   pattern_start, continuousReportingEnabled);
+                                   continuousReportingEnabled);
 }
 
 void GlobalKnitter::encodePosition() {
@@ -76,8 +76,8 @@ Machine_t GlobalKnitter::getMachineType() {
   return m_instance->getMachineType();
 }
 
-bool GlobalKnitter::setNextLine(uint8_t lineNumber) {
-  return m_instance->setNextLine(lineNumber);
+bool GlobalKnitter::setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer) {
+  return m_instance->setNextLine(lineNumber, lineBuffer);
 }
 
 void GlobalKnitter::setLastLine() {

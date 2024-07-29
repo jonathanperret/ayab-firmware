@@ -269,9 +269,6 @@ TEST_F(ComTest, test_empty_message_is_ignored) {
 }
 
 TEST_F(ComTest, test_cnfline_kh910) {
-  // dummy pattern
-  uint8_t pattern[] = {1};
-
   // message for machine with 200 needles
   uint8_t buffer[30] = {static_cast<uint8_t>(AYAB_API::cnfLine) /* 0x42 */,
                         0,
@@ -306,7 +303,7 @@ TEST_F(ComTest, test_cnfline_kh910) {
 
   // start KH910 job
   knitterMock->initMachine(Machine_t::Kh910);
-  knitterMock->startKnitting(0, 199, pattern, false);
+  knitterMock->startKnitting(0, 199, false);
 
   // first call increments line number to zero, not accepted
   EXPECT_CALL(*knitterMock, setNextLine).WillOnce(Return(false));

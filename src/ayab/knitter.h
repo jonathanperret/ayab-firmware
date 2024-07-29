@@ -39,7 +39,7 @@ public:
   virtual void setUpInterrupt() = 0;
   virtual void isr() = 0;
   virtual Err_t startKnitting(uint8_t startNeedle,
-                              uint8_t stopNeedle, uint8_t *pattern_start,
+                              uint8_t stopNeedle,
                               bool continuousReportingEnabled) = 0;
   virtual Err_t initMachine(Machine_t machine) = 0;
   virtual void encodePosition() = 0;
@@ -48,7 +48,7 @@ public:
   virtual void indState(Err_t error = ErrorCode::success) = 0;
   virtual uint8_t getStartOffset(const Direction_t direction) = 0;
   virtual Machine_t getMachineType() = 0;
-  virtual bool setNextLine(uint8_t lineNumber) = 0;
+  virtual bool setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer) = 0;
   virtual void setLastLine() = 0;
   virtual void setMachineType(Machine_t) = 0;
 };
@@ -74,7 +74,7 @@ public:
   static void isr();
 #endif
   static Err_t startKnitting(uint8_t startNeedle,
-                             uint8_t stopNeedle, uint8_t *pattern_start,
+                             uint8_t stopNeedle,
                              bool continuousReportingEnabled);
   static Err_t initMachine(Machine_t machine);
   static void encodePosition();
@@ -83,7 +83,7 @@ public:
   static void indState(Err_t error = ErrorCode::success);
   static uint8_t getStartOffset(const Direction_t direction);
   static Machine_t getMachineType();
-  static bool setNextLine(uint8_t lineNumber);
+  static bool setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer);
   static void setLastLine();
   static void setMachineType(Machine_t);
 };
@@ -94,7 +94,7 @@ public:
   void setUpInterrupt() final;
   void isr() final;
   Err_t startKnitting(uint8_t startNeedle,
-                      uint8_t stopNeedle, uint8_t *pattern_start,
+                      uint8_t stopNeedle,
                       bool continuousReportingEnabled) final;
   Err_t initMachine(Machine_t machine) final;
   void encodePosition() final;
@@ -103,7 +103,7 @@ public:
   void indState(Err_t error = ErrorCode::success) final;
   uint8_t getStartOffset(const Direction_t direction) final;
   Machine_t getMachineType() final;
-  bool setNextLine(uint8_t lineNumber) final;
+  bool setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer) final;
   void setLastLine() final;
   void setMachineType(Machine_t) final;
 
@@ -116,7 +116,7 @@ private:
   Machine_t m_machineType;
   uint8_t m_startNeedle;
   uint8_t m_stopNeedle;
-  uint8_t *m_lineBuffer;
+  uint8_t m_lineBuffer[MAX_LINE_BUFFER_LEN];
   bool m_continuousReportingEnabled;
 
   // current machine state

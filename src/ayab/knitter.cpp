@@ -65,7 +65,7 @@ void Knitter::init() {
   m_machineType = Machine_t::NoMachine;
   m_startNeedle = 0U;
   m_stopNeedle = 0U;
-  m_lineBuffer = nullptr;
+  memset(m_lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
   m_continuousReportingEnabled = false;
 
   m_lineRequested = false;
@@ -146,14 +146,12 @@ Err_t Knitter::initMachine(Machine_t machineType) {
  * \return Error code (0 = success, other values = error).
  */
 Err_t Knitter::startKnitting(uint8_t startNeedle,
-                             uint8_t stopNeedle, uint8_t *pattern_start,
+                             uint8_t stopNeedle,
                              bool continuousReportingEnabled) {
   if (GlobalFsm::getState() != OpState::ready) {
     return ErrorCode::wrong_machine_state;
   }
-  if (pattern_start == nullptr) {
-    return ErrorCode::null_pointer_argument;
-  }
+
   if ((startNeedle >= stopNeedle) || (stopNeedle >= NUM_NEEDLES[static_cast<uint8_t>(m_machineType)])) {
     return ErrorCode::needle_value_invalid;
   }
@@ -161,7 +159,7 @@ Err_t Knitter::startKnitting(uint8_t startNeedle,
   // record argument values
   m_startNeedle = startNeedle;
   m_stopNeedle = stopNeedle;
-  m_lineBuffer = pattern_start;
+  memset(m_lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
   m_continuousReportingEnabled = continuousReportingEnabled;
 
   // reset variables to start conditions
@@ -338,12 +336,13 @@ uint8_t Knitter::getStartOffset(const Direction_t direction) {
  * \param lineNumber Line number (0-indexed and modulo 256).
  * \return `true` if successful, `false` otherwise.
  */
-bool Knitter::setNextLine(uint8_t lineNumber) {
+bool Knitter::setNextLine(uint8_t lineNumber, const uint8_t* lineBuffer) {
   if (m_lineRequested) {
     // Is there even a need for a new line?
     if (lineNumber == m_currentLineNumber) {
       m_lineRequested = false;
       GlobalBeeper::finishedLine();
+      memcpy(m_lineBuffer, lineBuffer, MAX_LINE_BUFFER_LEN);
       return true;
     } else {
       // line numbers didn't match -> request again
