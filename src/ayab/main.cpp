@@ -97,7 +97,7 @@ void setup() {
   stackCanarySetup();
 
   GlobalBeeper::init(false);
-  GlobalCom::init();
+  _Com.init();
   GlobalFsm::init(&_Com);
   GlobalKnitter::init(&_Com);
   GlobalSolenoids::init();
