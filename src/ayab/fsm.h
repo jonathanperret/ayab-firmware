@@ -80,12 +80,14 @@ using Err_t = enum ErrorCode;
 
 constexpr unsigned int FLASH_DELAY = 500; // ms
 
+class ComInterface;
+
 class FsmInterface {
 public:
   virtual ~FsmInterface() = default;
 
   // any methods that need to be mocked should go here
-  virtual void init() = 0;
+  virtual void init(ComInterface *com) = 0;
   virtual OpState_t getState() = 0;
   virtual void setState(OpState_t state) = 0;
   virtual void dispatch() = 0;
@@ -106,7 +108,7 @@ public:
   // pointer to global instance whose methods are implemented
   static FsmInterface *m_instance;
 
-  static void init();
+  static void init(ComInterface *);
   static OpState_t getState();
   static void setState(OpState_t state);
   static void dispatch();
@@ -114,7 +116,7 @@ public:
 
 class Fsm : public FsmInterface {
 public:
-  void init() final;
+  void init(ComInterface *) final;
   OpState_t getState() final;
   void setState(OpState_t state) final;
   void dispatch() final;
@@ -126,6 +128,9 @@ private:
   void state_knit() const;
   void state_test() const;
   void state_error();
+
+  // collaborators
+  ComInterface *m_com;
 
   // machine state
   OpState_t m_currentState;

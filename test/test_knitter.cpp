@@ -72,7 +72,7 @@ protected:
     // start in state `OpState::init`
     expected_isr(Direction_t::NoDirection, Direction_t::NoDirection);
     EXPECT_CALL(*arduinoMock, millis);
-    fsm->init();
+    fsm->init(com);
     expect_knitter_init();
     knitter->init();
   }

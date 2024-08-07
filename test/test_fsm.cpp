@@ -76,7 +76,7 @@ protected:
 
     // start in state `OpState::init`
     EXPECT_CALL(*arduinoMock, millis);
-    fsm->init();
+    fsm->init(com);
     // expected_isr(NoDirection, NoDirection);
     // EXPECT_CALL(*arduinoMock, digitalWrite(LED_PIN_A, LOW));
     // fsm->setState(OpState::init);

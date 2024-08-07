@@ -40,7 +40,8 @@
 /*!
  * \brief Initialize Finite State Machine.
  */
-void Fsm::init() {
+void Fsm::init(ComInterface *com) {
+  m_com = com;
   m_currentState = OpState::wait_for_machine;
   m_nextState = OpState::wait_for_machine;
   m_flash = false;
@@ -99,7 +100,7 @@ void Fsm::dispatch() {
     break;
   }
   m_currentState = m_nextState;
-  GlobalCom::update();
+  m_com->update();
 }
 // GCOVR_EXCL_STOP
 
