@@ -74,7 +74,7 @@ protected:
     EXPECT_CALL(*arduinoMock, millis);
     fsm->init(com);
     expect_knitter_init();
-    knitter->init();
+    knitter->init(com);
   }
 
   void TearDown() override {

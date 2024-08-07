@@ -98,8 +98,8 @@ void setup() {
 
   GlobalBeeper::init(false);
   GlobalCom::init();
-  GlobalFsm::init(GlobalCom::m_instance);
-  GlobalKnitter::init();
+  GlobalFsm::init(&_Com);
+  GlobalKnitter::init(&_Com);
   GlobalSolenoids::init();
 }
 

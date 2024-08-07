@@ -146,7 +146,7 @@ void Fsm::state_test() const {
   GlobalTester::loop();
   if (m_nextState == OpState::init) {
     // quit test
-    GlobalKnitter::init();
+    GlobalKnitter::init(m_com);
   }
 }
 
@@ -157,7 +157,7 @@ void Fsm::state_error() {
   if (m_nextState == OpState::init) {
     // exit error state
     digitalWrite(LED_PIN_B, LOW); // yellow LED off
-    GlobalKnitter::init();
+    GlobalKnitter::init(m_com);
     return;
   }
   // every 500ms

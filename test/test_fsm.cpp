@@ -84,7 +84,7 @@ protected:
     // fsm->dispatch();
     // ASSERT_TRUE(fsm->getState() == OpState::init);
     expect_knitter_init();
-    knitter->init();
+    knitter->init(com);
     knitter->setMachineType(Machine_t::Kh910);
     expected_isr(Direction_t::NoDirection, Direction_t::NoDirection, 0);
   }

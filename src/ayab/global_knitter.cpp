@@ -27,8 +27,8 @@
 
 // static member functions
 
-void GlobalKnitter::init() {
-  m_instance->init();
+void GlobalKnitter::init(ComInterface *com) {
+  m_instance->init(com);
 }
 
 void GlobalKnitter::setUpInterrupt() {

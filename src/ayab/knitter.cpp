@@ -45,7 +45,9 @@ constexpr uint16_t UINT16_MAX = 0xFFFFU;
  *
  * Initialize the solenoids as well as pins and interrupts.
  */
-void Knitter::init() {
+void Knitter::init(ComInterface *com) {
+  m_com = com;
+  
   pinMode(ENC_PIN_A, INPUT);
   pinMode(ENC_PIN_B, INPUT);
   pinMode(ENC_PIN_C, INPUT);
@@ -309,7 +311,7 @@ void Knitter::knit() {
  * \param error Error state (0 = success, other values = error).
  */
 void Knitter::indState(Err_t error) {
-  GlobalCom::send_indState(m_carriage, m_position, error);
+  m_com->send_indState(m_carriage, m_position, error);
 }
 
 /*!
@@ -376,7 +378,7 @@ void Knitter::setMachineType(Machine_t machineType) {
  * \param lineNumber Line number requested.
  */
 void Knitter::reqLine(uint8_t lineNumber) {
-  GlobalCom::send_reqLine(lineNumber, ErrorCode::success);
+  m_com->send_reqLine(lineNumber, ErrorCode::success);
   m_lineRequested = true;
 }
 
