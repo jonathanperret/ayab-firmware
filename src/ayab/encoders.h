@@ -25,34 +25,35 @@
 #define ENCODERS_H_
 
 #include <Arduino.h>
+#include "enumarray.h"
 
 // Enumerated constants
 
 
 enum class Direction : unsigned char {
-  NoDirection = 0xFF,
   Left = 0,
-  Right = 1
+  Right = 1,
+  _Count,
+  NoDirection = 0xFF,
 };
-constexpr int NUM_DIRECTIONS = 2;
 using Direction_t = enum Direction;
 
 enum class Carriage : unsigned char {
-  NoCarriage = 0xFF,
   Knit = 0,
   Lace = 1,
-  Garter = 2
+  Garter = 2,
+  _Count,
+  NoCarriage = 0xFF,
 };
-constexpr int NUM_CARRIAGES = 3;
 using Carriage_t = enum Carriage;
 
 enum class MachineType : unsigned char {
-  NoMachine = 0xFF,
   Kh910 = 0,
   Kh930 = 1,
-  Kh270 = 2
+  Kh270 = 2,
+  _Count,
+  NoMachine = 0xFF,
 };
-constexpr int NUM_MACHINES = 3;
 using Machine_t = enum MachineType;
 
 enum class BeltShift : unsigned char { Unknown, Regular, Shifted, Lace_Regular, Lace_Shifted };
@@ -60,53 +61,63 @@ using BeltShift_t = enum BeltShift;
 
 // Machine constants
 
-constexpr uint8_t NUM_NEEDLES[NUM_MACHINES] = {200U, 200U, 112U};
-constexpr uint8_t LINE_BUFFER_LEN[NUM_MACHINES] = {25U, 25U, 14U};
-constexpr uint8_t END_OF_LINE_OFFSET_L[NUM_MACHINES] = {12U, 12U, 6U};
-constexpr uint8_t END_OF_LINE_OFFSET_R[NUM_MACHINES] = {12U, 12U, 6U};
+constexpr EnumArray<uint8_t, MachineType> NUM_NEEDLES = {{200U, 200U, 112U}};
+constexpr EnumArray<uint8_t, MachineType> LINE_BUFFER_LEN = {{25U, 25U, 14U}};
+constexpr EnumArray<uint8_t, MachineType> END_OF_LINE_OFFSET_L = {{12U, 12U, 6U}};
+constexpr EnumArray<uint8_t, MachineType> END_OF_LINE_OFFSET_R = {{12U, 12U, 6U}};
 
-constexpr uint8_t END_LEFT[NUM_MACHINES] = {0U, 0U, 0U};
-constexpr uint8_t END_RIGHT[NUM_MACHINES] = {255U, 255U, 140U};
-constexpr uint8_t END_OFFSET[NUM_MACHINES] = {28U, 28U, 5U};
+constexpr EnumArray<uint8_t, MachineType> END_LEFT = {{0U, 0U, 0U}};
+constexpr EnumArray<uint8_t, MachineType> END_RIGHT = {{255U, 255U, 140U}};
+constexpr EnumArray<uint8_t, MachineType> END_OFFSET = {{28U, 28U, 5U}};
 
 // The following two arrays are created by combining, respectively,
 // the arrays END_LEFT and END_RIGHT with END_OFFSET
-constexpr uint8_t END_LEFT_PLUS_OFFSET[NUM_MACHINES] = {28U, 28U, 5U};
-constexpr uint8_t END_RIGHT_MINUS_OFFSET[NUM_MACHINES] = {227U, 227U, 135U};
+constexpr EnumArray<uint8_t, MachineType> END_LEFT_PLUS_OFFSET = {{ 28U, 28U, 5U}};
+constexpr EnumArray<uint8_t, MachineType> END_RIGHT_MINUS_OFFSET = {{227U, 227U, 135U}};
 
 // The garter slop is needed to determine whether or not we have a garter carriage.
 // If we didn't have it, we'd decide which carriage we had when the first magnet passed the sensor.
 // For the garter carriage we need to see both magnets.
 constexpr uint8_t GARTER_SLOP = 2U;
 
-constexpr uint8_t START_OFFSET[NUM_MACHINES][NUM_DIRECTIONS][NUM_CARRIAGES] = {
+constexpr EnumArray<
+            EnumArray<
+              EnumArray<
+                uint8_t,
+                Carriage
+              >,
+              Direction
+            >,
+            MachineType
+          > START_OFFSET = {{
     // KH910
-    {
+    {{
         // K,   L,   G
-        {40U, 40U, 32U}, // Left
-        {16U, 16U, 56U} // Right
-    },
+        {{40U, 40U, 32U}}, // Left
+        {{16U, 16U, 56U}} // Right
+    }},
     // KH930
-    {
+    {{
         // K,   L,   G
-        {40U, 40U, 32U}, // Left
-        {16U, 16U, 56U} // Right
-    },
+        {{40U, 40U, 32U}}, // Left
+        {{16U, 16U, 56U}} // Right
+    }},
     // KH270
-    {
+    {{
         // K
-        {28U, 0U, 0U}, // Left: x % 12 == 4
-        {16U, 0U, 0U}   // Right: (x + 6) % 12 == 10
-    }};
+        {{28U, 0U, 0U}}, // Left: x % 12 == 4
+        {{16U, 0U, 0U}}   // Right: (x + 6) % 12 == 10
+    }}
+  }};
 
 // Should be calibrated to each device
 // Below filter minimum -> Lace carriage
 // Above filter maximum -> Knit carriage
 //                                               KH910 KH930 KH270
-constexpr uint16_t FILTER_L_MIN[NUM_MACHINES] = { 200U, 200U, 200U};
-constexpr uint16_t FILTER_L_MAX[NUM_MACHINES] = { 600U, 600U, 600U};
-constexpr uint16_t FILTER_R_MIN[NUM_MACHINES] = { 200U,   0U,   0U};
-constexpr uint16_t FILTER_R_MAX[NUM_MACHINES] = {1023U, 600U, 600U};
+constexpr EnumArray<uint16_t, MachineType> FILTER_L_MIN = {{ 200U, 200U, 200U}};
+constexpr EnumArray<uint16_t, MachineType> FILTER_L_MAX = {{ 600U, 600U, 600U}};
+constexpr EnumArray<uint16_t, MachineType> FILTER_R_MIN = {{ 200U,   0U,   0U}};
+constexpr EnumArray<uint16_t, MachineType> FILTER_R_MAX = {{1023U, 600U, 600U}};
 
 constexpr uint16_t SOLENOIDS_BITMASK = 0xFFFFU;
 

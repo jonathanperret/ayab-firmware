@@ -269,8 +269,7 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
  * \todo sl: Assert size? Handle error?
  */
 void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
-  auto machineType = static_cast<uint8_t>(GlobalKnitter::getMachineType());
-  uint8_t lenLineBuffer = LINE_BUFFER_LEN[machineType];
+  uint8_t lenLineBuffer = LINE_BUFFER_LEN[GlobalKnitter::getMachineType()];
   if (size < lenLineBuffer + 5U) {
     // message is too short
     // TODO(sl): handle error?

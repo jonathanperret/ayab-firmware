@@ -26,14 +26,15 @@
 
 #include "board.h"
 #include "encoders.h"
+#include "enumarray.h"
 #include <Arduino.h>
 #include <Adafruit_MCP23008.h>
 #include <Wire.h>
 
 // Different machines have a different number of solenoids.
 //                                              {910, 930, 270}
-constexpr uint8_t SOLENOIDS_NUM[NUM_MACHINES] = {16U, 16U, 12U};
-constexpr uint8_t HALF_SOLENOIDS_NUM[NUM_MACHINES] = {8U, 8U, 6U};
+const EnumArray<uint8_t, MachineType> SOLENOIDS_NUM = {{16U, 16U, 12U}};
+const EnumArray<uint8_t, MachineType> HALF_SOLENOIDS_NUM = {{8U, 8U, 6U}};
 constexpr uint8_t SOLENOIDS_I2C_ADDRESS_MASK = 0x20U;
 constexpr uint8_t SOLENOID_BUFFER_SIZE = 16U;
 
