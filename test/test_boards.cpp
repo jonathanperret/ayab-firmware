@@ -38,7 +38,7 @@ Beeper *beeper = new Beeper();
 Com *com = new Com();
 Encoders *encoders = new Encoders();
 Solenoids *solenoids = new Solenoids();
-Tester *tester = new Tester();
+Tester *tester = new Tester(com);
 
 FsmMock *fsm = new FsmMock();
 KnitterMock *knitter = new KnitterMock();

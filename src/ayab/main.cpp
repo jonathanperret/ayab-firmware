@@ -42,7 +42,7 @@ Encoders _Encoders;
 Fsm _Fsm;
 Knitter _Knitter;
 Solenoids _Solenoids;
-Tester _Tester;
+Tester _Tester(&_Com);
 
 BeeperInterface    *GlobalBeeper::m_instance    = &_Beeper;
 ComInterface       *GlobalCom::m_instance       = &_Com;
