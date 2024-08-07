@@ -92,8 +92,8 @@ void Com::send_reqLine(const uint8_t lineNumber, Err_t error) const {
  */
 void Com::send_indState(Carriage_t carriage, uint8_t position,
                         Err_t error) const {
-  uint16_t leftHallValue = GlobalEncoders::getHallValue(Direction_t::Left);
-  uint16_t rightHallValue = GlobalEncoders::getHallValue(Direction_t::Right);
+  uint16_t leftHallValue = m_encoders->getHallValue(Direction_t::Left);
+  uint16_t rightHallValue = m_encoders->getHallValue(Direction_t::Right);
   // `payload` will be allocated on stack since length is compile-time constant
   uint8_t payload[INDSTATE_LEN] = {
       static_cast<uint8_t>(AYAB_API::indState),
@@ -105,7 +105,7 @@ void Com::send_indState(Carriage_t carriage, uint8_t position,
       lowByte(rightHallValue),
       static_cast<uint8_t>(carriage),
       position,
-      static_cast<uint8_t>(GlobalEncoders::getDirection()),
+      static_cast<uint8_t>(m_encoders->getDirection()),
   };
   send(payload, INDSTATE_LEN);
 }

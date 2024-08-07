@@ -35,8 +35,8 @@
 // global definitions
 // references everywhere else must use `extern`
 Beeper *beeper = new Beeper();
-Com *com = new Com(beeper);
 Encoders *encoders = new Encoders();
+Com *com = new Com(beeper, encoders);
 Solenoids *solenoids = new Solenoids();
 Tester *tester = new Tester(beeper, com);
 
@@ -44,7 +44,6 @@ FsmMock *fsm = new FsmMock();
 KnitterMock *knitter = new KnitterMock();
 
 // initialize static members
-EncodersInterface *GlobalEncoders::m_instance = encoders;
 SolenoidsInterface *GlobalSolenoids::m_instance = solenoids;
 TesterInterface *GlobalTester::m_instance = tester;
 

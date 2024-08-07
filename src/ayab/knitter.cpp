@@ -106,12 +106,12 @@ void Knitter::setUpInterrupt() {
  */
 void Knitter::isr() {
   // update machine state data
-  GlobalEncoders::encA_interrupt();
-  m_position = GlobalEncoders::getPosition();
-  m_direction = GlobalEncoders::getDirection();
-  m_hallActive = GlobalEncoders::getHallActive();
-  m_beltShift = GlobalEncoders::getBeltShift();
-  m_carriage = GlobalEncoders::getCarriage();
+  m_encoders->encA_interrupt();
+  m_position = m_encoders->getPosition();
+  m_direction = m_encoders->getDirection();
+  m_hallActive = m_encoders->getHallActive();
+  m_beltShift = m_encoders->getBeltShift();
+  m_carriage = m_encoders->getCarriage();
 }
 
 /*!
@@ -128,7 +128,7 @@ Err_t Knitter::initMachine(Machine_t machineType) {
   }
   m_machineType = machineType;
 
-  GlobalEncoders::init(machineType);
+  m_encoders->init(machineType);
   GlobalFsm::setState(OpState::init);
 
   // Now that we have enough start state, we can set up interrupts

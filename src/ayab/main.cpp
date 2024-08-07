@@ -37,14 +37,13 @@
 // that implements a public interface. When testing, a pointer
 // to an instance of a mock class can be substituted.
 Beeper _Beeper;
-Com _Com(&_Beeper);
 Encoders _Encoders;
+Com _Com(&_Beeper, &_Encoders);
 Fsm _Fsm(&_Com);
-Knitter _Knitter(&_Beeper, &_Com);
+Knitter _Knitter(&_Beeper, &_Com, &_Encoders);
 Solenoids _Solenoids;
 Tester _Tester(&_Beeper, &_Com);
 
-EncodersInterface  *GlobalEncoders::m_instance  = &_Encoders;
 FsmInterface       *GlobalFsm::m_instance       = &_Fsm;
 KnitterInterface   *GlobalKnitter::m_instance   = &_Knitter;
 SolenoidsInterface *GlobalSolenoids::m_instance = &_Solenoids;

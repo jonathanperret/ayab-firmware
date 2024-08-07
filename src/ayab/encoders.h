@@ -144,31 +144,6 @@ public:
   virtual uint8_t getPosition() = 0;
 };
 
-// Container class for the static methods for the encoders.
-// Dependency injection is enabled using a pointer to a global instance of
-// either `Encoders` or `EncodersMock`, both of which classes implement the
-// pure virtual methods of `EncodersInterface`.
-
-class GlobalEncoders final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalEncoders() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static EncodersInterface *m_instance;
-
-  static void encA_interrupt();
-  static uint16_t getHallValue(Direction_t pSensor);
-  static void init(Machine_t machineType);
-  static Machine_t getMachineType();
-  static BeltShift_t getBeltShift();
-  static Carriage_t getCarriage();
-  static Direction_t getDirection();
-  static Direction_t getHallActive();
-  static uint8_t getPosition();
-};
-
 class Encoders : public EncodersInterface {
 public:
   Encoders() = default;

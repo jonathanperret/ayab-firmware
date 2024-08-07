@@ -38,7 +38,6 @@ set(COMMON_SOURCES
     ${PROJECT_SOURCE_DIR}/test_boards.cpp
 
     ${SOURCE_DIRECTORY}/encoders.cpp
-    ${SOURCE_DIRECTORY}/global_encoders.cpp
     ${PROJECT_SOURCE_DIR}/test_encoders.cpp
 
     ${SOURCE_DIRECTORY}/solenoids.cpp
@@ -127,7 +126,6 @@ add_executable(${PROJECT_NAME}_knitter
 
     ${PROJECT_SOURCE_DIR}/mocks/com_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_encoders.cpp
     ${PROJECT_SOURCE_DIR}/mocks/encoders_mock.cpp
 
     ${SOURCE_DIRECTORY}/global_solenoids.cpp

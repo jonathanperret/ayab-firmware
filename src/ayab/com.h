@@ -98,7 +98,8 @@ class BeeperInterface;
 
 class Com : public ComInterface {
 public:
-  Com(BeeperInterface *beeper): m_packetSerial(*this), m_beeper(beeper) {}
+  Com(BeeperInterface *beeper, EncodersInterface *encoders):
+    m_packetSerial(*this), m_beeper(beeper), m_encoders(encoders) {}
 
   void init() final;
   void update() final;
@@ -122,7 +123,11 @@ private:
   };
 
   WrappedPacketSerial m_packetSerial;
+  
+  // collaborators
   BeeperInterface *m_beeper;
+  EncodersInterface *m_encoders;
+
   uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = {0};
   uint8_t msgBuffer[MAX_MSG_BUFFER_LEN] = {0};
 
