@@ -84,7 +84,7 @@ void Com::sendMsg(AYAB_API_t id, const char *msg) {
 void Com::send_reqLine(const uint8_t lineNumber, Err_t error) const {
   // `payload` will be allocated on stack since length is compile-time constant
   uint8_t payload[REQLINE_LEN] = {static_cast<uint8_t>(AYAB_API::reqLine), lineNumber, static_cast<uint8_t>(error)};
-  send(static_cast<uint8_t *>(payload), REQLINE_LEN);
+  send(payload, REQLINE_LEN);
 }
 
 /*!
@@ -110,7 +110,7 @@ void Com::send_indState(Carriage_t carriage, uint8_t position,
       position,
       static_cast<uint8_t>(GlobalEncoders::getDirection()),
   };
-  send(static_cast<uint8_t *>(payload), INDSTATE_LEN);
+  send(payload, INDSTATE_LEN);
 }
 
 /*!
@@ -124,68 +124,68 @@ void Com::onPacketReceived(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  switch (buffer[0]) {
-  case static_cast<uint8_t>(AYAB_API::reqInit):
+  switch (static_cast<AYAB_API>(buffer[0])) {
+  case AYAB_API::reqInit:
     h_reqInit(buffer, size);
     break;
 
-  case static_cast<uint8_t>(AYAB_API::reqStart):
+  case AYAB_API::reqStart:
     h_reqStart(buffer, size);
     break;
 
-  case static_cast<uint8_t>(AYAB_API::cnfLine):
+  case AYAB_API::cnfLine:
     h_cnfLine(buffer, size);
     break;
 
-  case static_cast<uint8_t>(AYAB_API::reqInfo):
+  case AYAB_API::reqInfo:
     h_reqInfo();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::reqTest):
+  case AYAB_API::reqTest:
     h_reqTest();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::helpCmd):
+  case AYAB_API::helpCmd:
     GlobalTester::helpCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::sendCmd):
+  case AYAB_API::sendCmd:
     GlobalTester::sendCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::beepCmd):
+  case AYAB_API::beepCmd:
     GlobalTester::beepCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::setSingleCmd):
+  case AYAB_API::setSingleCmd:
     GlobalTester::setSingleCmd(buffer, size);
     break;
 
-  case static_cast<uint8_t>(AYAB_API::setAllCmd):
+  case AYAB_API::setAllCmd:
     GlobalTester::setAllCmd(buffer, size);
     break;
 
-  case static_cast<uint8_t>(AYAB_API::readEOLsensorsCmd):
+  case AYAB_API::readEOLsensorsCmd:
     GlobalTester::readEOLsensorsCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::readEncodersCmd):
+  case AYAB_API::readEncodersCmd:
     GlobalTester::readEncodersCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::autoReadCmd):
+  case AYAB_API::autoReadCmd:
     GlobalTester::autoReadCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::autoTestCmd):
+  case AYAB_API::autoTestCmd:
     GlobalTester::autoTestCmd();
     break;
 
-  case static_cast<uint8_t>(AYAB_API::stopCmd):
+  case AYAB_API::stopCmd:
     GlobalTester::stopCmd();
     break;
 
-   case static_cast<uint8_t>(AYAB_API::quitCmd):
+   case AYAB_API::quitCmd:
     GlobalTester::quitCmd();
     break;
 
