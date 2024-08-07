@@ -45,7 +45,6 @@ Solenoids _Solenoids;
 Tester _Tester(&_Com);
 
 BeeperInterface    *GlobalBeeper::m_instance    = &_Beeper;
-ComInterface       *GlobalCom::m_instance       = &_Com;
 EncodersInterface  *GlobalEncoders::m_instance  = &_Encoders;
 FsmInterface       *GlobalFsm::m_instance       = &_Fsm;
 KnitterInterface   *GlobalKnitter::m_instance   = &_Knitter;

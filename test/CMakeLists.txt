@@ -50,7 +50,6 @@ set(COMMON_SOURCES
     ${PROJECT_SOURCE_DIR}/test_beeper.cpp
 
     ${SOURCE_DIRECTORY}/com.cpp
-    ${SOURCE_DIRECTORY}/global_com.cpp
     ${PROJECT_SOURCE_DIR}/test_com.cpp
 
     ${SOURCE_DIRECTORY}/tester.cpp
@@ -128,7 +127,6 @@ add_executable(${PROJECT_NAME}_knitter
     ${SOURCE_DIRECTORY}/global_beeper.cpp
     ${PROJECT_SOURCE_DIR}/mocks/beeper_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_com.cpp
     ${PROJECT_SOURCE_DIR}/mocks/com_mock.cpp
 
     ${SOURCE_DIRECTORY}/global_encoders.cpp

@@ -94,33 +94,6 @@ public:
   virtual void onPacketReceived(const uint8_t *buffer, size_t size) = 0;
 };
 
-// Container class for the static methods that implement the serial API.
-// Dependency injection is enabled using a pointer to a global instance of
-// either `Com` or `ComMock`, both of which classes implement the
-// pure virtual methods of `ComInterface`.
-
-class GlobalCom final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalCom() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static ComInterface *m_instance;
-
-  static void init();
-  static void update();
-  static void send(uint8_t *payload, size_t length);
-  static void sendMsg(AYAB_API_t id, const char *msg);
-  static void send_reqLine(const uint8_t lineNumber, Err_t error = ErrorCode::success);
-  static void send_indState(Carriage_t carriage, uint8_t position,
-                             Err_t error = ErrorCode::success);
-  static void onPacketReceived(const uint8_t *buffer, size_t size);
-
-private:
-  static SLIPPacketSerial m_packetSerial;
-};
-
 class Com : public ComInterface {
 public:
   Com(): m_packetSerial(*this) {}
