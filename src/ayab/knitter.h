@@ -35,7 +35,7 @@ public:
   virtual ~KnitterInterface() = default;
 
   // any methods that need to be mocked should go here
-  virtual void init(ComInterface *com) = 0;
+  virtual void init() = 0;
   virtual void setUpInterrupt() = 0;
   virtual void isr() = 0;
   virtual Err_t startKnitting(uint8_t startNeedle,
@@ -68,7 +68,7 @@ public:
   // pointer to global instance whose methods are implemented
   static KnitterInterface *m_instance;
 
-  static void init(ComInterface *com);
+  static void init();
   static void setUpInterrupt();
 #ifndef AYAB_TESTS
   static void isr();
@@ -90,9 +90,9 @@ public:
 
 class Knitter : public KnitterInterface {
 public:
-  Knitter(BeeperInterface *beeper): m_beeper(beeper) { }
+  Knitter(BeeperInterface *beeper, ComInterface *com): m_beeper(beeper), m_com(com) { }
 
-  void init(ComInterface *com) final;
+  void init() final;
   void setUpInterrupt() final;
   void isr() final;
   Err_t startKnitting(uint8_t startNeedle,

@@ -34,11 +34,11 @@
 
 // global definitions
 // references everywhere else must use `extern`
-Fsm *fsm = new Fsm();
 
 BeeperMock *beeper = new BeeperMock();
-Knitter *knitter = new Knitter(beeper);
 ComMock *com = new ComMock();
+Fsm *fsm = new Fsm(com);
+Knitter *knitter = new Knitter(beeper, com);
 EncodersMock *encoders = new EncodersMock();
 SolenoidsMock *solenoids = new SolenoidsMock();
 TesterMock *tester = new TesterMock();

@@ -40,8 +40,7 @@
 /*!
  * \brief Initialize Finite State Machine.
  */
-void Fsm::init(ComInterface *com) {
-  m_com = com;
+void Fsm::init() {
   m_currentState = OpState::wait_for_machine;
   m_nextState = OpState::wait_for_machine;
   m_flash = false;
@@ -146,7 +145,7 @@ void Fsm::state_test() const {
   GlobalTester::loop();
   if (m_nextState == OpState::init) {
     // quit test
-    GlobalKnitter::init(m_com);
+    GlobalKnitter::init();
   }
 }
 
@@ -157,7 +156,7 @@ void Fsm::state_error() {
   if (m_nextState == OpState::init) {
     // exit error state
     digitalWrite(LED_PIN_B, LOW); // yellow LED off
-    GlobalKnitter::init(m_com);
+    GlobalKnitter::init();
     return;
   }
   // every 500ms

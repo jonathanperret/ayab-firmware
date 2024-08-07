@@ -40,9 +40,9 @@ void releaseFsmMock() {
   }
 }
 
-void Fsm::init(ComInterface *com) {
+void Fsm::init() {
   assert(gFsmMock != nullptr);
-  gFsmMock->init(com);
+  gFsmMock->init();
 }
 
 OpState_t Fsm::getState() {

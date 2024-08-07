@@ -87,7 +87,7 @@ public:
   virtual ~FsmInterface() = default;
 
   // any methods that need to be mocked should go here
-  virtual void init(ComInterface *com) = 0;
+  virtual void init() = 0;
   virtual OpState_t getState() = 0;
   virtual void setState(OpState_t state) = 0;
   virtual void dispatch() = 0;
@@ -108,7 +108,7 @@ public:
   // pointer to global instance whose methods are implemented
   static FsmInterface *m_instance;
 
-  static void init(ComInterface *);
+  static void init();
   static OpState_t getState();
   static void setState(OpState_t state);
   static void dispatch();
@@ -116,7 +116,8 @@ public:
 
 class Fsm : public FsmInterface {
 public:
-  void init(ComInterface *) final;
+  Fsm(ComInterface *com): m_com(com) { }
+  void init() final;
   OpState_t getState() final;
   void setState(OpState_t state) final;
   void dispatch() final;

@@ -45,9 +45,7 @@ constexpr uint16_t UINT16_MAX = 0xFFFFU;
  *
  * Initialize the solenoids as well as pins and interrupts.
  */
-void Knitter::init(ComInterface *com) {
-  m_com = com;
-  
+void Knitter::init() {
   pinMode(ENC_PIN_A, INPUT);
   pinMode(ENC_PIN_B, INPUT);
   pinMode(ENC_PIN_C, INPUT);

@@ -29,7 +29,7 @@
 
 class FsmMock : public FsmInterface {
 public:
-  MOCK_METHOD1(init, void(ComInterface* com));
+  MOCK_METHOD0(init, void());
   MOCK_METHOD0(getState, OpState_t());
   MOCK_METHOD1(setState, void(OpState_t state));
   MOCK_METHOD0(dispatch, void());

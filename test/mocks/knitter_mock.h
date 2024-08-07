@@ -29,7 +29,7 @@
 
 class KnitterMock : public KnitterInterface {
 public:
-  MOCK_METHOD1(init, void(ComInterface *com));
+  MOCK_METHOD0(init, void());
   MOCK_METHOD0(setUpInterrupt, void());
   MOCK_METHOD0(isr, void());
   MOCK_METHOD4(startKnitting, Err_t(uint8_t startNeedle,

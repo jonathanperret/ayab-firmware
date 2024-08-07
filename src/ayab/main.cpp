@@ -39,8 +39,8 @@
 Beeper _Beeper;
 Com _Com(&_Beeper);
 Encoders _Encoders;
-Fsm _Fsm;
-Knitter _Knitter(&_Beeper);
+Fsm _Fsm(&_Com);
+Knitter _Knitter(&_Beeper, &_Com);
 Solenoids _Solenoids;
 Tester _Tester(&_Beeper, &_Com);
 
@@ -96,8 +96,8 @@ void setup() {
 
   _Beeper.init(false);
   _Com.init();
-  GlobalFsm::init(&_Com);
-  GlobalKnitter::init(&_Com);
+  _Fsm.init();
+  _Knitter.init();
   GlobalSolenoids::init();
 }
 

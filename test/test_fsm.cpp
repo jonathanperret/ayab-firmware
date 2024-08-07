@@ -76,7 +76,7 @@ protected:
 
     // start in state `OpState::init`
     EXPECT_CALL(*arduinoMock, millis);
-    fsm->init(com);
+    fsm->init();
     // expected_isr(NoDirection, NoDirection);
     // EXPECT_CALL(*arduinoMock, digitalWrite(LED_PIN_A, LOW));
     // fsm->setState(OpState::init);
@@ -84,7 +84,7 @@ protected:
     // fsm->dispatch();
     // ASSERT_TRUE(fsm->getState() == OpState::init);
     expect_knitter_init();
-    knitter->init(com);
+    knitter->init();
     knitter->setMachineType(Machine_t::Kh910);
     expected_isr(Direction_t::NoDirection, Direction_t::NoDirection, 0);
   }

@@ -24,8 +24,8 @@
 
 // static member functions
 
-void GlobalFsm::init(ComInterface *com) {
-  m_instance->init(com);
+void GlobalFsm::init() {
+  m_instance->init();
 }
 
 OpState_t GlobalFsm::getState() {

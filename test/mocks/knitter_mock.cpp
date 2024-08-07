@@ -39,9 +39,9 @@ void releaseKnitterMock() {
   }
 }
 
-void Knitter::init(ComInterface *com) {
+void Knitter::init() {
   assert(gKnitterMock != nullptr);
-  gKnitterMock->init(com);
+  gKnitterMock->init();
 }
 
 void Knitter::setUpInterrupt() {

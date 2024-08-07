@@ -72,9 +72,9 @@ protected:
     // start in state `OpState::init`
     expected_isr(Direction_t::NoDirection, Direction_t::NoDirection);
     EXPECT_CALL(*arduinoMock, millis);
-    fsm->init(com);
+    fsm->init();
     expect_knitter_init();
-    knitter->init(com);
+    knitter->init();
   }
 
   void TearDown() override {
