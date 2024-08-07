@@ -126,72 +126,55 @@ void Com::onPacketReceived(const uint8_t *buffer, size_t size) {
 
   switch (static_cast<AYAB_API>(buffer[0])) {
   case AYAB_API::reqInit:
-    h_reqInit(buffer, size);
-    break;
+    return h_reqInit(buffer, size);
 
   case AYAB_API::reqStart:
-    h_reqStart(buffer, size);
-    break;
+    return h_reqStart(buffer, size);
 
   case AYAB_API::cnfLine:
-    h_cnfLine(buffer, size);
-    break;
+    return h_cnfLine(buffer, size);
 
   case AYAB_API::reqInfo:
-    h_reqInfo();
-    break;
+    return h_reqInfo();
 
   case AYAB_API::reqTest:
-    h_reqTest();
-    break;
+    return h_reqTest();
 
   case AYAB_API::helpCmd:
-    GlobalTester::helpCmd();
-    break;
+    return GlobalTester::helpCmd();
 
   case AYAB_API::sendCmd:
-    GlobalTester::sendCmd();
-    break;
+    return GlobalTester::sendCmd();
 
   case AYAB_API::beepCmd:
-    GlobalTester::beepCmd();
-    break;
+    return GlobalTester::beepCmd();
 
   case AYAB_API::setSingleCmd:
-    GlobalTester::setSingleCmd(buffer, size);
-    break;
+    return GlobalTester::setSingleCmd(buffer, size);
 
   case AYAB_API::setAllCmd:
-    GlobalTester::setAllCmd(buffer, size);
-    break;
+    return GlobalTester::setAllCmd(buffer, size);
 
   case AYAB_API::readEOLsensorsCmd:
-    GlobalTester::readEOLsensorsCmd();
-    break;
+    return GlobalTester::readEOLsensorsCmd();
 
   case AYAB_API::readEncodersCmd:
-    GlobalTester::readEncodersCmd();
-    break;
+    return GlobalTester::readEncodersCmd();
 
   case AYAB_API::autoReadCmd:
-    GlobalTester::autoReadCmd();
-    break;
+    return GlobalTester::autoReadCmd();
 
   case AYAB_API::autoTestCmd:
-    GlobalTester::autoTestCmd();
-    break;
+    return GlobalTester::autoTestCmd();
 
   case AYAB_API::stopCmd:
-    GlobalTester::stopCmd();
-    break;
+    return GlobalTester::stopCmd();
 
    case AYAB_API::quitCmd:
-    GlobalTester::quitCmd();
-    break;
+    return GlobalTester::quitCmd();
 
   default:
-    h_unrecognized();
-    break;
+    return h_unrecognized();
   }
 }
 
