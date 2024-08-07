@@ -57,7 +57,7 @@ void Knitter::init() {
   pinMode(DBG_BTN_PIN, INPUT);
 #endif
 
-  GlobalSolenoids::init();
+  m_solenoids->init();
 
   // explicitly initialize members
 
@@ -222,7 +222,7 @@ bool Knitter::isReady() {
   if (passedLeft || passedRight) {
 
 #endif // DBG_NOMACHINE
-    GlobalSolenoids::setSolenoids(SOLENOIDS_BITMASK);
+    m_solenoids->setSolenoids(SOLENOIDS_BITMASK);
     indState(ErrorCode::success);
     return true; // move to `OpState::ready`
   }
@@ -280,7 +280,7 @@ void Knitter::knit() {
   bool pixelValue =
       bitRead(m_lineBuffer[currentByte], m_pixelToSet & 0x07);
   // write Pixel state to the appropriate needle
-  GlobalSolenoids::setSolenoid(m_solenoidToSet, pixelValue);
+  m_solenoids->setSolenoid(m_solenoidToSet, pixelValue);
 
   if ((m_pixelToSet >= m_startNeedle) && (m_pixelToSet <= m_stopNeedle)) {
     m_workedOnLine = true;
@@ -454,7 +454,7 @@ void Knitter::stopKnitting() const {
   m_beeper->endWork();
   GlobalFsm::setState(OpState::init);
 
-  GlobalSolenoids::setSolenoids(SOLENOIDS_BITMASK);
+  m_solenoids->setSolenoids(SOLENOIDS_BITMASK);
   m_beeper->finishedLine();
 
   // detaching ENC_PIN_A, Interrupt #0

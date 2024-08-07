@@ -37,17 +37,16 @@
 
 BeeperMock *beeper = new BeeperMock();
 EncodersMock *encoders = new EncodersMock();
+SolenoidsMock *solenoids = new SolenoidsMock();
 ComMock *com = new ComMock();
 Fsm *fsm = new Fsm(com);
-Knitter *knitter = new Knitter(beeper, com, encoders);
-SolenoidsMock *solenoids = new SolenoidsMock();
+Knitter *knitter = new Knitter(beeper, encoders, solenoids, com);
 TesterMock *tester = new TesterMock();
 
 // instantiate singleton classes with mock objects
 FsmInterface *GlobalFsm::m_instance = fsm;
 KnitterInterface *GlobalKnitter::m_instance = knitter;
 
-SolenoidsInterface *GlobalSolenoids::m_instance = solenoids;
 TesterInterface *GlobalTester::m_instance = tester;
 
 int main(int argc, char *argv[]) {

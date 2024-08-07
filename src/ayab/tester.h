@@ -27,7 +27,6 @@
 
 #include "beeper.h"
 #include "com.h"
-#include "encoders.h"
 
 constexpr uint8_t BUFFER_LEN = 40;
 constexpr unsigned int TEST_LOOP_DELAY = 500; // ms
@@ -89,10 +88,12 @@ public:
 };
 
 class BeeperInterface;
+class SolenoidsInterface;
 
 class Tester : public TesterInterface {
 public:
-  Tester(BeeperInterface *beeper, ComInterface *com): m_beeper(beeper), m_com(com) { }
+  Tester(BeeperInterface *beeper, SolenoidsInterface *solenoids, ComInterface *com):
+    m_beeper(beeper), m_solenoids(solenoids), m_com(com) { }
   Err_t startTest(Machine_t machineType) final;
   void loop() final;
   void helpCmd() final;
@@ -122,6 +123,7 @@ private:
 
   // collaborators
   BeeperInterface *m_beeper;
+  SolenoidsInterface *m_solenoids;
   ComInterface *m_com;
 
   bool m_autoReadOn = false;

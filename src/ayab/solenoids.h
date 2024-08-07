@@ -48,25 +48,6 @@ public:
   virtual void setSolenoids(uint16_t state) = 0;
 };
 
-// Container class for the static methods that control the solenoids.
-// Dependency injection is enabled using a pointer to a global instance of
-// either `Solenoids` or `SolenoidsMock`, both of which classes implement
-// the pure virtual methods of `SolenoidsInterface`.
-
-class GlobalSolenoids final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalSolenoids() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static SolenoidsInterface *m_instance;
-
-  static void init();
-  static void setSolenoid(uint8_t solenoid, bool state);
-  static void setSolenoids(uint16_t state);
-};
-
 class Solenoids : public SolenoidsInterface {
 #ifdef AYAB_TESTS
   FRIEND_TEST(SolenoidsTest, test_init);

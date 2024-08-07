@@ -91,7 +91,7 @@ void Tester::setSingleCmd(const uint8_t *buffer, size_t size) {
     m_com->sendMsg(AYAB_API::testRes, buf);
     return;
   }
-  GlobalSolenoids::setSolenoid(solenoidNumber, solenoidState);
+  m_solenoids->setSolenoid(solenoidNumber, solenoidState);
 }
 
 /*!
@@ -106,7 +106,7 @@ void Tester::setAllCmd(const uint8_t *buffer, size_t size) {
     return;
   }
   uint16_t solenoidState = (buffer[1] << 8) + buffer[2];
-  GlobalSolenoids::setSolenoids(solenoidState);
+  m_solenoids->setSolenoids(solenoidState);
 }
 
 /*!
@@ -279,7 +279,7 @@ void Tester::autoTestEven() const {
   m_com->sendMsg(AYAB_API::testRes, "Set even solenoids\n");
   digitalWrite(LED_PIN_A, HIGH);
   digitalWrite(LED_PIN_B, HIGH);
-  GlobalSolenoids::setSolenoids(0xAAAA);
+  m_solenoids->setSolenoids(0xAAAA);
 }
 
 /*!
@@ -289,7 +289,7 @@ void Tester::autoTestOdd() const {
   m_com->sendMsg(AYAB_API::testRes, "Set odd solenoids\n");
   digitalWrite(LED_PIN_A, LOW);
   digitalWrite(LED_PIN_B, LOW);
-  GlobalSolenoids::setSolenoids(0x5555);
+  m_solenoids->setSolenoids(0x5555);
 }
 
 /*!

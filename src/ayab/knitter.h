@@ -90,8 +90,8 @@ public:
 
 class Knitter : public KnitterInterface {
 public:
-  Knitter(BeeperInterface *beeper, ComInterface *com, EncodersInterface *encoders):
-    m_beeper(beeper), m_com(com), m_encoders(encoders) { }
+  Knitter(BeeperInterface *beeper, EncodersInterface *encoders, SolenoidsInterface *solenoids, ComInterface *com):
+    m_beeper(beeper), m_encoders(encoders), m_solenoids(solenoids), m_com(com) { }
 
   void init() final;
   void setUpInterrupt() final;
@@ -117,8 +117,9 @@ private:
 
   // collaborators
   BeeperInterface *m_beeper;
-  ComInterface *m_com;
   EncodersInterface *m_encoders;
+  SolenoidsInterface *m_solenoids;
+  ComInterface *m_com;
 
   // job parameters
   Machine_t m_machineType;

@@ -41,7 +41,6 @@ set(COMMON_SOURCES
     ${PROJECT_SOURCE_DIR}/test_encoders.cpp
 
     ${SOURCE_DIRECTORY}/solenoids.cpp
-    ${SOURCE_DIRECTORY}/global_solenoids.cpp
     ${PROJECT_SOURCE_DIR}/test_solenoids.cpp
 
     ${SOURCE_DIRECTORY}/beeper.cpp
@@ -128,7 +127,6 @@ add_executable(${PROJECT_NAME}_knitter
 
     ${PROJECT_SOURCE_DIR}/mocks/encoders_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_solenoids.cpp
     ${PROJECT_SOURCE_DIR}/mocks/solenoids_mock.cpp
 
     ${SOURCE_DIRECTORY}/global_tester.cpp
