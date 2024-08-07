@@ -80,6 +80,10 @@ using Err_t = enum ErrorCode;
 
 constexpr unsigned int FLASH_DELAY = 500; // ms
 
+class ComInterface;
+class KnitterInterface;
+class TesterInterface;
+
 class FsmInterface {
 public:
   virtual ~FsmInterface() = default;
@@ -89,27 +93,6 @@ public:
   virtual OpState_t getState() = 0;
   virtual void setState(OpState_t state) = 0;
   virtual void dispatch() = 0;
-};
-
-// Singleton container class for static methods.
-// Dependency injection is enabled using a pointer
-// to a global instance of either `Knitter` or `KnitterMock`
-// both of which classes implement the pure virtual methods
-// of the `KnitterInterface` class.
-
-class GlobalFsm final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalFsm() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static FsmInterface *m_instance;
-
-  static void init();
-  static OpState_t getState();
-  static void setState(OpState_t state);
-  static void dispatch();
 };
 
 class Fsm : public FsmInterface {
@@ -138,5 +121,7 @@ private:
   bool m_flash;
   unsigned long m_flashTime;
 };
+
+extern FsmInterface *g_fsm;
 
 #endif // FSM_H_

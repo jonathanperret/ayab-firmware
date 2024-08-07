@@ -99,7 +99,7 @@ void Fsm::dispatch() {
     break;
   }
   m_currentState = m_nextState;
-  GlobalCom::update();
+  g_com->update();
 }
 // GCOVR_EXCL_STOP
 
@@ -117,7 +117,7 @@ void Fsm::state_wait_for_machine() const {
  */
 void Fsm::state_init() {
   digitalWrite(LED_PIN_A, LOW); // green LED off
-  if (GlobalKnitter::isReady()) {
+  if (g_knitter->isReady()) {
     setState(OpState::ready);
   }
 }
@@ -134,18 +134,18 @@ void Fsm::state_ready() const {
  */
 void Fsm::state_knit() const {
   digitalWrite(LED_PIN_A, HIGH); // green LED on
-  GlobalKnitter::knit();
+  g_knitter->knit();
 }
 
 /*!
  * \brief Action of machine in state `OpState::test`.
  */
 void Fsm::state_test() const {
-  GlobalKnitter::encodePosition();
-  GlobalTester::loop();
+  g_knitter->encodePosition();
+  g_tester->loop();
   if (m_nextState == OpState::init) {
     // quit test
-    GlobalKnitter::init();
+    g_knitter->init();
   }
 }
 
@@ -156,7 +156,7 @@ void Fsm::state_error() {
   if (m_nextState == OpState::init) {
     // exit error state
     digitalWrite(LED_PIN_B, LOW); // yellow LED off
-    GlobalKnitter::init();
+    g_knitter->init();
     return;
   }
   // every 500ms
@@ -169,6 +169,6 @@ void Fsm::state_error() {
     m_flashTime = now;
 
     // send error message
-    GlobalKnitter::indState(m_error);
+    g_knitter->indState(m_error);
   }
 }

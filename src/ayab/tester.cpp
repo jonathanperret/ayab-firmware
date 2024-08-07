@@ -36,35 +36,35 @@
  * \brief Help command handler.
  */
 void Tester::helpCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "The following commands are available:\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "setSingle [0..15] [1/0]\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "setAll [0..FFFF]\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "readEOLsensors\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "readEncoders\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "beep\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "autoRead\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "autoTest\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "send\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "stop\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "quit\n");
-  GlobalCom::sendMsg(AYAB_API::testRes, "help\n");
+  g_com->sendMsg(AYAB_API::testRes, "The following commands are available:\n");
+  g_com->sendMsg(AYAB_API::testRes, "setSingle [0..15] [1/0]\n");
+  g_com->sendMsg(AYAB_API::testRes, "setAll [0..FFFF]\n");
+  g_com->sendMsg(AYAB_API::testRes, "readEOLsensors\n");
+  g_com->sendMsg(AYAB_API::testRes, "readEncoders\n");
+  g_com->sendMsg(AYAB_API::testRes, "beep\n");
+  g_com->sendMsg(AYAB_API::testRes, "autoRead\n");
+  g_com->sendMsg(AYAB_API::testRes, "autoTest\n");
+  g_com->sendMsg(AYAB_API::testRes, "send\n");
+  g_com->sendMsg(AYAB_API::testRes, "stop\n");
+  g_com->sendMsg(AYAB_API::testRes, "quit\n");
+  g_com->sendMsg(AYAB_API::testRes, "help\n");
 }
 
 /*!
  * \brief Send command handler.
  */
 void Tester::sendCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called send\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called send\n");
   uint8_t p[] = {0x31, 0x32, 0x33};
-  GlobalCom::send(p, 3);
-  GlobalCom::sendMsg(AYAB_API::testRes, "\n");
+  g_com->send(p, 3);
+  g_com->sendMsg(AYAB_API::testRes, "\n");
 }
 
 /*!
  * \brief Beep command handler.
  */
 void Tester::beepCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called beep\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called beep\n");
   beep();
 }
 
@@ -74,24 +74,24 @@ void Tester::beepCmd() {
  * \param size Number of bytes of data in the buffer.
  */
 void Tester::setSingleCmd(const uint8_t *buffer, size_t size) {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called setSingle\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called setSingle\n");
   if (size < 3U) {
-    GlobalCom::sendMsg(AYAB_API::testRes, "Error: invalid arguments\n");
+    g_com->sendMsg(AYAB_API::testRes, "Error: invalid arguments\n");
     return;
   }
   uint8_t solenoidNumber = buffer[1];
   if (solenoidNumber > 15) {
     snprintf(buf, BUFFER_LEN, "Error: invalid solenoid index %i\n", solenoidNumber);
-    GlobalCom::sendMsg(AYAB_API::testRes, buf);
+    g_com->sendMsg(AYAB_API::testRes, buf);
     return;
   }
   uint8_t solenoidState = buffer[2];
   if (solenoidState > 1) {
     snprintf(buf, BUFFER_LEN, "Error: invalid solenoid value %i\n", solenoidState);
-    GlobalCom::sendMsg(AYAB_API::testRes, buf);
+    g_com->sendMsg(AYAB_API::testRes, buf);
     return;
   }
-  GlobalSolenoids::setSolenoid(solenoidNumber, solenoidState);
+  g_solenoids->setSolenoid(solenoidNumber, solenoidState);
 }
 
 /*!
@@ -100,38 +100,38 @@ void Tester::setSingleCmd(const uint8_t *buffer, size_t size) {
  * \param size Number of bytes of data in the buffer.
  */
 void Tester::setAllCmd(const uint8_t *buffer, size_t size) {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called setAll\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called setAll\n");
   if (size < 3U) {
-    GlobalCom::sendMsg(AYAB_API::testRes, "Error: invalid arguments\n");
+    g_com->sendMsg(AYAB_API::testRes, "Error: invalid arguments\n");
     return;
   }
   uint16_t solenoidState = (buffer[1] << 8) + buffer[2];
-  GlobalSolenoids::setSolenoids(solenoidState);
+  g_solenoids->setSolenoids(solenoidState);
 }
 
 /*!
  * \brief Read EOL sensors command handler.
  */
 void Tester::readEOLsensorsCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called readEOLsensors\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called readEOLsensors\n");
   readEOLsensors();
-  GlobalCom::sendMsg(AYAB_API::testRes, "\n");
+  g_com->sendMsg(AYAB_API::testRes, "\n");
 }
 
 /*!
  * \brief Read encoders command handler.
  */
 void Tester::readEncodersCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called readEncoders\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called readEncoders\n");
   readEncoders();
-  GlobalCom::sendMsg(AYAB_API::testRes, "\n");
+  g_com->sendMsg(AYAB_API::testRes, "\n");
 }
 
 /*!
  * \brief Auto read command handler.
  */
 void Tester::autoReadCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called autoRead, send stop to quit\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called autoRead, send stop to quit\n");
   m_autoReadOn = true;
 }
 
@@ -139,7 +139,7 @@ void Tester::autoReadCmd() {
  * \brief Auto test command handler.
  */
 void Tester::autoTestCmd() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Called autoTest, send stop to quit\n");
+  g_com->sendMsg(AYAB_API::testRes, "Called autoTest, send stop to quit\n");
   m_autoTestOn = true;
 }
 
@@ -155,8 +155,8 @@ void Tester::stopCmd() {
  * \brief Quit command handler.
  */
 void Tester::quitCmd() {
-  GlobalFsm::setState(OpState::init);
-  GlobalKnitter::setUpInterrupt();
+  g_fsm->setState(OpState::init);
+  g_knitter->setUpInterrupt();
 }
 
 /*!
@@ -165,10 +165,10 @@ void Tester::quitCmd() {
  * \return Error code (0 = success, other values = error).
  */
 Err_t Tester::startTest(Machine_t machineType) {
-  OpState_t currentState = GlobalFsm::getState();
+  OpState_t currentState = g_fsm->getState();
   if (OpState::wait_for_machine == currentState || OpState::init == currentState || OpState::ready == currentState) {
-    GlobalFsm::setState(OpState::test);
-    GlobalKnitter::setMachineType(machineType);
+    g_fsm->setState(OpState::test);
+    g_knitter->setMachineType(machineType);
     setUp();
     return ErrorCode::success;
   }
@@ -186,14 +186,12 @@ void Tester::loop() {
   }
 }
 
-#ifndef AYAB_TESTS
 /*!
  * \brief Interrupt service routine for encoder A.
  */
 void Tester::encoderAChange() {
   beep();
 }
-#endif // AYAB_TESTS
 
 // Private member functions
 
@@ -202,13 +200,13 @@ void Tester::encoderAChange() {
  */
 void Tester::setUp() {
   // Print welcome message
-  GlobalCom::sendMsg(AYAB_API::testRes, "AYAB Hardware Test, ");
+  g_com->sendMsg(AYAB_API::testRes, "AYAB Hardware Test, ");
   snprintf(buf, BUFFER_LEN, "Firmware v%hhu", FW_VERSION_MAJ);
-  GlobalCom::sendMsg(AYAB_API::testRes, buf);
+  g_com->sendMsg(AYAB_API::testRes, buf);
   snprintf(buf, BUFFER_LEN, ".%hhu", FW_VERSION_MIN);
-  GlobalCom::sendMsg(AYAB_API::testRes, buf);
+  g_com->sendMsg(AYAB_API::testRes, buf);
   snprintf(buf, BUFFER_LEN, " API v%hhu\n\n", API_VERSION);
-  GlobalCom::sendMsg(AYAB_API::testRes, buf);
+  g_com->sendMsg(AYAB_API::testRes, buf);
   helpCmd();
 
   // attach interrupt for ENC_PIN_A(=2), interrupt #0
@@ -217,7 +215,8 @@ void Tester::setUp() {
   // Attaching ENC_PIN_A, Interrupt #0
   // This interrupt cannot be enabled until
   // the machine type has been validated.
-  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), GlobalTester::encoderAChange, RISING);
+  s_instance = this;
+  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), _encoderAChange, RISING);
 #endif // AYAB_TESTS
 
   m_autoReadOn = false;
@@ -230,22 +229,22 @@ void Tester::setUp() {
  * \brief Make a beep.
  */
 void Tester::beep() const {
-  GlobalBeeper::ready();
+  g_beeper->ready();
 }
 
 /*!
  * \brief Read the Hall sensors that determine which carriage is in use.
  */
 void Tester::readEncoders() const {
-  GlobalCom::sendMsg(AYAB_API::testRes, "  ENC_A: ");
+  g_com->sendMsg(AYAB_API::testRes, "  ENC_A: ");
   bool state = digitalRead(ENC_PIN_A);
-  GlobalCom::sendMsg(AYAB_API::testRes, state ? "HIGH" : "LOW");
-  GlobalCom::sendMsg(AYAB_API::testRes, "  ENC_B: ");
+  g_com->sendMsg(AYAB_API::testRes, state ? "HIGH" : "LOW");
+  g_com->sendMsg(AYAB_API::testRes, "  ENC_B: ");
   state = digitalRead(ENC_PIN_B);
-  GlobalCom::sendMsg(AYAB_API::testRes, state ? "HIGH" : "LOW");
-  GlobalCom::sendMsg(AYAB_API::testRes, "  ENC_C: ");
+  g_com->sendMsg(AYAB_API::testRes, state ? "HIGH" : "LOW");
+  g_com->sendMsg(AYAB_API::testRes, "  ENC_C: ");
   state = digitalRead(ENC_PIN_C);
-  GlobalCom::sendMsg(AYAB_API::testRes, state ? "HIGH" : "LOW");
+  g_com->sendMsg(AYAB_API::testRes, state ? "HIGH" : "LOW");
 }
 
 /*!
@@ -254,40 +253,40 @@ void Tester::readEncoders() const {
 void Tester::readEOLsensors() {
   auto hallSensor = static_cast<uint16_t>(analogRead(EOL_PIN_L));
   snprintf(buf, BUFFER_LEN, "  EOL_L: %hu", hallSensor);
-  GlobalCom::sendMsg(AYAB_API::testRes, buf);
+  g_com->sendMsg(AYAB_API::testRes, buf);
   hallSensor = static_cast<uint16_t>(analogRead(EOL_PIN_R));
   snprintf(buf, BUFFER_LEN, "  EOL_R: %hu", hallSensor);
-  GlobalCom::sendMsg(AYAB_API::testRes, buf);
+  g_com->sendMsg(AYAB_API::testRes, buf);
 }
 
 /*!
  * \brief Read both carriage sensors and End of Line sensors.
  */
 void Tester::autoRead() {
-  GlobalCom::sendMsg(AYAB_API::testRes, "\n");
+  g_com->sendMsg(AYAB_API::testRes, "\n");
   readEOLsensors();
   readEncoders();
-  GlobalCom::sendMsg(AYAB_API::testRes, "\n");
+  g_com->sendMsg(AYAB_API::testRes, "\n");
 }
 
 /*!
  * \brief Set even-numbered solenoids.
  */
 void Tester::autoTestEven() const {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Set even solenoids\n");
+  g_com->sendMsg(AYAB_API::testRes, "Set even solenoids\n");
   digitalWrite(LED_PIN_A, HIGH);
   digitalWrite(LED_PIN_B, HIGH);
-  GlobalSolenoids::setSolenoids(0xAAAA);
+  g_solenoids->setSolenoids(0xAAAA);
 }
 
 /*!
  * \brief Set odd-numbered solenoids.
  */
 void Tester::autoTestOdd() const {
-  GlobalCom::sendMsg(AYAB_API::testRes, "Set odd solenoids\n");
+  g_com->sendMsg(AYAB_API::testRes, "Set odd solenoids\n");
   digitalWrite(LED_PIN_A, LOW);
   digitalWrite(LED_PIN_B, LOW);
-  GlobalSolenoids::setSolenoids(0x5555);
+  g_solenoids->setSolenoids(0x5555);
 }
 
 /*!
@@ -305,4 +304,9 @@ void Tester::handleTimerEvent() {
     }
   }
   m_timerEventOdd = !m_timerEventOdd;
+}
+
+TesterInterface *Tester::s_instance;
+void Tester::_encoderAChange() {
+  s_instance->encoderAChange();
 }

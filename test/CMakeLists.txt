@@ -38,29 +38,22 @@ set(COMMON_SOURCES
     ${PROJECT_SOURCE_DIR}/test_boards.cpp
 
     ${SOURCE_DIRECTORY}/encoders.cpp
-    ${SOURCE_DIRECTORY}/global_encoders.cpp
     ${PROJECT_SOURCE_DIR}/test_encoders.cpp
 
     ${SOURCE_DIRECTORY}/solenoids.cpp
-    ${SOURCE_DIRECTORY}/global_solenoids.cpp
     ${PROJECT_SOURCE_DIR}/test_solenoids.cpp
 
     ${SOURCE_DIRECTORY}/beeper.cpp
-    ${SOURCE_DIRECTORY}/global_beeper.cpp
     ${PROJECT_SOURCE_DIR}/test_beeper.cpp
 
     ${SOURCE_DIRECTORY}/com.cpp
-    ${SOURCE_DIRECTORY}/global_com.cpp
     ${PROJECT_SOURCE_DIR}/test_com.cpp
 
     ${SOURCE_DIRECTORY}/tester.cpp
-    ${SOURCE_DIRECTORY}/global_tester.cpp
     ${PROJECT_SOURCE_DIR}/test_tester.cpp
 
-    ${SOURCE_DIRECTORY}/global_knitter.cpp
     ${PROJECT_SOURCE_DIR}/mocks/knitter_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_fsm.cpp
     ${PROJECT_SOURCE_DIR}/mocks/fsm_mock.cpp
     )
 set(COMMON_DEFINES
@@ -125,27 +118,20 @@ add_board(uno)
 add_executable(${PROJECT_NAME}_knitter
     ${PROJECT_SOURCE_DIR}/test_all.cpp
 
-    ${SOURCE_DIRECTORY}/global_beeper.cpp
     ${PROJECT_SOURCE_DIR}/mocks/beeper_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_com.cpp
     ${PROJECT_SOURCE_DIR}/mocks/com_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_encoders.cpp
     ${PROJECT_SOURCE_DIR}/mocks/encoders_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_solenoids.cpp
     ${PROJECT_SOURCE_DIR}/mocks/solenoids_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_tester.cpp
     ${PROJECT_SOURCE_DIR}/mocks/tester_mock.cpp
 
     ${SOURCE_DIRECTORY}/fsm.cpp
-    ${SOURCE_DIRECTORY}/global_fsm.cpp
     ${PROJECT_SOURCE_DIR}/test_fsm.cpp
 
     ${SOURCE_DIRECTORY}/knitter.cpp
-    ${SOURCE_DIRECTORY}/global_knitter.cpp
     ${PROJECT_SOURCE_DIR}/test_knitter.cpp
 )
 target_include_directories(${PROJECT_NAME}_knitter

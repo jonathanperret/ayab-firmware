@@ -57,7 +57,7 @@ void Knitter::init() {
   pinMode(DBG_BTN_PIN, INPUT);
 #endif
 
-  GlobalSolenoids::init();
+  g_solenoids->init();
 
   // explicitly initialize members
 
@@ -93,8 +93,14 @@ void Knitter::setUpInterrupt() {
   // Attaching ENC_PIN_A, Interrupt #0
   // This interrupt cannot be enabled until
   // the machine type has been validated.
-  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), GlobalKnitter::isr, CHANGE);
+  s_instance = this;
+  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), _isr, CHANGE);
 #endif // AYAB_TESTS
+}
+
+Knitter *Knitter::s_instance;
+void Knitter::_isr() {
+  s_instance->isr();
 }
 
 /*!
@@ -106,12 +112,12 @@ void Knitter::setUpInterrupt() {
  */
 void Knitter::isr() {
   // update machine state data
-  GlobalEncoders::encA_interrupt();
-  m_position = GlobalEncoders::getPosition();
-  m_direction = GlobalEncoders::getDirection();
-  m_hallActive = GlobalEncoders::getHallActive();
-  m_beltShift = GlobalEncoders::getBeltShift();
-  m_carriage = GlobalEncoders::getCarriage();
+  g_encoders->encA_interrupt();
+  m_position = g_encoders->getPosition();
+  m_direction = g_encoders->getDirection();
+  m_hallActive = g_encoders->getHallActive();
+  m_beltShift = g_encoders->getBeltShift();
+  m_carriage = g_encoders->getCarriage();
 }
 
 /*!
@@ -120,7 +126,7 @@ void Knitter::isr() {
  * \return Error code (0 = success, other values = error).
  */
 Err_t Knitter::initMachine(Machine_t machineType) {
-  if (GlobalFsm::getState() != OpState::wait_for_machine) {
+  if (g_fsm->getState() != OpState::wait_for_machine) {
     return ErrorCode::wrong_machine_state;
   }
   if (machineType == Machine_t::NoMachine) {
@@ -128,8 +134,8 @@ Err_t Knitter::initMachine(Machine_t machineType) {
   }
   m_machineType = machineType;
 
-  GlobalEncoders::init(machineType);
-  GlobalFsm::setState(OpState::init);
+  g_encoders->init(machineType);
+  g_fsm->setState(OpState::init);
 
   // Now that we have enough start state, we can set up interrupts
   setUpInterrupt();
@@ -148,7 +154,7 @@ Err_t Knitter::initMachine(Machine_t machineType) {
 Err_t Knitter::startKnitting(uint8_t startNeedle,
                              uint8_t stopNeedle, uint8_t *pattern_start,
                              bool continuousReportingEnabled) {
-  if (GlobalFsm::getState() != OpState::ready) {
+  if (g_fsm->getState() != OpState::ready) {
     return ErrorCode::wrong_machine_state;
   }
   if (pattern_start == nullptr) {
@@ -171,8 +177,8 @@ Err_t Knitter::startKnitting(uint8_t startNeedle,
   m_lastLineFlag = false;
 
   // proceed to next state
-  GlobalFsm::setState(OpState::knit);
-  GlobalBeeper::ready();
+  g_fsm->setState(OpState::knit);
+  g_beeper->ready();
 
   // success
   return ErrorCode::success;
@@ -222,7 +228,7 @@ bool Knitter::isReady() {
   if (passedLeft || passedRight) {
 
 #endif // DBG_NOMACHINE
-    GlobalSolenoids::setSolenoids(SOLENOIDS_BITMASK);
+    g_solenoids->setSolenoids(SOLENOIDS_BITMASK);
     indState(ErrorCode::success);
     return true; // move to `OpState::ready`
   }
@@ -239,7 +245,7 @@ bool Knitter::isReady() {
 void Knitter::knit() {
   if (m_firstRun) {
     m_firstRun = false;
-    GlobalBeeper::finishedLine();
+    g_beeper->finishedLine();
     ++m_currentLineNumber;
     reqLine(m_currentLineNumber);
   }
@@ -280,7 +286,7 @@ void Knitter::knit() {
   bool pixelValue =
       bitRead(m_lineBuffer[currentByte], m_pixelToSet & 0x07);
   // write Pixel state to the appropriate needle
-  GlobalSolenoids::setSolenoid(m_solenoidToSet, pixelValue);
+  g_solenoids->setSolenoid(m_solenoidToSet, pixelValue);
 
   if ((m_pixelToSet >= m_startNeedle) && (m_pixelToSet <= m_stopNeedle)) {
     m_workedOnLine = true;
@@ -309,7 +315,7 @@ void Knitter::knit() {
  * \param error Error state (0 = success, other values = error).
  */
 void Knitter::indState(Err_t error) {
-  GlobalCom::send_indState(m_carriage, m_position, error);
+  g_com->send_indState(m_carriage, m_position, error);
 }
 
 /*!
@@ -343,7 +349,7 @@ bool Knitter::setNextLine(uint8_t lineNumber) {
     // Is there even a need for a new line?
     if (lineNumber == m_currentLineNumber) {
       m_lineRequested = false;
-      GlobalBeeper::finishedLine();
+      g_beeper->finishedLine();
       return true;
     } else {
       // line numbers didn't match -> request again
@@ -376,7 +382,7 @@ void Knitter::setMachineType(Machine_t machineType) {
  * \param lineNumber Line number requested.
  */
 void Knitter::reqLine(uint8_t lineNumber) {
-  GlobalCom::send_reqLine(lineNumber, ErrorCode::success);
+  g_com->send_reqLine(lineNumber, ErrorCode::success);
   m_lineRequested = true;
 }
 
@@ -451,11 +457,11 @@ bool Knitter::calculatePixelAndSolenoid() {
  * \brief Finish knitting procedure.
  */
 void Knitter::stopKnitting() const {
-  GlobalBeeper::endWork();
-  GlobalFsm::setState(OpState::init);
+  g_beeper->endWork();
+  g_fsm->setState(OpState::init);
 
-  GlobalSolenoids::setSolenoids(SOLENOIDS_BITMASK);
-  GlobalBeeper::finishedLine();
+  g_solenoids->setSolenoids(SOLENOIDS_BITMASK);
+  g_beeper->finishedLine();
 
   // detaching ENC_PIN_A, Interrupt #0
   /* detachInterrupt(digitalPinToInterrupt(ENC_PIN_A)); */

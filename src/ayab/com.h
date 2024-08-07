@@ -94,35 +94,15 @@ public:
   virtual void onPacketReceived(const uint8_t *buffer, size_t size) = 0;
 };
 
-// Container class for the static methods that implement the serial API.
-// Dependency injection is enabled using a pointer to a global instance of
-// either `Com` or `ComMock`, both of which classes implement the
-// pure virtual methods of `ComInterface`.
-
-class GlobalCom final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalCom() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static ComInterface *m_instance;
-
-  static void init();
-  static void update();
-  static void send(uint8_t *payload, size_t length);
-  static void sendMsg(AYAB_API_t id, const char *msg);
-  static void send_reqLine(const uint8_t lineNumber, Err_t error = ErrorCode::success);
-  static void send_indState(Carriage_t carriage, uint8_t position,
-                             Err_t error = ErrorCode::success);
-  static void onPacketReceived(const uint8_t *buffer, size_t size);
-
-private:
-  static SLIPPacketSerial m_packetSerial;
-};
+class BeeperInterface;
+class TesterInterface;
+class KnitterInterface;
+class FsmInterface;
 
 class Com : public ComInterface {
 public:
+  Com(): m_packetSerial(*this) {}
+  
   void init() final;
   void update() final;
   void send(uint8_t *payload, size_t length) const final;
@@ -133,7 +113,19 @@ public:
   void onPacketReceived(const uint8_t *buffer, size_t size) final;
 
 private:
-  PacketSerial_<SLIP, SLIP::END, MAX_MSG_BUFFER_LEN> m_packetSerial;
+  struct WrappedPacketSerial: PacketSerial_<SLIP, SLIP::END, MAX_MSG_BUFFER_LEN> {
+    Com &m_com;
+    WrappedPacketSerial(Com &com): m_com(com) {
+      setPacketHandler(onPacketReceived);
+    }
+    static void onPacketReceived(const void *sender, const uint8_t *buffer, size_t size) {
+      WrappedPacketSerial *self = static_cast<WrappedPacketSerial *>(const_cast<void *>(sender));
+      self->m_com.onPacketReceived(buffer, size);
+    }
+  };
+
+  WrappedPacketSerial m_packetSerial;
+  
   uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = {0};
   uint8_t msgBuffer[MAX_MSG_BUFFER_LEN] = {0};
 
@@ -150,5 +142,7 @@ private:
   void send_cnfTest(Err_t error) const;
   uint8_t CRC8(const uint8_t *buffer, size_t len) const;
 };
+
+extern ComInterface *g_com;
 
 #endif // COM_H_
