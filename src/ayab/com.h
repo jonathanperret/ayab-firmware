@@ -123,6 +123,8 @@ private:
 
 class Com : public ComInterface {
 public:
+  Com(): m_packetSerial(*this) {}
+
   void init() final;
   void update() final;
   void send(uint8_t *payload, size_t length) const final;
@@ -133,7 +135,18 @@ public:
   void onPacketReceived(const uint8_t *buffer, size_t size) final;
 
 private:
-  PacketSerial_<SLIP, SLIP::END, MAX_MSG_BUFFER_LEN> m_packetSerial;
+  struct WrappedPacketSerial: PacketSerial_<SLIP, SLIP::END, MAX_MSG_BUFFER_LEN> {
+    Com &m_com;
+    WrappedPacketSerial(Com &com): m_com(com) {
+      setPacketHandler(onPacketReceived);
+    }
+    static void onPacketReceived(const void *sender, const uint8_t *buffer, size_t size) {
+      WrappedPacketSerial *self = static_cast<WrappedPacketSerial *>(const_cast<void *>(sender));
+      self->m_com.onPacketReceived(buffer, size);
+    }
+  };
+
+  WrappedPacketSerial m_packetSerial;
   uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = {0};
   uint8_t msgBuffer[MAX_MSG_BUFFER_LEN] = {0};
 

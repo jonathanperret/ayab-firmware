@@ -31,9 +31,6 @@
  */
 void Com::init() {
   m_packetSerial.begin(SERIAL_BAUDRATE);
-#ifndef AYAB_TESTS
-  m_packetSerial.setPacketHandler(GlobalCom::onPacketReceived);
-#endif // AYAB_TESTS
 }
 
 /*!
