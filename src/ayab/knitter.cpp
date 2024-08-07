@@ -174,7 +174,7 @@ Err_t Knitter::startKnitting(uint8_t startNeedle,
 
   // proceed to next state
   GlobalFsm::setState(OpState::knit);
-  GlobalBeeper::ready();
+  m_beeper->ready();
 
   // success
   return ErrorCode::success;
@@ -241,7 +241,7 @@ bool Knitter::isReady() {
 void Knitter::knit() {
   if (m_firstRun) {
     m_firstRun = false;
-    GlobalBeeper::finishedLine();
+    m_beeper->finishedLine();
     ++m_currentLineNumber;
     reqLine(m_currentLineNumber);
   }
@@ -345,7 +345,7 @@ bool Knitter::setNextLine(uint8_t lineNumber) {
     // Is there even a need for a new line?
     if (lineNumber == m_currentLineNumber) {
       m_lineRequested = false;
-      GlobalBeeper::finishedLine();
+      m_beeper->finishedLine();
       return true;
     } else {
       // line numbers didn't match -> request again
@@ -453,11 +453,11 @@ bool Knitter::calculatePixelAndSolenoid() {
  * \brief Finish knitting procedure.
  */
 void Knitter::stopKnitting() const {
-  GlobalBeeper::endWork();
+  m_beeper->endWork();
   GlobalFsm::setState(OpState::init);
 
   GlobalSolenoids::setSolenoids(SOLENOIDS_BITMASK);
-  GlobalBeeper::finishedLine();
+  m_beeper->finishedLine();
 
   // detaching ENC_PIN_A, Interrupt #0
   /* detachInterrupt(digitalPinToInterrupt(ENC_PIN_A)); */

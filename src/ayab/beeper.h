@@ -52,29 +52,6 @@ public:
   virtual void schedule() = 0;
 };
 
-// Container class for the static methods that control the beeper.
-// Dependency injection is enabled using a pointer to a global instance of
-// either `Beeper` or `BeeperMock`, both of which classes implement the
-// pure virtual methods of `BeeperInterface`.
-
-class GlobalBeeper final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalBeeper() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static BeeperInterface *m_instance;
-
-  static void init(bool enabled);
-  static bool enabled();
-  static BeepState getState();
-  static void ready();
-  static void finishedLine();
-  static void endWork();
-  static void schedule();
-};
-
 /*!
  * \brief Class to actuate a beeper connected to PIEZO_PIN
  */

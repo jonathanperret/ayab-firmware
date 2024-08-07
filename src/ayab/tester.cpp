@@ -232,7 +232,7 @@ void Tester::setUp() {
  * \brief Make a beep.
  */
 void Tester::beep() const {
-  GlobalBeeper::ready();
+  m_beeper->ready();
 }
 
 /*!

@@ -88,9 +88,11 @@ public:
 #endif
 };
 
+class BeeperInterface;
+
 class Tester : public TesterInterface {
 public:
-  Tester(ComInterface *com): m_com(com) { }
+  Tester(BeeperInterface *beeper, ComInterface *com): m_beeper(beeper), m_com(com) { }
   Err_t startTest(Machine_t machineType) final;
   void loop() final;
   void helpCmd() final;
@@ -118,7 +120,10 @@ private:
   void autoTestOdd() const;
   void handleTimerEvent();
 
+  // collaborators
+  BeeperInterface *m_beeper;
   ComInterface *m_com;
+
   bool m_autoReadOn = false;
   bool m_autoTestOn = false;
   unsigned long m_lastTime = 0U;

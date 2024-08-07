@@ -35,9 +35,9 @@
 // global definitions
 // references everywhere else must use `extern`
 Fsm *fsm = new Fsm();
-Knitter *knitter = new Knitter();
 
 BeeperMock *beeper = new BeeperMock();
+Knitter *knitter = new Knitter(beeper);
 ComMock *com = new ComMock();
 EncodersMock *encoders = new EncodersMock();
 SolenoidsMock *solenoids = new SolenoidsMock();
@@ -47,7 +47,6 @@ TesterMock *tester = new TesterMock();
 FsmInterface *GlobalFsm::m_instance = fsm;
 KnitterInterface *GlobalKnitter::m_instance = knitter;
 
-BeeperInterface *GlobalBeeper::m_instance = beeper;
 EncodersInterface *GlobalEncoders::m_instance = encoders;
 SolenoidsInterface *GlobalSolenoids::m_instance = solenoids;
 TesterInterface *GlobalTester::m_instance = tester;

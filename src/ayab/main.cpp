@@ -37,14 +37,13 @@
 // that implements a public interface. When testing, a pointer
 // to an instance of a mock class can be substituted.
 Beeper _Beeper;
-Com _Com;
+Com _Com(&_Beeper);
 Encoders _Encoders;
 Fsm _Fsm;
-Knitter _Knitter;
+Knitter _Knitter(&_Beeper);
 Solenoids _Solenoids;
-Tester _Tester(&_Com);
+Tester _Tester(&_Beeper, &_Com);
 
-BeeperInterface    *GlobalBeeper::m_instance    = &_Beeper;
 EncodersInterface  *GlobalEncoders::m_instance  = &_Encoders;
 FsmInterface       *GlobalFsm::m_instance       = &_Fsm;
 KnitterInterface   *GlobalKnitter::m_instance   = &_Knitter;
@@ -95,7 +94,7 @@ void stackCanaryCheck() {
 void setup() {
   stackCanarySetup();
 
-  GlobalBeeper::init(false);
+  _Beeper.init(false);
   _Com.init();
   GlobalFsm::init(&_Com);
   GlobalKnitter::init(&_Com);
@@ -109,7 +108,7 @@ void loop() {
   stackCanaryCheck();
 
   GlobalFsm::dispatch();
-  if (GlobalBeeper::enabled()) {
-    GlobalBeeper::schedule();
+  if (_Beeper.enabled()) {
+    _Beeper.schedule();
   }
 }

@@ -46,7 +46,6 @@ set(COMMON_SOURCES
     ${PROJECT_SOURCE_DIR}/test_solenoids.cpp
 
     ${SOURCE_DIRECTORY}/beeper.cpp
-    ${SOURCE_DIRECTORY}/global_beeper.cpp
     ${PROJECT_SOURCE_DIR}/test_beeper.cpp
 
     ${SOURCE_DIRECTORY}/com.cpp
@@ -124,7 +123,6 @@ add_board(uno)
 add_executable(${PROJECT_NAME}_knitter
     ${PROJECT_SOURCE_DIR}/test_all.cpp
 
-    ${SOURCE_DIRECTORY}/global_beeper.cpp
     ${PROJECT_SOURCE_DIR}/mocks/beeper_mock.cpp
 
     ${PROJECT_SOURCE_DIR}/mocks/com_mock.cpp

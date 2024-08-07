@@ -228,7 +228,7 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  GlobalBeeper::init(beeperEnabled);
+  m_beeper->init(beeperEnabled);
   memset(lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
 
   // Note (August 2020): the return value of this function has changed.

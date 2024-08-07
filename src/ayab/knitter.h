@@ -90,6 +90,8 @@ public:
 
 class Knitter : public KnitterInterface {
 public:
+  Knitter(BeeperInterface *beeper): m_beeper(beeper) { }
+
   void init(ComInterface *com) final;
   void setUpInterrupt() final;
   void isr() final;
@@ -113,6 +115,7 @@ private:
   void stopKnitting() const;
 
   // collaborators
+  BeeperInterface *m_beeper;
   ComInterface *m_com;
 
   // job parameters

@@ -94,9 +94,11 @@ public:
   virtual void onPacketReceived(const uint8_t *buffer, size_t size) = 0;
 };
 
+class BeeperInterface;
+
 class Com : public ComInterface {
 public:
-  Com(): m_packetSerial(*this) {}
+  Com(BeeperInterface *beeper): m_packetSerial(*this), m_beeper(beeper) {}
 
   void init() final;
   void update() final;
@@ -120,6 +122,7 @@ private:
   };
 
   WrappedPacketSerial m_packetSerial;
+  BeeperInterface *m_beeper;
   uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = {0};
   uint8_t msgBuffer[MAX_MSG_BUFFER_LEN] = {0};
 
