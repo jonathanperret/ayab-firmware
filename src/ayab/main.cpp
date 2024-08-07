@@ -32,25 +32,14 @@
 #include "solenoids.h"
 #include "tester.h"
 
-// Initialize static members.
-// Each singleton class contains a pointer to a static instance
-// that implements a public interface. When testing, a pointer
-// to an instance of a mock class can be substituted.
-Beeper _Beeper;
-Com _Com;
-Encoders _Encoders;
-Fsm _Fsm;
-Knitter _Knitter;
-Solenoids _Solenoids;
-Tester _Tester;
-
-BeeperInterface    *GlobalBeeper::m_instance    = &_Beeper;
-ComInterface       *GlobalCom::m_instance       = &_Com;
-EncodersInterface  *GlobalEncoders::m_instance  = &_Encoders;
-FsmInterface       *GlobalFsm::m_instance       = &_Fsm;
-KnitterInterface   *GlobalKnitter::m_instance   = &_Knitter;
-SolenoidsInterface *GlobalSolenoids::m_instance = &_Solenoids;
-TesterInterface    *GlobalTester::m_instance    = &_Tester;
+// Global objects
+Beeper beeper;
+Encoders encoders;
+Solenoids solenoids;
+Com com;
+Knitter knitter;
+Tester tester;
+Fsm fsm;
 
 /*!
  * Setup - do once before going to the main loop.
@@ -96,11 +85,17 @@ void stackCanaryCheck() {
 void setup() {
   stackCanarySetup();
 
-  GlobalBeeper::init(false);
-  GlobalCom::init();
-  GlobalFsm::init();
-  GlobalKnitter::init();
-  GlobalSolenoids::init();
+  // inject collaborators
+  com.inject(&beeper, &encoders, &fsm, &knitter, &tester);
+  knitter.inject(&beeper, &encoders, &solenoids, &com, &fsm);
+  tester.inject(&beeper, &solenoids, &com, &knitter, &fsm);
+  fsm.inject(&com, &knitter, &tester);
+
+  beeper.init(false);
+  solenoids.init();
+  com.init();
+  fsm.init();
+  knitter.init();
 }
 
 /*!
@@ -109,8 +104,8 @@ void setup() {
 void loop() {
   stackCanaryCheck();
 
-  GlobalFsm::dispatch();
-  if (GlobalBeeper::enabled()) {
-    GlobalBeeper::schedule();
+  fsm.dispatch();
+  if (beeper.enabled()) {
+    beeper.schedule();
   }
 }

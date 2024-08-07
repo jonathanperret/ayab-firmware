@@ -30,6 +30,8 @@
 #include "solenoids.h"
 #include "tester.h"
 
+class FsmInterface;
+
 class KnitterInterface {
 public:
   virtual ~KnitterInterface() = default;
@@ -53,43 +55,22 @@ public:
   virtual void setMachineType(Machine_t) = 0;
 };
 
-// Singleton container class for static methods.
-// Dependency injection is enabled using a pointer
-// to a global instance of either `Knitter` or `KnitterMock`
-// both of which classes implement the pure virtual methods
-// of the `KnitterInterface` class.
-
-class GlobalKnitter final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalKnitter() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static KnitterInterface *m_instance;
-
-  static void init();
-  static void setUpInterrupt();
-#ifndef AYAB_TESTS
-  static void isr();
-#endif
-  static Err_t startKnitting(uint8_t startNeedle,
-                             uint8_t stopNeedle, uint8_t *pattern_start,
-                             bool continuousReportingEnabled);
-  static Err_t initMachine(Machine_t machine);
-  static void encodePosition();
-  static bool isReady();
-  static void knit();
-  static void indState(Err_t error = ErrorCode::success);
-  static uint8_t getStartOffset(const Direction_t direction);
-  static Machine_t getMachineType();
-  static bool setNextLine(uint8_t lineNumber);
-  static void setLastLine();
-  static void setMachineType(Machine_t);
-};
-
 class Knitter : public KnitterInterface {
 public:
+  void inject(
+    BeeperInterface *beeper,
+    EncodersInterface *encoders,
+    SolenoidsInterface *solenoids,
+    ComInterface *com,
+    FsmInterface *fsm
+  ) {
+    m_beeper = beeper;
+    m_encoders = encoders;
+    m_solenoids = solenoids;
+    m_com = com;
+    m_fsm = fsm; 
+  }
+
   void init() final;
   void setUpInterrupt() final;
   void isr() final;
@@ -111,6 +92,13 @@ private:
   void reqLine(uint8_t lineNumber);
   bool calculatePixelAndSolenoid();
   void stopKnitting() const;
+
+  // collaborators
+  BeeperInterface *m_beeper;
+  EncodersInterface *m_encoders;
+  SolenoidsInterface *m_solenoids;
+  ComInterface *m_com;
+  FsmInterface *m_fsm;
 
   // job parameters
   Machine_t m_machineType;
@@ -141,6 +129,10 @@ private:
   // resulting needle data
   uint8_t m_solenoidToSet;
   uint8_t m_pixelToSet;
+
+  // ISR support
+  static Knitter *s_instance;
+  static void _isr();
 
 #if AYAB_TESTS
   // Note: ideally tests would only rely on the public interface.

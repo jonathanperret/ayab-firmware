@@ -34,26 +34,20 @@
 
 // global definitions
 // references everywhere else must use `extern`
-Fsm *fsm = new Fsm();
-Knitter *knitter = new Knitter();
 
 BeeperMock *beeper = new BeeperMock();
-ComMock *com = new ComMock();
 EncodersMock *encoders = new EncodersMock();
 SolenoidsMock *solenoids = new SolenoidsMock();
+ComMock *com = new ComMock();
 TesterMock *tester = new TesterMock();
-
-// instantiate singleton classes with mock objects
-FsmInterface *GlobalFsm::m_instance = fsm;
-KnitterInterface *GlobalKnitter::m_instance = knitter;
-
-BeeperInterface *GlobalBeeper::m_instance = beeper;
-ComInterface *GlobalCom::m_instance = com;
-EncodersInterface *GlobalEncoders::m_instance = encoders;
-SolenoidsInterface *GlobalSolenoids::m_instance = solenoids;
-TesterInterface *GlobalTester::m_instance = tester;
+Knitter *knitter = new Knitter();
+Fsm *fsm = new Fsm();
 
 int main(int argc, char *argv[]) {
+  // inject collaborators
+  knitter->inject(beeper, encoders, solenoids, com, fsm);
+  fsm->inject(com, knitter, tester);
+
   ::testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }

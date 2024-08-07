@@ -27,10 +27,11 @@
 
 #include "beeper.h"
 #include "com.h"
-#include "encoders.h"
 
 constexpr uint8_t BUFFER_LEN = 40;
 constexpr unsigned int TEST_LOOP_DELAY = 500; // ms
+
+class FsmInterface;
 
 class TesterInterface {
 public:
@@ -50,46 +51,29 @@ public:
   virtual void autoTestCmd() = 0;
   virtual void stopCmd() = 0;
   virtual void quitCmd() = 0;
-#ifndef AYAB_TESTS
-  virtual void encoderAChange();
-#endif
+  virtual void encoderAChange() = 0;
 };
 
-// Container class for the static methods that implement the hardware test
-// commands. Originally these methods were called back by `SerialCommand`.
-// Dependency injection is enabled using a pointer to a global instance of
-// either `Tester` or `TesterMock`, both of which classes implement the
-// pure virtual methods of `TesterInterface`.
-
-class GlobalTester final {
-private:
-  // singleton class so private constructor is appropriate
-  GlobalTester() = default;
-
-public:
-  // pointer to global instance whose methods are implemented
-  static TesterInterface *m_instance;
-
-  static Err_t startTest(Machine_t machineType);
-  static void loop();
-  static void helpCmd();
-  static void sendCmd();
-  static void beepCmd();
-  static void setSingleCmd(const uint8_t *buffer, size_t size);
-  static void setAllCmd(const uint8_t *buffer, size_t size);
-  static void readEOLsensorsCmd();
-  static void readEncodersCmd();
-  static void autoReadCmd();
-  static void autoTestCmd();
-  static void stopCmd();
-  static void quitCmd();
-#ifndef AYAB_TESTS
-  static void encoderAChange();
-#endif
-};
+class BeeperInterface;
+class SolenoidsInterface;
+class KnitterInterface;
 
 class Tester : public TesterInterface {
 public:
+  void inject(
+    BeeperInterface *beeper,
+    SolenoidsInterface *solenoids,
+    ComInterface *com,
+    KnitterInterface *knitter,
+    FsmInterface *fsm
+  ) {
+    m_beeper = beeper;
+    m_solenoids = solenoids;
+    m_com = com;
+    m_knitter = knitter;
+    m_fsm = fsm;
+  }
+
   Err_t startTest(Machine_t machineType) final;
   void loop() final;
   void helpCmd() final;
@@ -103,9 +87,7 @@ public:
   void autoTestCmd() final;
   void stopCmd() final;
   void quitCmd() final;
-#ifndef AYAB_TESTS
   void encoderAChange() final;
-#endif
 
 private:
   void setUp();
@@ -116,6 +98,17 @@ private:
   void autoTestEven() const;
   void autoTestOdd() const;
   void handleTimerEvent();
+
+  // collaborators
+  BeeperInterface *m_beeper;
+  SolenoidsInterface *m_solenoids;
+  ComInterface *m_com;
+  KnitterInterface *m_knitter;
+  FsmInterface *m_fsm;
+
+  // ISR static wrapper
+  static TesterInterface *s_instance;
+  static void _encoderAChange();
 
   bool m_autoReadOn = false;
   bool m_autoTestOn = false;

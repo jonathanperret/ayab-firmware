@@ -31,9 +31,6 @@
  */
 void Com::init() {
   m_packetSerial.begin(SERIAL_BAUDRATE);
-#ifndef AYAB_TESTS
-  m_packetSerial.setPacketHandler(GlobalCom::onPacketReceived);
-#endif // AYAB_TESTS
 }
 
 /*!
@@ -95,20 +92,20 @@ void Com::send_reqLine(const uint8_t lineNumber, Err_t error) const {
  */
 void Com::send_indState(Carriage_t carriage, uint8_t position,
                         Err_t error) const {
-  uint16_t leftHallValue = GlobalEncoders::getHallValue(Direction_t::Left);
-  uint16_t rightHallValue = GlobalEncoders::getHallValue(Direction_t::Right);
+  uint16_t leftHallValue = m_encoders->getHallValue(Direction_t::Left);
+  uint16_t rightHallValue = m_encoders->getHallValue(Direction_t::Right);
   // `payload` will be allocated on stack since length is compile-time constant
   uint8_t payload[INDSTATE_LEN] = {
       static_cast<uint8_t>(AYAB_API::indState),
       static_cast<uint8_t>(error),
-      static_cast<uint8_t>(GlobalFsm::getState()),
+      static_cast<uint8_t>(m_fsm->getState()),
       highByte(leftHallValue),
       lowByte(leftHallValue),
       highByte(rightHallValue),
       lowByte(rightHallValue),
       static_cast<uint8_t>(carriage),
       position,
-      static_cast<uint8_t>(GlobalEncoders::getDirection()),
+      static_cast<uint8_t>(m_encoders->getDirection()),
   };
   send(static_cast<uint8_t *>(payload), INDSTATE_LEN);
 }
@@ -146,47 +143,47 @@ void Com::onPacketReceived(const uint8_t *buffer, size_t size) {
     break;
 
   case static_cast<uint8_t>(AYAB_API::helpCmd):
-    GlobalTester::helpCmd();
+    m_tester->helpCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::sendCmd):
-    GlobalTester::sendCmd();
+    m_tester->sendCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::beepCmd):
-    GlobalTester::beepCmd();
+    m_tester->beepCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::setSingleCmd):
-    GlobalTester::setSingleCmd(buffer, size);
+    m_tester->setSingleCmd(buffer, size);
     break;
 
   case static_cast<uint8_t>(AYAB_API::setAllCmd):
-    GlobalTester::setAllCmd(buffer, size);
+    m_tester->setAllCmd(buffer, size);
     break;
 
   case static_cast<uint8_t>(AYAB_API::readEOLsensorsCmd):
-    GlobalTester::readEOLsensorsCmd();
+    m_tester->readEOLsensorsCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::readEncodersCmd):
-    GlobalTester::readEncodersCmd();
+    m_tester->readEncodersCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::autoReadCmd):
-    GlobalTester::autoReadCmd();
+    m_tester->autoReadCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::autoTestCmd):
-    GlobalTester::autoTestCmd();
+    m_tester->autoTestCmd();
     break;
 
   case static_cast<uint8_t>(AYAB_API::stopCmd):
-    GlobalTester::stopCmd();
+    m_tester->stopCmd();
     break;
 
    case static_cast<uint8_t>(AYAB_API::quitCmd):
-    GlobalTester::quitCmd();
+    m_tester->quitCmd();
     break;
 
   default:
@@ -220,7 +217,7 @@ void Com::h_reqInit(const uint8_t *buffer, size_t size) {
 
   memset(lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
 
-  Err_t error = GlobalKnitter::initMachine(machineType);
+  Err_t error = m_knitter->initMachine(machineType);
   send_cnfInit(error);
 }
 
@@ -248,14 +245,14 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  GlobalBeeper::init(beeperEnabled);
+  m_beeper->init(beeperEnabled);
   memset(lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
 
   // Note (August 2020): the return value of this function has changed.
   // Previously, it returned `true` for success and `false` for failure.
   // Now, it returns `0` for success and an informative error code otherwise.
   Err_t error =
-      GlobalKnitter::startKnitting(startNeedle, stopNeedle,
+      m_knitter->startKnitting(startNeedle, stopNeedle,
                                    lineBuffer, continuousReportingEnabled);
   send_cnfStart(error);
 }
@@ -269,7 +266,7 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
  * \todo sl: Assert size? Handle error?
  */
 void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
-  auto machineType = static_cast<uint8_t>(GlobalKnitter::getMachineType());
+  auto machineType = static_cast<uint8_t>(m_knitter->getMachineType());
   uint8_t lenLineBuffer = LINE_BUFFER_LEN[machineType];
   if (size < lenLineBuffer + 5U) {
     // message is too short
@@ -295,11 +292,11 @@ void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  if (GlobalKnitter::setNextLine(lineNumber)) {
+  if (m_knitter->setNextLine(lineNumber)) {
     // Line was accepted
     bool flagLastLine = bitRead(flags, 0U);
     if (flagLastLine) {
-      GlobalKnitter::setLastLine();
+      m_knitter->setLastLine();
     }
   }
 }
@@ -319,12 +316,12 @@ void Com::h_reqInfo() const {
  * \param size The number of bytes in the data buffer.
  */
 void Com::h_reqTest() const {
-  auto machineType = static_cast<Machine_t>(GlobalKnitter::getMachineType());
+  auto machineType = static_cast<Machine_t>(m_knitter->getMachineType());
 
   // Note (August 2020): the return value of this function has changed.
   // Previously, it returned `true` for success and `false` for failure.
   // Now, it returns `0` for success and an informative error code otherwise.
-  Err_t error = GlobalTester::startTest(machineType);
+  Err_t error = m_tester->startTest(machineType);
   send_cnfTest(error);
 }
 
