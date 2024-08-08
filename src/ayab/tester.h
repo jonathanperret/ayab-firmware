@@ -54,11 +54,12 @@ public:
 
 class BeeperInterface;
 class SolenoidsInterface;
+class KnitterInterface;
 
 class Tester : public TesterInterface {
 public:
-  Tester(BeeperInterface *beeper, SolenoidsInterface *solenoids, ComInterface *com):
-    m_beeper(beeper), m_solenoids(solenoids), m_com(com) {
+  Tester(BeeperInterface *beeper, SolenoidsInterface *solenoids, ComInterface *com, KnitterInterface *knitter):
+    m_beeper(beeper), m_solenoids(solenoids), m_com(com), m_knitter(knitter) {
     m_com->setTester(this);
   }
   Err_t startTest(Machine_t machineType) final;
@@ -90,9 +91,10 @@ private:
   BeeperInterface *m_beeper;
   SolenoidsInterface *m_solenoids;
   ComInterface *m_com;
+  KnitterInterface *m_knitter;
 
   // ISR static wrapper
-  static TesterInterface *m_instance;
+  static TesterInterface *s_instance;
   static void _encoderChange();
 
   bool m_autoReadOn = false;

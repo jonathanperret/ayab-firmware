@@ -41,11 +41,10 @@ Encoders _Encoders;
 Solenoids _Solenoids;
 Com _Com(&_Beeper, &_Encoders);
 Knitter _Knitter(&_Beeper, &_Encoders, &_Solenoids, &_Com);
-Tester _Tester(&_Beeper, &_Solenoids, &_Com);
-Fsm _Fsm(&_Com, &_Tester);
+Tester _Tester(&_Beeper, &_Solenoids, &_Com, &_Knitter);
+Fsm _Fsm(&_Com, &_Knitter, &_Tester);
 
 FsmInterface       *GlobalFsm::m_instance       = &_Fsm;
-KnitterInterface   *GlobalKnitter::m_instance   = &_Knitter;
 
 /*!
  * Setup - do once before going to the main loop.

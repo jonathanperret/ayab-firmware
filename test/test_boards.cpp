@@ -38,16 +38,19 @@ Beeper *beeper = new Beeper();
 Encoders *encoders = new Encoders();
 Solenoids *solenoids = new Solenoids();
 Com *com = new Com(beeper, encoders);
-Tester *tester = new Tester(beeper, solenoids, com);
+
+KnitterMock *knitter = new KnitterMock();
+Tester *tester = new Tester(beeper, solenoids, com, knitter);
 
 FsmMock *fsm = new FsmMock();
-KnitterMock *knitter = new KnitterMock();
 
 // initialize static members
 FsmInterface *GlobalFsm::m_instance = fsm;
-KnitterInterface *GlobalKnitter::m_instance = knitter;
 
 int main(int argc, char *argv[]) {
+  com->setTester(tester);
+  com->setKnitter(knitter);
+
   ::testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -93,8 +93,14 @@ void Knitter::setUpInterrupt() {
   // Attaching ENC_PIN_A, Interrupt #0
   // This interrupt cannot be enabled until
   // the machine type has been validated.
-  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), GlobalKnitter::isr, CHANGE);
+  s_instance = this;
+  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), _isr, CHANGE);
 #endif // AYAB_TESTS
+}
+
+Knitter *Knitter::s_instance;
+void Knitter::_isr() {
+  s_instance->isr();
 }
 
 /*!

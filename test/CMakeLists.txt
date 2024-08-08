@@ -52,7 +52,6 @@ set(COMMON_SOURCES
     ${SOURCE_DIRECTORY}/tester.cpp
     ${PROJECT_SOURCE_DIR}/test_tester.cpp
 
-    ${SOURCE_DIRECTORY}/global_knitter.cpp
     ${PROJECT_SOURCE_DIR}/mocks/knitter_mock.cpp
 
     ${SOURCE_DIRECTORY}/global_fsm.cpp
@@ -135,7 +134,6 @@ add_executable(${PROJECT_NAME}_knitter
     ${PROJECT_SOURCE_DIR}/test_fsm.cpp
 
     ${SOURCE_DIRECTORY}/knitter.cpp
-    ${SOURCE_DIRECTORY}/global_knitter.cpp
     ${PROJECT_SOURCE_DIR}/test_knitter.cpp
 )
 target_include_directories(${PROJECT_NAME}_knitter

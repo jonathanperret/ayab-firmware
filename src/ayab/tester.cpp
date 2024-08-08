@@ -158,7 +158,8 @@ void Tester::quitCmd() {
   detachInterrupt(digitalPinToInterrupt(ENC_PIN_A));
   detachInterrupt(digitalPinToInterrupt(ENC_PIN_B));
 
-  GlobalFsm::setState(OpState::wait_for_machine);
+  GlobalFsm::setState(OpState::init);
+  m_knitter->setUpInterrupt();
 }
 
 /*!
@@ -170,7 +171,7 @@ Err_t Tester::startTest(Machine_t machineType) {
   OpState_t currentState = GlobalFsm::getState();
   if (OpState::wait_for_machine == currentState || OpState::init == currentState || OpState::ready == currentState) {
     GlobalFsm::setState(OpState::test);
-    GlobalKnitter::setMachineType(machineType);
+    m_knitter->setMachineType(machineType);
     setUp();
     return ErrorCode::success;
   }
@@ -213,6 +214,7 @@ void Tester::setUp() {
 
 #ifndef AYAB_TESTS
   // Attach interrupts for both encoder pins
+  s_instance = this;
   attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), _encoderChange, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENC_PIN_B), _encoderChange, CHANGE);
 #endif // AYAB_TESTS
@@ -307,7 +309,7 @@ void Tester::handleTimerEvent() {
   m_timerEventOdd = !m_timerEventOdd;
 }
 
-TesterInterface *Tester::m_instance;
+TesterInterface *Tester::s_instance;
 void Tester::_encoderChange() {
-  m_instance->encoderChange();
+  s_instance->encoderChange();
 }

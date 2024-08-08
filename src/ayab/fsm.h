@@ -115,10 +115,12 @@ public:
 };
 
 class TesterInterface;
+class KnitterInterface;
 
 class Fsm : public FsmInterface {
 public:
-  Fsm(ComInterface *com, TesterInterface *tester): m_com(com), m_tester(tester) { }
+  Fsm(ComInterface *com, KnitterInterface *knitter, TesterInterface *tester):
+    m_com(com), m_knitter(knitter), m_tester(tester) { }
 
   void init() final;
   OpState_t getState() final;
@@ -135,6 +137,7 @@ private:
 
   // collaborators
   ComInterface *m_com;
+  KnitterInterface *m_knitter;
   TesterInterface *m_tester;
 
   // machine state

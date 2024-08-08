@@ -117,7 +117,7 @@ void Fsm::state_wait_for_machine() const {
  */
 void Fsm::state_init() {
   digitalWrite(LED_PIN_A, LOW); // green LED off
-  if (GlobalKnitter::isReady()) {
+  if (m_knitter->isReady()) {
     setState(OpState::ready);
   }
 }
@@ -134,18 +134,18 @@ void Fsm::state_ready() const {
  */
 void Fsm::state_knit() const {
   digitalWrite(LED_PIN_A, HIGH); // green LED on
-  GlobalKnitter::knit();
+  m_knitter->knit();
 }
 
 /*!
  * \brief Action of machine in state `OpState::test`.
  */
 void Fsm::state_test() const {
-  GlobalKnitter::encodePosition();
+  m_knitter->encodePosition();
   m_tester->loop();
   if (m_nextState == OpState::init) {
     // quit test
-    GlobalKnitter::init();
+    m_knitter->init();
   }
 }
 
@@ -156,7 +156,7 @@ void Fsm::state_error() {
   if (m_nextState == OpState::init) {
     // exit error state
     digitalWrite(LED_PIN_B, LOW); // yellow LED off
-    GlobalKnitter::init();
+    m_knitter->init();
     return;
   }
   // every 500ms
@@ -169,6 +169,6 @@ void Fsm::state_error() {
     m_flashTime = now;
 
     // send error message
-    GlobalKnitter::indState(m_error);
+    m_knitter->indState(m_error);
   }
 }

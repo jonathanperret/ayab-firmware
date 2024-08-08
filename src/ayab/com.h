@@ -83,6 +83,7 @@ public:
   virtual ~ComInterface() = default;
 
   virtual void setTester(TesterInterface *) { }
+  virtual void setKnitter(KnitterInterface *) { }
 
   // any methods that need to be mocked should go here
   virtual void init() = 0;
@@ -98,12 +99,14 @@ public:
 
 class BeeperInterface;
 class TesterInterface;
+class KnitterInterface;
 
 class Com : public ComInterface {
 public:
   Com(BeeperInterface *beeper, EncodersInterface *encoders):
     m_packetSerial(*this), m_beeper(beeper), m_encoders(encoders) {}
   void setTester(TesterInterface *tester) { m_tester = tester; }
+  void setKnitter(KnitterInterface *knitter) { m_knitter = knitter; }
 
   void init() final;
   void update() final;
@@ -132,6 +135,7 @@ private:
   BeeperInterface *m_beeper;
   EncodersInterface *m_encoders;
   TesterInterface *m_tester;
+  KnitterInterface *m_knitter;
 
   uint8_t lineBuffer[MAX_LINE_BUFFER_LEN] = {0};
   uint8_t msgBuffer[MAX_MSG_BUFFER_LEN] = {0};

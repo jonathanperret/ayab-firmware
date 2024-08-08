@@ -200,7 +200,7 @@ void Com::h_reqInit(const uint8_t *buffer, size_t size) {
 
   memset(lineBuffer, 0xFF, MAX_LINE_BUFFER_LEN);
 
-  Err_t error = GlobalKnitter::initMachine(machineType);
+  Err_t error = m_knitter->initMachine(machineType);
   send_cnfInit(error);
 }
 
@@ -235,7 +235,7 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
   // Previously, it returned `true` for success and `false` for failure.
   // Now, it returns `0` for success and an informative error code otherwise.
   Err_t error =
-      GlobalKnitter::startKnitting(startNeedle, stopNeedle,
+      m_knitter->startKnitting(startNeedle, stopNeedle,
                                    lineBuffer, continuousReportingEnabled);
   send_cnfStart(error);
 }
@@ -249,7 +249,7 @@ void Com::h_reqStart(const uint8_t *buffer, size_t size) {
  * \todo sl: Assert size? Handle error?
  */
 void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
-  uint8_t lenLineBuffer = LINE_BUFFER_LEN[GlobalKnitter::getMachineType()];
+  uint8_t lenLineBuffer = LINE_BUFFER_LEN[m_knitter->getMachineType()];
   if (size < lenLineBuffer + 5U) {
     // message is too short
     // TODO(sl): handle error?
@@ -274,11 +274,11 @@ void Com::h_cnfLine(const uint8_t *buffer, size_t size) {
     return;
   }
 
-  if (GlobalKnitter::setNextLine(lineNumber)) {
+  if (m_knitter->setNextLine(lineNumber)) {
     // Line was accepted
     bool flagLastLine = bitRead(flags, 0U);
     if (flagLastLine) {
-      GlobalKnitter::setLastLine();
+      m_knitter->setLastLine();
     }
   }
 }
@@ -298,7 +298,7 @@ void Com::h_reqInfo() const {
  * \param size The number of bytes in the data buffer.
  */
 void Com::h_reqTest() const {
-  auto machineType = static_cast<Machine_t>(GlobalKnitter::getMachineType());
+  auto machineType = static_cast<Machine_t>(m_knitter->getMachineType());
 
   // Note (August 2020): the return value of this function has changed.
   // Previously, it returned `true` for success and `false` for failure.
