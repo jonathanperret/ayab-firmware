@@ -32,10 +32,7 @@
 #include "solenoids.h"
 #include "tester.h"
 
-// Initialize static members.
-// Each singleton class contains a pointer to a static instance
-// that implements a public interface. When testing, a pointer
-// to an instance of a mock class can be substituted.
+// Global objects
 Beeper _Beeper;
 Encoders _Encoders;
 Solenoids _Solenoids;
@@ -43,8 +40,6 @@ Com _Com(&_Beeper, &_Encoders);
 Knitter _Knitter(&_Beeper, &_Encoders, &_Solenoids, &_Com);
 Tester _Tester(&_Beeper, &_Solenoids, &_Com, &_Knitter);
 Fsm _Fsm(&_Com, &_Knitter, &_Tester);
-
-FsmInterface       *GlobalFsm::m_instance       = &_Fsm;
 
 /*!
  * Setup - do once before going to the main loop.
@@ -90,6 +85,13 @@ void stackCanaryCheck() {
 void setup() {
   stackCanarySetup();
 
+  // complete circular references
+  _Com.setFsm(&_Fsm);
+  _Com.setKnitter(&_Knitter);
+  _Com.setTester(&_Tester);
+  _Knitter.setFsm(&_Fsm);
+  _Tester.setFsm(&_Fsm);
+
   _Beeper.init(false);
   _Solenoids.init();
   _Com.init();
@@ -103,7 +105,7 @@ void setup() {
 void loop() {
   stackCanaryCheck();
 
-  GlobalFsm::dispatch();
+  _Fsm.dispatch();
   if (_Beeper.enabled()) {
     _Beeper.schedule();
   }

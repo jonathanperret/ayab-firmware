@@ -30,9 +30,13 @@
 #include "solenoids.h"
 #include "tester.h"
 
+class FsmInterface;
+
 class KnitterInterface {
 public:
   virtual ~KnitterInterface() = default;
+
+  virtual void setFsm(FsmInterface *) { }
 
   // any methods that need to be mocked should go here
   virtual void init() = 0;
@@ -56,9 +60,9 @@ public:
 class Knitter : public KnitterInterface {
 public:
   Knitter(BeeperInterface *beeper, EncodersInterface *encoders, SolenoidsInterface *solenoids, ComInterface *com):
-    m_beeper(beeper), m_encoders(encoders), m_solenoids(solenoids), m_com(com) {
-    m_com->setKnitter(this);
-  }
+    m_beeper(beeper), m_encoders(encoders), m_solenoids(solenoids), m_com(com) { }
+
+  void setFsm(FsmInterface *fsm) { m_fsm = fsm; }
 
   void init() final;
   void setUpInterrupt() final;
@@ -87,6 +91,7 @@ private:
   EncodersInterface *m_encoders;
   SolenoidsInterface *m_solenoids;
   ComInterface *m_com;
+  FsmInterface *m_fsm;
 
   // job parameters
   Machine_t m_machineType;

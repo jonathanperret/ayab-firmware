@@ -98,7 +98,7 @@ void Com::send_indState(Carriage_t carriage, uint8_t position,
   uint8_t payload[INDSTATE_LEN] = {
       static_cast<uint8_t>(AYAB_API::indState),
       static_cast<uint8_t>(error),
-      static_cast<uint8_t>(GlobalFsm::getState()),
+      static_cast<uint8_t>(m_fsm->getState()),
       highByte(leftHallValue),
       lowByte(leftHallValue),
       highByte(rightHallValue),

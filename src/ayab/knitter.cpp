@@ -126,7 +126,7 @@ void Knitter::isr() {
  * \return Error code (0 = success, other values = error).
  */
 Err_t Knitter::initMachine(Machine_t machineType) {
-  if (GlobalFsm::getState() != OpState::wait_for_machine) {
+  if (m_fsm->getState() != OpState::wait_for_machine) {
     return ErrorCode::wrong_machine_state;
   }
   if (machineType == Machine_t::NoMachine) {
@@ -135,7 +135,7 @@ Err_t Knitter::initMachine(Machine_t machineType) {
   m_machineType = machineType;
 
   m_encoders->init(machineType);
-  GlobalFsm::setState(OpState::init);
+  m_fsm->setState(OpState::init);
 
   // Now that we have enough start state, we can set up interrupts
   setUpInterrupt();
@@ -154,7 +154,7 @@ Err_t Knitter::initMachine(Machine_t machineType) {
 Err_t Knitter::startKnitting(uint8_t startNeedle,
                              uint8_t stopNeedle, uint8_t *pattern_start,
                              bool continuousReportingEnabled) {
-  if (GlobalFsm::getState() != OpState::ready) {
+  if (m_fsm->getState() != OpState::ready) {
     return ErrorCode::wrong_machine_state;
   }
   if (pattern_start == nullptr) {
@@ -177,7 +177,7 @@ Err_t Knitter::startKnitting(uint8_t startNeedle,
   m_lastLineFlag = false;
 
   // proceed to next state
-  GlobalFsm::setState(OpState::knit);
+  m_fsm->setState(OpState::knit);
   m_beeper->ready();
 
   // success
@@ -458,7 +458,7 @@ bool Knitter::calculatePixelAndSolenoid() {
  */
 void Knitter::stopKnitting() const {
   m_beeper->endWork();
-  GlobalFsm::setState(OpState::init);
+  m_fsm->setState(OpState::init);
 
   m_solenoids->setSolenoids(SOLENOIDS_BITMASK);
   m_beeper->finishedLine();

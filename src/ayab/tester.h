@@ -31,9 +31,13 @@
 constexpr uint8_t BUFFER_LEN = 40;
 constexpr unsigned int TEST_LOOP_DELAY = 500; // ms
 
+class FsmInterface;
+
 class TesterInterface {
 public:
   virtual ~TesterInterface() = default;
+
+  virtual void setFsm(FsmInterface *) { }
 
   // any methods that need to be mocked should go here
   virtual Err_t startTest(Machine_t machineType) = 0;
@@ -59,9 +63,10 @@ class KnitterInterface;
 class Tester : public TesterInterface {
 public:
   Tester(BeeperInterface *beeper, SolenoidsInterface *solenoids, ComInterface *com, KnitterInterface *knitter):
-    m_beeper(beeper), m_solenoids(solenoids), m_com(com), m_knitter(knitter) {
-    m_com->setTester(this);
-  }
+    m_beeper(beeper), m_solenoids(solenoids), m_com(com), m_knitter(knitter) { }
+
+  void setFsm(FsmInterface *fsm) { m_fsm = fsm; }
+
   Err_t startTest(Machine_t machineType) final;
   void loop() final;
   void helpCmd() final;
@@ -92,6 +97,7 @@ private:
   SolenoidsInterface *m_solenoids;
   ComInterface *m_com;
   KnitterInterface *m_knitter;
+  FsmInterface *m_fsm;
 
   // ISR static wrapper
   static TesterInterface *s_instance;

@@ -43,10 +43,14 @@ TesterMock *tester = new TesterMock();
 Knitter *knitter = new Knitter(beeper, encoders, solenoids, com);
 Fsm *fsm = new Fsm(com, knitter, tester);
 
-// instantiate singleton classes with mock objects
-FsmInterface *GlobalFsm::m_instance = fsm;
-
 int main(int argc, char *argv[]) {
+  // complete circular references
+  com->setTester(tester);
+  com->setKnitter(knitter);
+  com->setFsm(fsm);
+  knitter->setFsm(fsm);
+  tester->setFsm(fsm);
+
   ::testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }

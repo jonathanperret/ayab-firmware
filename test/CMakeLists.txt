@@ -54,7 +54,6 @@ set(COMMON_SOURCES
 
     ${PROJECT_SOURCE_DIR}/mocks/knitter_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_fsm.cpp
     ${PROJECT_SOURCE_DIR}/mocks/fsm_mock.cpp
     )
 set(COMMON_DEFINES
@@ -130,7 +129,6 @@ add_executable(${PROJECT_NAME}_knitter
     ${PROJECT_SOURCE_DIR}/mocks/tester_mock.cpp
 
     ${SOURCE_DIRECTORY}/fsm.cpp
-    ${SOURCE_DIRECTORY}/global_fsm.cpp
     ${PROJECT_SOURCE_DIR}/test_fsm.cpp
 
     ${SOURCE_DIRECTORY}/knitter.cpp

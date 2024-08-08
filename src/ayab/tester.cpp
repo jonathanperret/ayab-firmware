@@ -158,7 +158,7 @@ void Tester::quitCmd() {
   detachInterrupt(digitalPinToInterrupt(ENC_PIN_A));
   detachInterrupt(digitalPinToInterrupt(ENC_PIN_B));
 
-  GlobalFsm::setState(OpState::init);
+  m_fsm->setState(OpState::init);
   m_knitter->setUpInterrupt();
 }
 
@@ -168,9 +168,9 @@ void Tester::quitCmd() {
  * \return Error code (0 = success, other values = error).
  */
 Err_t Tester::startTest(Machine_t machineType) {
-  OpState_t currentState = GlobalFsm::getState();
+  OpState_t currentState = m_fsm->getState();
   if (OpState::wait_for_machine == currentState || OpState::init == currentState || OpState::ready == currentState) {
-    GlobalFsm::setState(OpState::test);
+    m_fsm->setState(OpState::test);
     m_knitter->setMachineType(machineType);
     setUp();
     return ErrorCode::success;
