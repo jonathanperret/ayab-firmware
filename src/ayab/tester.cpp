@@ -188,7 +188,6 @@ void Tester::loop() {
   }
 }
 
-#ifndef AYAB_TESTS
 /*!
  * \brief Interrupt service routine for encoder A.
  */
@@ -196,7 +195,6 @@ void Tester::encoderChange() {
   digitalWrite(LED_PIN_A, digitalRead(ENC_PIN_A));
   digitalWrite(LED_PIN_B, digitalRead(ENC_PIN_B));
 }
-#endif // AYAB_TESTS
 
 // Private member functions
 
@@ -215,8 +213,8 @@ void Tester::setUp() {
 
 #ifndef AYAB_TESTS
   // Attach interrupts for both encoder pins
-  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), GlobalTester::encoderChange, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENC_PIN_B), GlobalTester::encoderChange, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC_PIN_A), _encoderChange, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC_PIN_B), _encoderChange, CHANGE);
 #endif // AYAB_TESTS
 
   m_autoReadOn = false;
@@ -225,7 +223,7 @@ void Tester::setUp() {
   m_timerEventOdd = false;
 
   // Enable beeper so that it can be tested
-  GlobalBeeper::init(true);
+  m_beeper->init(true);
 }
 
 /*!
@@ -307,4 +305,9 @@ void Tester::handleTimerEvent() {
     }
   }
   m_timerEventOdd = !m_timerEventOdd;
+}
+
+TesterInterface *Tester::m_instance;
+void Tester::_encoderChange() {
+  m_instance->encoderChange();
 }

@@ -138,37 +138,37 @@ void Com::onPacketReceived(const uint8_t *buffer, size_t size) {
     return h_reqTest();
 
   case AYAB_API::helpCmd:
-    return GlobalTester::helpCmd();
+    return m_tester->helpCmd();
 
   case AYAB_API::sendCmd:
-    return GlobalTester::sendCmd();
+    return m_tester->sendCmd();
 
   case AYAB_API::beepCmd:
-    return GlobalTester::beepCmd();
+    return m_tester->beepCmd();
 
   case AYAB_API::setSingleCmd:
-    return GlobalTester::setSingleCmd(buffer, size);
+    return m_tester->setSingleCmd(buffer, size);
 
   case AYAB_API::setAllCmd:
-    return GlobalTester::setAllCmd(buffer, size);
+    return m_tester->setAllCmd(buffer, size);
 
   case AYAB_API::readEOLsensorsCmd:
-    return GlobalTester::readEOLsensorsCmd();
+    return m_tester->readEOLsensorsCmd();
 
   case AYAB_API::readEncodersCmd:
-    return GlobalTester::readEncodersCmd();
+    return m_tester->readEncodersCmd();
 
   case AYAB_API::autoReadCmd:
-    return GlobalTester::autoReadCmd();
+    return m_tester->autoReadCmd();
 
   case AYAB_API::autoTestCmd:
-    return GlobalTester::autoTestCmd();
+    return m_tester->autoTestCmd();
 
   case AYAB_API::stopCmd:
-    return GlobalTester::stopCmd();
+    return m_tester->stopCmd();
 
    case AYAB_API::quitCmd:
-    return GlobalTester::quitCmd();
+    return m_tester->quitCmd();
 
   default:
     return h_unrecognized();
@@ -303,7 +303,7 @@ void Com::h_reqTest() const {
   // Note (August 2020): the return value of this function has changed.
   // Previously, it returned `true` for success and `false` for failure.
   // Now, it returns `0` for success and an informative error code otherwise.
-  Err_t error = GlobalTester::startTest(machineType);
+  Err_t error = m_tester->startTest(machineType);
   send_cnfTest(error);
 }
 

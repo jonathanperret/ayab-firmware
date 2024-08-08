@@ -39,15 +39,13 @@ BeeperMock *beeper = new BeeperMock();
 EncodersMock *encoders = new EncodersMock();
 SolenoidsMock *solenoids = new SolenoidsMock();
 ComMock *com = new ComMock();
-Fsm *fsm = new Fsm(com);
-Knitter *knitter = new Knitter(beeper, encoders, solenoids, com);
 TesterMock *tester = new TesterMock();
+Knitter *knitter = new Knitter(beeper, encoders, solenoids, com);
+Fsm *fsm = new Fsm(com, tester);
 
 // instantiate singleton classes with mock objects
 FsmInterface *GlobalFsm::m_instance = fsm;
 KnitterInterface *GlobalKnitter::m_instance = knitter;
-
-TesterInterface *GlobalTester::m_instance = tester;
 
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleMock(&argc, argv);

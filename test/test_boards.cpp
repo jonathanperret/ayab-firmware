@@ -44,8 +44,6 @@ FsmMock *fsm = new FsmMock();
 KnitterMock *knitter = new KnitterMock();
 
 // initialize static members
-TesterInterface *GlobalTester::m_instance = tester;
-
 FsmInterface *GlobalFsm::m_instance = fsm;
 KnitterInterface *GlobalKnitter::m_instance = knitter;
 

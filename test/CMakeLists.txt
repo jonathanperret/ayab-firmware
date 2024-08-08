@@ -50,7 +50,6 @@ set(COMMON_SOURCES
     ${PROJECT_SOURCE_DIR}/test_com.cpp
 
     ${SOURCE_DIRECTORY}/tester.cpp
-    ${SOURCE_DIRECTORY}/global_tester.cpp
     ${PROJECT_SOURCE_DIR}/test_tester.cpp
 
     ${SOURCE_DIRECTORY}/global_knitter.cpp
@@ -129,7 +128,6 @@ add_executable(${PROJECT_NAME}_knitter
 
     ${PROJECT_SOURCE_DIR}/mocks/solenoids_mock.cpp
 
-    ${SOURCE_DIRECTORY}/global_tester.cpp
     ${PROJECT_SOURCE_DIR}/mocks/tester_mock.cpp
 
     ${SOURCE_DIRECTORY}/fsm.cpp

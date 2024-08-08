@@ -142,7 +142,7 @@ void Fsm::state_knit() const {
  */
 void Fsm::state_test() const {
   GlobalKnitter::encodePosition();
-  GlobalTester::loop();
+  m_tester->loop();
   if (m_nextState == OpState::init) {
     // quit test
     GlobalKnitter::init();

@@ -114,9 +114,12 @@ public:
   static void dispatch();
 };
 
+class TesterInterface;
+
 class Fsm : public FsmInterface {
 public:
-  Fsm(ComInterface *com): m_com(com) { }
+  Fsm(ComInterface *com, TesterInterface *tester): m_com(com), m_tester(tester) { }
+
   void init() final;
   OpState_t getState() final;
   void setState(OpState_t state) final;
@@ -132,6 +135,7 @@ private:
 
   // collaborators
   ComInterface *m_com;
+  TesterInterface *m_tester;
 
   // machine state
   OpState_t m_currentState;
