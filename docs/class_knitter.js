@@ -20,6 +20,7 @@ var class_knitter =
     [ "m_beltShift", "class_knitter.html#af2c79cc66001279a20875f5298b01b06", null ],
     [ "m_carriage", "class_knitter.html#aebbd8815ccb800fcdf0676ae828152dd", null ],
     [ "m_continuousReportingEnabled", "class_knitter.html#a3f9208501c9369916b398de6c899b521", null ],
+    [ "m_currentLineDirection", "class_knitter.html#a30338e0f835aac68f3aaf3cc1e2340de", null ],
     [ "m_currentLineNumber", "class_knitter.html#a1c84ce8a808384888e28c97badbe279f", null ],
     [ "m_direction", "class_knitter.html#a1b01af623787f5ee8f17e5d7e6262b1b", null ],
     [ "m_firstRun", "class_knitter.html#abbf4dc6ee40bb8f4f1700e3445232273", null ],

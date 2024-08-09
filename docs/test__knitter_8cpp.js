@@ -15,6 +15,7 @@ var test__knitter_8cpp =
     [ "TEST_F", "test__knitter_8cpp.html#a34bbb9d85451eafc67764100d8c125ec", null ],
     [ "TEST_F", "test__knitter_8cpp.html#a0221c2ab2e58deae09a49a3510236bae", null ],
     [ "TEST_F", "test__knitter_8cpp.html#aaf366c02da750a8af42c2fa7d8e07fff", null ],
+    [ "TEST_F", "test__knitter_8cpp.html#a68c35ec841f1bbd748741b719513a014", null ],
     [ "TEST_F", "test__knitter_8cpp.html#a9478de7cd2cb61f3865d8dffe10e9901", null ],
     [ "TEST_F", "test__knitter_8cpp.html#a0d334c82edf850f6894f8ca26e319a1e", null ],
     [ "TEST_F", "test__knitter_8cpp.html#a5b18354edb8e287ec717c10c43b0e117", null ],
