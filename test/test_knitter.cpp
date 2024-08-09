@@ -35,6 +35,7 @@
 
 using ::testing::_;
 using ::testing::AtLeast;
+using ::testing::AnyNumber;
 using ::testing::Mock;
 using ::testing::Return;
 using ::testing::TypedEq;
@@ -413,6 +414,59 @@ TEST_F(KnitterTest, test_knit_Kh910) {
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expect_indState();
   expected_dispatch_knit(false);
+
+  // test expectations without destroying instance
+  ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
+  ASSERT_TRUE(Mock::VerifyAndClear(encodersMock));
+  ASSERT_TRUE(Mock::VerifyAndClear(beeperMock));
+  ASSERT_TRUE(Mock::VerifyAndClear(comMock));
+}
+
+TEST_F(KnitterTest, test_knit_should_not_request_new_line_if_carriage_goes_back_one_needle_inside_working_area) {
+  get_to_ready(Machine_t::Kh910);
+
+  // knit
+  uint8_t pattern[25] = { };
+
+  // not interested in solenoids or beeps for this test
+  EXPECT_CALL(*solenoidsMock, setSolenoid).Times(AnyNumber());
+  EXPECT_CALL(*beeperMock, finishedLine).Times(AnyNumber());
+
+  const uint8_t startNeedle = 0;
+  const uint8_t stopNeedle = 100;
+  knitter->startKnitting(startNeedle, stopNeedle, pattern, /* continuous_reporting */ false);
+
+  // first knit: should request first line
+  EXPECT_CALL(*comMock, send_reqLine);
+  knitter->knit();
+
+  // confirm reception of first line
+  knitter->setNextLine(0);
+
+  // offset between working needle and m_position, for K carriage moving rightwards
+  const int startOffset = START_OFFSET[(int)MachineType::Kh910][(int)Direction::Left][(int)Carriage::Knit];
+  ASSERT_EQ(startOffset, 40);
+
+  // working on a needle near the end of the work area
+  expected_isr(90 + startOffset, Direction_t::Right, Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
+  knitter->knit();
+
+  // at this point m_workedOnLine should be true
+
+  // going back left one needle
+  expected_isr(89 + startOffset,
+    Direction_t::Right, // works
+    // Direction_t::Left,  // wrongly triggers new line
+    Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
+  // should not request a new line!
+  EXPECT_CALL(*comMock, send_reqLine).Times(0);
+  knitter->knit();
+
+  // going rightwards to well outside the work area
+  expected_isr(150 + startOffset, Direction_t::Right, Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
+  // should request a new line
+  EXPECT_CALL(*comMock, send_reqLine(1, ErrorCode::success));
+  knitter->knit();
 
   // test expectations without destroying instance
   ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
