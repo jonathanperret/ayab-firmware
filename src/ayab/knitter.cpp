@@ -270,9 +270,7 @@ void Knitter::knit() {
     indState(ErrorCode::success);
   }
 
-  if (!calculatePixelAndSolenoid()
-    || m_direction == Direction::NoDirection // TODO this is only here to make an old test pass
-  ) {
+  if (!calculatePixelAndSolenoid()) {
     // no valid/useful position calculated
     return;
   }

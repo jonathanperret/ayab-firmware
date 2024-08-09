@@ -398,7 +398,7 @@ TEST_F(KnitterTest, test_knit_Kh910) {
   expected_dispatch_knit(false);
 
   // no useful position calculated by `calculatePixelAndSolenoid()`
-  expected_isr(100, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
+  expected_isr(0, Direction_t::Right, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
   EXPECT_CALL(*solenoidsMock, setSolenoid).Times(0);
   expect_indState();
   expected_dispatch_knit(false);
@@ -500,7 +500,7 @@ TEST_F(KnitterTest, test_knit_Kh270) {
   expected_dispatch_knit(false);
 
   // no useful position calculated by `calculatePixelAndSolenoid()`
-  expected_isr(60, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
+  expected_isr(0, Direction_t::Right, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
   EXPECT_CALL(*solenoidsMock, setSolenoid).Times(0);
   expect_indState();
   expected_dispatch_knit(false);
