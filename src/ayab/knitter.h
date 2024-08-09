@@ -119,6 +119,8 @@ private:
   uint8_t *m_lineBuffer;
   bool m_continuousReportingEnabled;
 
+  Direction m_currentLineDirection;
+
   // current machine state
   uint8_t m_position;
   Direction_t m_direction;
