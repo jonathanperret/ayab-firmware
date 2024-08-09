@@ -455,8 +455,7 @@ TEST_F(KnitterTest, test_knit_should_not_request_new_line_if_carriage_goes_back_
 
   // going back left one needle
   expected_isr(89 + startOffset,
-    Direction_t::Right, // works
-    // Direction_t::Left,  // wrongly triggers new line
+    Direction_t::Left,
     Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
   // should not request a new line!
   EXPECT_CALL(*comMock, send_reqLine).Times(0);
@@ -585,6 +584,7 @@ TEST_F(KnitterTest, test_knit_lastLine_and_no_req) {
       knitter->m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1;
   knitter->m_firstRun = false;
   knitter->m_direction = Direction_t::Left;
+  knitter->m_currentLineDirection = Direction_t::Left;
   knitter->m_position = wanted_pixel + knitter->getStartOffset(Direction_t::Right);
   knitter->m_workedOnLine = true;
   knitter->m_lineRequested = false;

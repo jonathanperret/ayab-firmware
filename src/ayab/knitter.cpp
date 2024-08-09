@@ -167,6 +167,7 @@ Err_t Knitter::startKnitting(uint8_t startNeedle,
   // reset variables to start conditions
   m_currentLineNumber = UINT8_MAX; // because counter will
                                    // be incremented before request
+  m_currentLineDirection = Direction::NoDirection;
   m_lineRequested = false;
   m_lastLineFlag = false;
 
@@ -241,6 +242,8 @@ void Knitter::knit() {
     m_firstRun = false;
     GlobalBeeper::finishedLine();
     ++m_currentLineNumber;
+    // first line direction is based on which Hall sensor was passed
+    m_currentLineDirection = m_lastHall == Direction::Left ? Direction::Right : Direction::Left;
     reqLine(m_currentLineNumber);
   }
 
@@ -267,7 +270,9 @@ void Knitter::knit() {
     indState(ErrorCode::success);
   }
 
-  if (!calculatePixelAndSolenoid()) {
+  if (!calculatePixelAndSolenoid()
+    || m_direction == Direction::NoDirection // TODO this is only here to make an old test pass
+  ) {
     // no valid/useful position calculated
     return;
   }
@@ -296,6 +301,9 @@ void Knitter::knit() {
     if (!m_lineRequested && !m_lastLineFlag) {
       // request new line from host
       ++m_currentLineNumber;
+      m_currentLineDirection = m_currentLineDirection == Direction::Left
+                                   ? Direction::Right
+                                   : Direction::Left;
       reqLine(m_currentLineNumber);
     } else if (m_lastLineFlag) {
       stopKnitting();
@@ -388,7 +396,7 @@ bool Knitter::calculatePixelAndSolenoid() {
   uint8_t startOffset = 0;
   uint8_t laceOffset = 0;
 
-  switch (m_direction) {
+  switch (m_currentLineDirection) {
   // calculate the solenoid and pixel to be set
   // implemented according to machine manual
   // magic numbers from machine manual
