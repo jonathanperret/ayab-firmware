@@ -289,8 +289,21 @@ void Knitter::knit() {
     m_workedOnLine = true;
   }
 
-  if (((m_pixelToSet < m_startNeedle - END_OF_LINE_OFFSET_L[static_cast<uint8_t>(m_machineType)]) ||
-       (m_pixelToSet > m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(m_machineType)])) &&
+  // Compute the position of both "needle checkers" as they both need to clear
+  // the last needle before the carriage can safely turn around.
+  int leftCheckerPosition = m_position - getStartOffset(Direction::Left);
+  int rightCheckerPosition = m_position - getStartOffset(Direction::Right);
+
+  // The limits we are testing against are the working needles plus a safety margin
+  int leftLimit = m_startNeedle - END_OF_LINE_OFFSET_L[static_cast<uint8_t>(m_machineType)];
+  int rightLimit = m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(m_machineType)];
+
+  // If going left, the rightmost checker must have cleared the left limit;
+  // otherwise, the leftmost checker must have cleared the right limit.
+  if (((m_currentLineDirection == Direction::Left &&
+        (std::max(leftCheckerPosition, rightCheckerPosition) < leftLimit)) ||
+       (m_currentLineDirection == Direction::Right &&
+        (std::min(leftCheckerPosition, rightCheckerPosition) > rightLimit))) &&
       m_workedOnLine) {
     // outside of the active needles and
     // already worked on the current line -> finished the line

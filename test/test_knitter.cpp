@@ -586,13 +586,19 @@ TEST_F(KnitterTest, test_knit_lastLine) {
 
   // Run one knit inside the working needles.
   EXPECT_CALL(*solenoidsMock, setSolenoid);
-  expected_isr(knitter->getStartOffset(Direction_t::Left) + 20);
+  expected_isr(knitter->getStartOffset(Direction_t::Left) + 20,
+               Direction::Right, Direction::Left, BeltShift::Regular,
+               Carriage::Knit);
   // `m_workedOnLine` is set to true
   expected_dispatch_knit(false);
 
   // Position has changed since last call to operate function
   // `m_pixelToSet` is above `m_stopNeedle` + END_OF_LINE_OFFSET_R
-  expected_isr(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
+  expected_isr(
+      NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] +
+          END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 +
+          knitter->getStartOffset(Direction_t::Left),
+      Direction::Right, Direction::Left, BeltShift::Regular, Carriage::Knit);
 
   // `m_lastLineFlag` is `true`
   knitter->setLastLine();
@@ -618,8 +624,8 @@ TEST_F(KnitterTest, test_knit_lastLine_and_no_req) {
   uint8_t wanted_pixel =
       knitter->m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1;
   knitter->m_firstRun = false;
-  knitter->m_currentLineDirection = Direction_t::Left;
-  knitter->m_position = wanted_pixel + knitter->getStartOffset(Direction_t::Right);
+  knitter->m_currentLineDirection = Direction_t::Right;
+  knitter->m_position = wanted_pixel + knitter->getStartOffset(Direction_t::Left);
   knitter->m_workedOnLine = true;
   knitter->m_lineRequested = false;
   knitter->m_lastLineFlag = true;
@@ -662,13 +668,19 @@ TEST_F(KnitterTest, test_knit_new_line) {
 
   // Run one knit inside the working needles.
   EXPECT_CALL(*solenoidsMock, setSolenoid);
-  expected_isr(knitter->getStartOffset(Direction_t::Left) + 20);
+  expected_isr(knitter->getStartOffset(Direction_t::Left) + 20,
+               Direction::Right, Direction::Left, BeltShift::Regular,
+               Carriage::Knit);
   // `m_workedOnLine` is set to true
   expected_dispatch_knit(false);
 
   // Position has changed since last call to operate function
   // `m_pixelToSet` is above `m_stopNeedle` + END_OF_LINE_OFFSET_R
-  expected_isr(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
+  expected_isr(
+      NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] +
+          END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 +
+          knitter->getStartOffset(Direction_t::Left),
+      Direction::Right, Direction::Left, BeltShift::Regular, Carriage::Knit);
 
   // set `m_lineRequested` to `false`
   EXPECT_CALL(*beeperMock, finishedLine);
