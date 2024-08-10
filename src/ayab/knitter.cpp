@@ -73,7 +73,6 @@ void Knitter::init() {
   m_lastLineFlag = false;
   m_sOldPosition = 0U;
   m_firstRun = true;
-  m_workedOnLine = false;
   m_lastHall = Direction_t::NoDirection;
   m_position = 0U;
   m_hallActive = Direction_t::NoDirection;
@@ -285,17 +284,26 @@ void Knitter::knit() {
   // write Pixel state to the appropriate needle
   GlobalSolenoids::setSolenoid(m_solenoidToSet, pixelValue);
 
-  if ((m_pixelToSet >= m_startNeedle) && (m_pixelToSet <= m_stopNeedle)) {
-    m_workedOnLine = true;
-  }
+  // Compute the position of both "needle selectors" as they both need to clear
+  // the last needle before the carriage can safely turn around.
+  // Using int here as the results may be negative.
+  int leftSelectorPosition = m_position - getStartOffset(Direction::Left);
+  int rightSelectorPosition = m_position - getStartOffset(Direction::Right);
 
-  if (((m_pixelToSet < m_startNeedle - END_OF_LINE_OFFSET_L[static_cast<uint8_t>(m_machineType)]) ||
-       (m_pixelToSet > m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(m_machineType)])) &&
-      m_workedOnLine) {
-    // outside of the active needles and
-    // already worked on the current line -> finished the line
-    m_workedOnLine = false;
+  // The limits we are testing against are the working needles plus a safety margin
+  int leftLimit = m_startNeedle - END_OF_LINE_OFFSET_L[static_cast<uint8_t>(m_machineType)];
+  int rightLimit = m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(m_machineType)];
 
+  // If going left, both selectors must have cleared the left limit before we
+  // consider the row done; if going right, both selectors must have cleared the
+  // right limit.
+  if (((m_currentLineDirection == Direction::Left &&
+        leftSelectorPosition < leftLimit &&
+        rightSelectorPosition < leftLimit) ||
+       (m_currentLineDirection == Direction::Right &&
+        leftSelectorPosition > rightLimit &&
+        rightSelectorPosition > rightLimit))) {
+    // both selectors are beyond the last needle? -> finished the line
     if (!m_lineRequested && !m_lastLineFlag) {
       // request new line from host
       ++m_currentLineNumber;
