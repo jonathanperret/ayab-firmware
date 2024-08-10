@@ -301,9 +301,9 @@ void Knitter::knit() {
   // If going left, the rightmost checker must have cleared the left limit;
   // otherwise, the leftmost checker must have cleared the right limit.
   if (((m_currentLineDirection == Direction::Left &&
-        (std::max(leftCheckerPosition, rightCheckerPosition) < leftLimit)) ||
+        leftCheckerPosition < leftLimit && rightCheckerPosition < leftLimit) ||
        (m_currentLineDirection == Direction::Right &&
-        (std::min(leftCheckerPosition, rightCheckerPosition) > rightLimit))) &&
+        leftCheckerPosition > rightLimit && rightCheckerPosition > rightLimit)) &&
       m_workedOnLine) {
     // outside of the active needles and
     // already worked on the current line -> finished the line
