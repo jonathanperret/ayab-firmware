@@ -35,7 +35,9 @@
 
 using ::testing::_;
 using ::testing::AtLeast;
+using ::testing::AtMost;
 using ::testing::AnyNumber;
+using ::testing::Assign;
 using ::testing::Mock;
 using ::testing::Return;
 using ::testing::TypedEq;
@@ -425,15 +427,18 @@ TEST_F(KnitterTest, test_knit_Kh910) {
 TEST_F(KnitterTest, test_knit_should_not_request_new_line_if_carriage_goes_back_one_needle_inside_working_area) {
   get_to_ready(Machine_t::Kh910);
 
-  // knit
+  // not interested in beeps for this test
+  EXPECT_CALL(*beeperMock, finishedLine).Times(AnyNumber());
+
+  // 0-only pattern for the first row
   uint8_t pattern[25] = { };
 
-  // not interested in solenoids or beeps for this test
-  EXPECT_CALL(*solenoidsMock, setSolenoid).Times(AnyNumber());
-  EXPECT_CALL(*beeperMock, finishedLine).Times(AnyNumber());
+  // all solenoids should be set to 0 only for the first row
+  EXPECT_CALL(*solenoidsMock, setSolenoid(_, 0)).Times(AnyNumber());
 
   const uint8_t startNeedle = 0;
   const uint8_t stopNeedle = 100;
+  const Carriage carriageType = Carriage::Garter;
   knitter->startKnitting(startNeedle, stopNeedle, pattern, /* continuous_reporting */ false);
 
   // first knit: should request first line
@@ -444,28 +449,58 @@ TEST_F(KnitterTest, test_knit_should_not_request_new_line_if_carriage_goes_back_
   knitter->setNextLine(0);
 
   // offset between working needle and m_position, for K carriage moving rightwards
-  const int startOffset = START_OFFSET[(int)MachineType::Kh910][(int)Direction::Left][(int)Carriage::Knit];
-  ASSERT_EQ(startOffset, 40);
+  const int startOffset =
+      START_OFFSET[(int)MachineType::Kh910]
+                  // yes, Direction::Left is for a carriage moving rightwards
+                  [(int)Direction::Left][(int)carriageType];
+
+  int currentPosition;
 
   // working on a needle near the end of the work area
-  expected_isr(90 + startOffset, Direction_t::Right, Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
+  expected_isr(currentPosition = 90 + startOffset, Direction::Right, Direction::NoDirection, BeltShift::Regular, carriageType);
   knitter->knit();
 
   // at this point m_workedOnLine should be true
 
   // going back left one needle
-  expected_isr(89 + startOffset,
-    Direction_t::Left,
-    Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
+  expected_isr(--currentPosition,
+    Direction::Left,
+    Direction::NoDirection, BeltShift::Regular, carriageType);
   // should not request a new line!
   EXPECT_CALL(*comMock, send_reqLine).Times(0);
   knitter->knit();
 
-  // going rightwards to well outside the work area
-  expected_isr(150 + startOffset, Direction_t::Right, Direction_t::NoDirection, BeltShift::Regular, Carriage_t::Knit);
-  // should request a new line
-  EXPECT_CALL(*comMock, send_reqLine(1, ErrorCode::success));
+  // going rightwards to the last needle in work (stop_needle)
+  expected_isr(currentPosition = stopNeedle + startOffset, Direction::Right, Direction::NoDirection, BeltShift::Regular, carriageType);
+  // should not request a new line yet
+  EXPECT_CALL(*comMock, send_reqLine).Times(0);
   knitter->knit();
+
+  // going rightwards to just outside the work area
+  expected_isr(++currentPosition, Direction::Right, Direction::NoDirection, BeltShift::Regular, carriageType);
+  // should not request a new line (because of END_OF_LINE_OFFSET_R)
+  EXPECT_CALL(*comMock, send_reqLine).Times(0);
+  knitter->knit();
+
+  // move rightwards until the line is requested
+  bool lineWasRequested = false;
+  EXPECT_CALL(*comMock, send_reqLine(1, _)).Times(AtMost(1)).WillOnce(Assign(&lineWasRequested, true));
+  while (!lineWasRequested) {
+    // safety valve if the line is never requested
+    ASSERT_LT(currentPosition, 200);
+    // going rightwards one needle at a time
+    expected_isr(++currentPosition, Direction::Right, Direction::NoDirection, BeltShift::Regular, carriageType);
+    // at some point it should request a new line
+    knitter->knit();
+  }
+
+  // the line should have been requested at a point where the
+  // leftwards needle checker is outside of the work area
+  const int leftwardsOffset =
+      START_OFFSET[(int)MachineType::Kh910]
+                  // yes, Direction::Right is for a carriage moving leftwards
+                  [(int)Direction::Right][(int)carriageType];
+  ASSERT_GT(currentPosition - leftwardsOffset, stopNeedle);
 
   // test expectations without destroying instance
   ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
@@ -583,7 +618,6 @@ TEST_F(KnitterTest, test_knit_lastLine_and_no_req) {
   uint8_t wanted_pixel =
       knitter->m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1;
   knitter->m_firstRun = false;
-  knitter->m_direction = Direction_t::Left;
   knitter->m_currentLineDirection = Direction_t::Left;
   knitter->m_position = wanted_pixel + knitter->getStartOffset(Direction_t::Right);
   knitter->m_workedOnLine = true;
