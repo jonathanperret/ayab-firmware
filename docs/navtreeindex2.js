@@ -1,6 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"class_tester.html#a3164379110ee960f61e992f68e2323a8":[9,0,35,24],
 "class_tester.html#a342ef41d59162445c3bcba69d8f7928b":[9,0,35,22],
 "class_tester.html#a3bd42df7381ad5dcf440ccd05f76e4de":[9,0,35,26],
 "class_tester.html#a4e4ea67945a05ac9a52950c158abb9d2":[9,0,35,7],
@@ -236,8 +235,8 @@ var NAVTREEINDEX2 =
 "globals_func.html":[10,1,1],
 "globals_vars.html":[10,1,2],
 "hierarchy.html":[9,2],
-"index.html":[0],
 "index.html":[],
+"index.html":[0],
 "index.html#autotoc_md23":[0,0],
 "index.html#autotoc_md24":[0,1],
 "index.html#autotoc_md25":[0,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX2 =
 "index.html#autotoc_md31":[0,3,2,0],
 "index.html#autotoc_md32":[0,3,2,1],
 "index.html#autotoc_md33":[0,3,2,2],
-"index.html#autotoc_md34":[0,3,2,3]
+"index.html#autotoc_md34":[0,3,2,3],
+"index.html#autotoc_md35":[0,3,3]
 };
