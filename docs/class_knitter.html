@@ -75,7 +75,7 @@ Inheritance diagram for Knitter:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_knitter__inherit__graph.png" border="0" usemap="#a_knitter_inherit__map" alt="Inheritance graph"/></div>
 <map name="a_knitter_inherit__map" id="a_knitter_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,336,243,809"/>
+<area shape="rect" title=" " alt="" coords="5,336,243,795"/>
 <area shape="rect" href="class_knitter_interface.html" title=" " alt="" coords="44,5,204,288"/>
 </map>
 </div>
@@ -84,7 +84,7 @@ Collaboration diagram for Knitter:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_knitter__coll__graph.png" border="0" usemap="#a_knitter_coll__map" alt="Collaboration graph"/></div>
 <map name="a_knitter_coll__map" id="a_knitter_coll__map">
-<area shape="rect" title=" " alt="" coords="5,336,243,809"/>
+<area shape="rect" title=" " alt="" coords="5,336,243,795"/>
 <area shape="rect" href="class_knitter_interface.html" title=" " alt="" coords="44,5,204,288"/>
 </map>
 </div>
@@ -144,9 +144,6 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a5cc38250cabe7a19332b0ad0fbacf3cc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_knitter.html#a5cc38250cabe7a19332b0ad0fbacf3cc">calculatePixelAndSolenoid</a> ()</td></tr>
 <tr class="memdesc:a5cc38250cabe7a19332b0ad0fbacf3cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the solenoid and pixel to be set.  <a href="class_knitter.html#a5cc38250cabe7a19332b0ad0fbacf3cc">More...</a><br /></td></tr>
 <tr class="separator:a5cc38250cabe7a19332b0ad0fbacf3cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e2bff4eceaf029b45001ee4643387aa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_knitter.html#a7e2bff4eceaf029b45001ee4643387aa">isLineFinished</a> ()</td></tr>
-<tr class="memdesc:a7e2bff4eceaf029b45001ee4643387aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assess whether the current line is done being knitted, based on the position of the carriage.  <a href="class_knitter.html#a7e2bff4eceaf029b45001ee4643387aa">More...</a><br /></td></tr>
-<tr class="separator:a7e2bff4eceaf029b45001ee4643387aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2131cebe8b25d9f84300a851a95044ac"><td class="memItemLeft" align="right" valign="top"><a id="a2131cebe8b25d9f84300a851a95044ac"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_knitter.html#a2131cebe8b25d9f84300a851a95044ac">stopKnitting</a> () const</td></tr>
 <tr class="memdesc:a2131cebe8b25d9f84300a851a95044ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finish knitting procedure. <br /></td></tr>
@@ -190,9 +187,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_lineRequested</b></
 <tr class="memitem:a1c84ce8a808384888e28c97badbe279f"><td class="memItemLeft" align="right" valign="top"><a id="a1c84ce8a808384888e28c97badbe279f"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_currentLineNumber</b></td></tr>
 <tr class="separator:a1c84ce8a808384888e28c97badbe279f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30338e0f835aac68f3aaf3cc1e2340de"><td class="memItemLeft" align="right" valign="top"><a id="a30338e0f835aac68f3aaf3cc1e2340de"></a>
-Direction&#160;</td><td class="memItemRight" valign="bottom"><b>m_currentLineDirection</b></td></tr>
-<tr class="separator:a30338e0f835aac68f3aaf3cc1e2340de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac10e07cf0df380cce110623c2c4d64d6"><td class="memItemLeft" align="right" valign="top"><a id="ac10e07cf0df380cce110623c2c4d64d6"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_lastLineFlag</b></td></tr>
 <tr class="separator:ac10e07cf0df380cce110623c2c4d64d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -202,6 +196,9 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_sOldPosition</b>
 <tr class="memitem:abbf4dc6ee40bb8f4f1700e3445232273"><td class="memItemLeft" align="right" valign="top"><a id="abbf4dc6ee40bb8f4f1700e3445232273"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_firstRun</b></td></tr>
 <tr class="separator:abbf4dc6ee40bb8f4f1700e3445232273"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21be3b7f856381e717feab49684796b8"><td class="memItemLeft" align="right" valign="top"><a id="a21be3b7f856381e717feab49684796b8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_workedOnLine</b></td></tr>
+<tr class="separator:a21be3b7f856381e717feab49684796b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab831350b2ae5c547cc839eda524ca5ed"><td class="memItemLeft" align="right" valign="top"><a id="ab831350b2ae5c547cc839eda524ca5ed"></a>
 Direction_t&#160;</td><td class="memItemRight" valign="bottom"><b>m_lastHall</b></td></tr>
 <tr class="separator:ab831350b2ae5c547cc839eda524ca5ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -367,9 +364,8 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_knitter_ad00d6b246c74e1d7cc9c78ffaa2684fc_icgraph.png" border="0" usemap="#aclass_knitter_ad00d6b246c74e1d7cc9c78ffaa2684fc_icgraph" alt=""/></div>
 <map name="aclass_knitter_ad00d6b246c74e1d7cc9c78ffaa2684fc_icgraph" id="aclass_knitter_ad00d6b246c74e1d7cc9c78ffaa2684fc_icgraph">
-<area shape="rect" title="Get start offset." alt="" coords="464,42,629,69"/>
+<area shape="rect" title="Get start offset." alt="" coords="464,13,629,39"/>
 <area shape="rect" href="class_knitter.html#a5cc38250cabe7a19332b0ad0fbacf3cc" title="Calculate the solenoid and pixel to be set." alt="" coords="227,5,416,47"/>
-<area shape="rect" href="class_knitter.html#a7e2bff4eceaf029b45001ee4643387aa" title="Assess whether the current line is done being knitted, based on the position of the carriage." alt="" coords="238,71,405,98"/>
 <area shape="rect" href="class_knitter.html#af36522669a315dca49ce48af61c5dbdd" title="Record current encoder position." alt="" coords="5,13,179,39"/>
 </map>
 </div>
@@ -414,8 +410,9 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_knitter_a92edc0570fa4e718302aa8fa2e36c482_icgraph.png" border="0" usemap="#aclass_knitter_a92edc0570fa4e718302aa8fa2e36c482_icgraph" alt=""/></div>
 <map name="aclass_knitter_a92edc0570fa4e718302aa8fa2e36c482_icgraph" id="aclass_knitter_a92edc0570fa4e718302aa8fa2e36c482_icgraph">
-<area shape="rect" title="Send indState message." alt="" coords="227,5,355,32"/>
+<area shape="rect" title="Send indState message." alt="" coords="227,31,355,57"/>
 <area shape="rect" href="class_knitter.html#af36522669a315dca49ce48af61c5dbdd" title="Record current encoder position." alt="" coords="5,5,179,32"/>
+<area shape="rect" href="class_knitter.html#a8edb0e49c22e0b38345a24ddbd31fd81" title="Function that is repeatedly called during state OpState::knit" alt="" coords="43,56,141,83"/>
 </map>
 </div>
 
@@ -485,45 +482,6 @@ Here is the caller graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>Error code (0 = success, other values = error). </dd></dl>
 
 <p>Implements <a class="el" href="class_knitter_interface.html">KnitterInterface</a>.</p>
-
-</div>
-</div>
-<a id="a7e2bff4eceaf029b45001ee4643387aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e2bff4eceaf029b45001ee4643387aa">&#9670;&nbsp;</a></span>isLineFinished()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Knitter::isLineFinished </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assess whether the current line is done being knitted, based on the position of the carriage. </p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the line is finished, <code>false</code> * otherwise. </dd></dl>
-
-<p class="reference">References <a class="el" href="class_knitter.html#ad00d6b246c74e1d7cc9c78ffaa2684fc">getStartOffset()</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_knitter_a7e2bff4eceaf029b45001ee4643387aa_cgraph.png" border="0" usemap="#aclass_knitter_a7e2bff4eceaf029b45001ee4643387aa_cgraph" alt=""/></div>
-<map name="aclass_knitter_a7e2bff4eceaf029b45001ee4643387aa_cgraph" id="aclass_knitter_a7e2bff4eceaf029b45001ee4643387aa_cgraph">
-<area shape="rect" title="Assess whether the current line is done being knitted, based on the position of the carriage." alt="" coords="5,5,172,32"/>
-<area shape="rect" href="class_knitter.html#ad00d6b246c74e1d7cc9c78ffaa2684fc" title="Get start offset." alt="" coords="220,5,385,32"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -623,8 +581,9 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_knitter_ac369fe67f9d546a9a1546b4b5e0d9d86_icgraph.png" border="0" usemap="#aclass_knitter_ac369fe67f9d546a9a1546b4b5e0d9d86_icgraph" alt=""/></div>
 <map name="aclass_knitter_ac369fe67f9d546a9a1546b4b5e0d9d86_icgraph" id="aclass_knitter_ac369fe67f9d546a9a1546b4b5e0d9d86_icgraph">
-<area shape="rect" title="Send reqLine message." alt="" coords="205,5,328,32"/>
-<area shape="rect" href="class_knitter.html#a2207ceece59284f18f3d82409644675e" title="Set line number of next row to be knitted." alt="" coords="5,5,157,32"/>
+<area shape="rect" title="Send reqLine message." alt="" coords="205,31,328,57"/>
+<area shape="rect" href="class_knitter.html#a8edb0e49c22e0b38345a24ddbd31fd81" title="Function that is repeatedly called during state OpState::knit" alt="" coords="32,5,131,32"/>
+<area shape="rect" href="class_knitter.html#a2207ceece59284f18f3d82409644675e" title="Set line number of next row to be knitted." alt="" coords="5,56,157,83"/>
 </map>
 </div>
 
@@ -822,7 +781,7 @@ Here is the call graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="class_knitter.html">Knitter</a></li>
-    <li class="footer">Generated on Fri Aug 16 2024 19:23:59 for AYAB Arduino Firmware by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Fri Nov 8 2024 18:19:02 for AYAB Arduino Firmware by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

@@ -106,9 +106,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_adafruit___m_c_p23008_8h_source.html",
-"class_fsm_test.html#a89fcb926cc5fb20ab003e62a27435ade",
-"class_tester.html#a3164379110ee960f61e992f68e2323a8",
-"index.html#autotoc_md35"
+"class_fsm_test.html#a1a6a3438efb2b76f801ed29d7ffa81f6",
+"class_solenoids_test.html#aed17c74d2af395a9be47a3ad3194ef9a",
+"index.html#autotoc_md27"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

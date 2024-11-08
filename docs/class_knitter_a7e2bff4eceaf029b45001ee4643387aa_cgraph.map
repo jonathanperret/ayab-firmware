@@ -1,4 +1,0 @@
-<map id="Knitter::isLineFinished" name="Knitter::isLineFinished">
-<area shape="rect" id="node1" title="Assess whether the current line is done being knitted, based on the position of the carriage." alt="" coords="5,5,172,32"/>
-<area shape="rect" id="node2" href="$class_knitter.html#ad00d6b246c74e1d7cc9c78ffaa2684fc" title="Get start offset." alt="" coords="220,5,385,32"/>
-</map>

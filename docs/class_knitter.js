@@ -7,7 +7,6 @@ var class_knitter =
     [ "indState", "class_knitter.html#a92edc0570fa4e718302aa8fa2e36c482", null ],
     [ "init", "class_knitter.html#a5daea276ba47f0fe7fa728f7c899af09", null ],
     [ "initMachine", "class_knitter.html#ae684b7ca6461254ef00ff813918e28e9", null ],
-    [ "isLineFinished", "class_knitter.html#a7e2bff4eceaf029b45001ee4643387aa", null ],
     [ "isr", "class_knitter.html#a7237d95549d973e4b0b894574482508c", null ],
     [ "isReady", "class_knitter.html#ade911f1f980a950767272ce81860eb9b", null ],
     [ "knit", "class_knitter.html#a8edb0e49c22e0b38345a24ddbd31fd81", null ],
@@ -21,7 +20,6 @@ var class_knitter =
     [ "m_beltShift", "class_knitter.html#af2c79cc66001279a20875f5298b01b06", null ],
     [ "m_carriage", "class_knitter.html#aebbd8815ccb800fcdf0676ae828152dd", null ],
     [ "m_continuousReportingEnabled", "class_knitter.html#a3f9208501c9369916b398de6c899b521", null ],
-    [ "m_currentLineDirection", "class_knitter.html#a30338e0f835aac68f3aaf3cc1e2340de", null ],
     [ "m_currentLineNumber", "class_knitter.html#a1c84ce8a808384888e28c97badbe279f", null ],
     [ "m_direction", "class_knitter.html#a1b01af623787f5ee8f17e5d7e6262b1b", null ],
     [ "m_firstRun", "class_knitter.html#abbf4dc6ee40bb8f4f1700e3445232273", null ],
@@ -36,5 +34,6 @@ var class_knitter =
     [ "m_sOldPosition", "class_knitter.html#a9727b5ff8e72ff569339ff43cd200ee2", null ],
     [ "m_solenoidToSet", "class_knitter.html#aa9b5ef8efec53e73ea9644ae734f1156", null ],
     [ "m_startNeedle", "class_knitter.html#a029d6380896b004122e36e03ac6f7413", null ],
-    [ "m_stopNeedle", "class_knitter.html#aa32a5df2d72673f8ad20ca87fc8462a1", null ]
+    [ "m_stopNeedle", "class_knitter.html#aa32a5df2d72673f8ad20ca87fc8462a1", null ],
+    [ "m_workedOnLine", "class_knitter.html#a21be3b7f856381e717feab49684796b8", null ]
 ];

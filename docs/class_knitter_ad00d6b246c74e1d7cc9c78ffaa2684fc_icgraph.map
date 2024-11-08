@@ -1,6 +1,5 @@
 <map id="Knitter::getStartOffset" name="Knitter::getStartOffset">
-<area shape="rect" id="node1" title="Get start offset." alt="" coords="464,42,629,69"/>
+<area shape="rect" id="node1" title="Get start offset." alt="" coords="464,13,629,39"/>
 <area shape="rect" id="node2" href="$class_knitter.html#a5cc38250cabe7a19332b0ad0fbacf3cc" title="Calculate the solenoid and pixel to be set." alt="" coords="227,5,416,47"/>
-<area shape="rect" id="node4" href="$class_knitter.html#a7e2bff4eceaf029b45001ee4643387aa" title="Assess whether the current line is done being knitted, based on the position of the carriage." alt="" coords="238,71,405,98"/>
 <area shape="rect" id="node3" href="$class_knitter.html#af36522669a315dca49ce48af61c5dbdd" title="Record current encoder position." alt="" coords="5,13,179,39"/>
 </map>
