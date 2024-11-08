@@ -86,20 +86,20 @@ constexpr uint8_t START_OFFSET[NUM_MACHINES][NUM_DIRECTIONS][NUM_CARRIAGES] = {
     // KH910
     {
         // K,   L,   G
-        {42U, 32U, 32U}, // Left
-        {16U, 32U, 50U} // Right
+        {45U, 32U, 32U}, // Left
+        {12U, 24U, 50U}  // Right
     },
     // KH930
     {
         // K,   L,   G
-        {42U, 32U, 32U}, // Left
-        {16U, 32U, 50U} // Right
+        {45U, 32U, 32U}, // Left
+        {12U, 24U, 50U}  // Right
     },
     // KH270
     {
         // K
         {28U, 0U, 0U}, // Left
-        {16U, 0U, 0U} // Right
+        {16U, 0U, 0U}  // Right
     }};
 
 // Should be calibrated to each device
