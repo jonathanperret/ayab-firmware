@@ -66,16 +66,16 @@ constexpr uint8_t END_OF_LINE_OFFSET_L[NUM_MACHINES] = {12U, 12U, 6U};
 constexpr uint8_t END_OF_LINE_OFFSET_R[NUM_MACHINES] = {12U, 12U, 6U};
 
 constexpr uint8_t END_LEFT[NUM_MACHINES] = {0U, 0U, 0U};
-constexpr uint8_t END_RIGHT[NUM_MACHINES] = {255U, 255U, 140U};
+constexpr uint8_t END_RIGHT[NUM_MACHINES] = {199U, 199U, 130U};
 constexpr uint8_t END_OFFSET[NUM_MACHINES] = {28U, 28U, 5U};
 
 // The following two arrays are created by combining, respectively,
 // the arrays END_LEFT and END_RIGHT with END_OFFSET
-constexpr uint8_t END_LEFT_PLUS_OFFSET[NUM_MACHINES] = {28U, 28U, 5U};
-constexpr uint8_t END_RIGHT_MINUS_OFFSET[NUM_MACHINES] = {227U, 227U, 135U};
+constexpr uint8_t END_LEFT_PLUS_OFFSET[NUM_MACHINES] = {END_LEFT[0] + END_OFFSET[0], END_LEFT[1] + END_OFFSET[1], END_LEFT[2] + END_OFFSET[2]};
+constexpr uint8_t END_RIGHT_PLUS_OFFSET[NUM_MACHINES] = {END_RIGHT[0] + END_OFFSET[0], END_RIGHT[1] + END_OFFSET[1], END_RIGHT[2] + END_OFFSET[2]};
 
-constexpr uint8_t ALL_MAGNETS_CLEARED_LEFT[NUM_MACHINES] = {56U, 56U, 10U};
-constexpr uint8_t ALL_MAGNETS_CLEARED_RIGHT[NUM_MACHINES] = {199U, 199U, 130U};
+constexpr uint8_t ALL_MAGNETS_CLEARED_LEFT[NUM_MACHINES] = {END_LEFT_PLUS_OFFSET[0] + 28U, END_LEFT_PLUS_OFFSET[1] + 28U, END_LEFT_PLUS_OFFSET[2] + 5U};
+constexpr uint8_t ALL_MAGNETS_CLEARED_RIGHT[NUM_MACHINES] = {END_RIGHT_PLUS_OFFSET[0] - 28U, END_RIGHT_PLUS_OFFSET[1] - 28U, END_RIGHT_PLUS_OFFSET[2] - 5U};
 
 // The garter slop is needed to determine whether or not we have a garter carriage.
 // If we didn't have it, we'd decide which carriage we had when the first magnet passed the sensor.

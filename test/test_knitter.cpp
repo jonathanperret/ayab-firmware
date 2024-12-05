@@ -94,7 +94,7 @@ protected:
   }
 
   int16_t get_position_past_right() {
-    return (END_RIGHT_MINUS_OFFSET[static_cast<uint8_t>(encoders->getMachineType())] - GARTER_SLOP) - 1;
+    return (END_RIGHT_PLUS_OFFSET[static_cast<uint8_t>(encoders->getMachineType())] - GARTER_SLOP) - 1;
   }
 
   void expect_knitter_init() {

@@ -50,7 +50,7 @@ extern TesterMock *tester;
 
 // Defaults for position
 const int16_t positionPassedLeft = (END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] + GARTER_SLOP) + 1;
-const int16_t positionPassedRight = (END_RIGHT_MINUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] - GARTER_SLOP) - 1;
+const int16_t positionPassedRight = (END_RIGHT_PLUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] - GARTER_SLOP) - 1;
 
 class FsmTest : public ::testing::Test {
 protected:

@@ -160,7 +160,7 @@ void Encoders::encA_rising() {
       if (Carriage_t::Garter == m_carriage) {
         // This has to be the first magnet and the belt shift needs to be swapped
         // But only for the G-carriage
-        if (m_position < 30) {
+        if (m_position < END_LEFT_PLUS_OFFSET[(int)m_machineType] + 2) {
           if (BeltShift::Regular == m_beltShift) {
             m_beltShift = BeltShift::Shifted;
           } else {
@@ -282,6 +282,6 @@ void Encoders::encA_falling() {
     }
 
     // Known position of the carriage -> overwrite position
-    m_position = END_RIGHT_MINUS_OFFSET[static_cast<uint8_t>(m_machineType)];
+    m_position = END_RIGHT_PLUS_OFFSET[static_cast<uint8_t>(m_machineType)];
   }
 }
