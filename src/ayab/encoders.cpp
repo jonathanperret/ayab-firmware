@@ -160,7 +160,7 @@ void Encoders::encA_rising() {
       if (Carriage_t::Garter == m_carriage) {
         // This has to be the first magnet and the belt shift needs to be swapped
         // But only for the G-carriage
-        if (m_position < END_LEFT_PLUS_OFFSET[(int)m_machineType] + 2) {
+        if (m_position < END_LEFT[(int)m_machineType] + 2) {
           if (BeltShift::Regular == m_beltShift) {
             m_beltShift = BeltShift::Shifted;
           } else {
@@ -183,7 +183,7 @@ void Encoders::encA_rising() {
     }
 
     Carriage detected_carriage = Carriage_t::NoCarriage;
-    int16_t start_position = END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(m_machineType)];
+    int16_t start_position = END_LEFT[static_cast<uint8_t>(m_machineType)];
 
     if (hallValue >= FILTER_L_MIN[static_cast<uint8_t>(m_machineType)]) {
       detected_carriage = Carriage_t::Knit;
@@ -282,6 +282,6 @@ void Encoders::encA_falling() {
     }
 
     // Known position of the carriage -> overwrite position
-    m_position = END_RIGHT_PLUS_OFFSET[static_cast<uint8_t>(m_machineType)];
+    m_position = END_RIGHT[static_cast<uint8_t>(m_machineType)];
   }
 }

@@ -67,15 +67,9 @@ constexpr uint8_t END_OF_LINE_OFFSET_R[NUM_MACHINES] = {12U, 12U, 6U};
 
 constexpr uint8_t END_LEFT[NUM_MACHINES] = {0U, 0U, 0U};
 constexpr uint8_t END_RIGHT[NUM_MACHINES] = {199U, 199U, 130U};
-constexpr uint8_t END_OFFSET[NUM_MACHINES] = {28U, 28U, 5U};
 
-// The following two arrays are created by combining, respectively,
-// the arrays END_LEFT and END_RIGHT with END_OFFSET
-constexpr uint8_t END_LEFT_PLUS_OFFSET[NUM_MACHINES] = {END_LEFT[0] + END_OFFSET[0], END_LEFT[1] + END_OFFSET[1], END_LEFT[2] + END_OFFSET[2]};
-constexpr uint8_t END_RIGHT_PLUS_OFFSET[NUM_MACHINES] = {END_RIGHT[0] + END_OFFSET[0], END_RIGHT[1] + END_OFFSET[1], END_RIGHT[2] + END_OFFSET[2]};
-
-constexpr uint8_t ALL_MAGNETS_CLEARED_LEFT[NUM_MACHINES] = {END_LEFT_PLUS_OFFSET[0] + 28U, END_LEFT_PLUS_OFFSET[1] + 28U, END_LEFT_PLUS_OFFSET[2] + 5U};
-constexpr uint8_t ALL_MAGNETS_CLEARED_RIGHT[NUM_MACHINES] = {END_RIGHT_PLUS_OFFSET[0] - 28U, END_RIGHT_PLUS_OFFSET[1] - 28U, END_RIGHT_PLUS_OFFSET[2] - 5U};
+constexpr uint8_t ALL_MAGNETS_CLEARED_LEFT[NUM_MACHINES] = {END_LEFT[0] + 28U, END_LEFT[1] + 28U, END_LEFT[2] + 5U};
+constexpr uint8_t ALL_MAGNETS_CLEARED_RIGHT[NUM_MACHINES] = {END_RIGHT[0] - 28U, END_RIGHT[1] - 28U, END_RIGHT[2] - 5U};
 
 // The garter slop is needed to determine whether or not we have a garter carriage.
 // If we didn't have it, we'd decide which carriage we had when the first magnet passed the sensor.
@@ -93,28 +87,26 @@ constexpr int8_t START_OFFSET[NUM_MACHINES][NUM_DIRECTIONS][NUM_CARRIAGES] = {
     //  - K: selectors 24 needles away from center -> solenoid activation points 16 needles away from center
     //  - L: selectors 12 needles away from center -> solenoid activation points 4 needles away from center
     //  - G: selector at center -> solenoid activation points 8 needles away from center
-    //  — add END_OFFSET
     //  - for G add magnet distance from center (12)
     {
         // K,                           L,                            G
-        {END_OFFSET[0] + (16 - TIMING_ADVANCE_9XX), END_OFFSET[0] + (4 - TIMING_ADVANCE_9XX), END_OFFSET[0] - (8 - TIMING_ADVANCE_9XX) + 12}, // Left
-        {END_OFFSET[0] - (16 - TIMING_ADVANCE_9XX), END_OFFSET[0] - (4 - TIMING_ADVANCE_9XX), END_OFFSET[0] + (8 - TIMING_ADVANCE_9XX) + 12} // Right
+        {+(16 - TIMING_ADVANCE_9XX), +(4 - TIMING_ADVANCE_9XX), -(8 - TIMING_ADVANCE_9XX) + 12}, // Left
+        {-(16 - TIMING_ADVANCE_9XX), -(4 - TIMING_ADVANCE_9XX), +(8 - TIMING_ADVANCE_9XX) + 12} // Right
     },
     // KH930: same as KH910
     {
         // K,                           L,                            G
-        {END_OFFSET[1] + (16 - TIMING_ADVANCE_9XX), END_OFFSET[1] + (4 - TIMING_ADVANCE_9XX), END_OFFSET[1] - (8 - TIMING_ADVANCE_9XX) + 12}, // Left
-        {END_OFFSET[1] - (16 - TIMING_ADVANCE_9XX), END_OFFSET[1] - (4 - TIMING_ADVANCE_9XX), END_OFFSET[1] + (8 - TIMING_ADVANCE_9XX) + 12} // Right
+        {+(16 - TIMING_ADVANCE_9XX), +(4 - TIMING_ADVANCE_9XX), -(8 - TIMING_ADVANCE_9XX) + 12}, // Left
+        {-(16 - TIMING_ADVANCE_9XX), -(4 - TIMING_ADVANCE_9XX), +(8 - TIMING_ADVANCE_9XX) + 12} // Right
     },
     // KH270: 12 solenoids, half-cycle is 6 needles
     //  - K: selectors 15 needles away from center -> solenoid activation points 9 needles away
-    //  - add END_OFFSET
     //  - add MAGNET_DISTANCE_270
     //  - add actual magnet distance from center (3)
     {
         // K
-        {END_OFFSET[2] + (9 - TIMING_ADVANCE_270) + MAGNET_DISTANCE_270 + 3}, // Left
-        {END_OFFSET[2] - (9 - TIMING_ADVANCE_270) + MAGNET_DISTANCE_270 + 3} // Right
+        {+(9 - TIMING_ADVANCE_270) + MAGNET_DISTANCE_270 + 3}, // Left
+        {-(9 - TIMING_ADVANCE_270) + MAGNET_DISTANCE_270 + 3} // Right
     }};
 
 // Should be calibrated to each device

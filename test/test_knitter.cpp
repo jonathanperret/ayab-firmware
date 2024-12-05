@@ -90,11 +90,11 @@ protected:
   TesterMock *testerMock;
 
   int16_t get_position_past_left() {
-    return (END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(encoders->getMachineType())] + GARTER_SLOP) + 1;
+    return (END_LEFT[static_cast<uint8_t>(encoders->getMachineType())] + GARTER_SLOP) + 1;
   }
 
   int16_t get_position_past_right() {
-    return (END_RIGHT_PLUS_OFFSET[static_cast<uint8_t>(encoders->getMachineType())] - GARTER_SLOP) - 1;
+    return (END_RIGHT[static_cast<uint8_t>(encoders->getMachineType())] - GARTER_SLOP) - 1;
   }
 
   void expect_knitter_init() {

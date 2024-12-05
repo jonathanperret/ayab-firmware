@@ -91,7 +91,7 @@ TEST_F(EncodersTest, test_encA_rising_in_front_notKH270) {
 
   ASSERT_EQ(encoders->getDirection(), Direction_t::Right);
   ASSERT_EQ(encoders->getHallActive(), Direction_t::Left);
-  ASSERT_EQ(encoders->getPosition(), END_OFFSET[static_cast<int8_t>(encoders->getMachineType())]);
+  ASSERT_EQ(encoders->getPosition(), 0);
   ASSERT_EQ(encoders->getCarriage(), Carriage_t::Lace);
   ASSERT_EQ(encoders->getBeltShift(), BeltShift::Shifted);
 }
@@ -122,7 +122,7 @@ TEST_F(EncodersTest, test_encA_rising_in_front_KH270) {
 
   ASSERT_EQ(encoders->getDirection(), Direction_t::Right);
   ASSERT_EQ(encoders->getHallActive(), Direction_t::Left);
-  ASSERT_EQ(encoders->getPosition(), END_OFFSET[static_cast<int8_t>(encoders->getMachineType())]);
+  ASSERT_EQ(encoders->getPosition(), 0);
   ASSERT_EQ(encoders->getCarriage(), Carriage_t::Knit);
   ASSERT_EQ(encoders->getBeltShift(), BeltShift::Shifted);
 }
@@ -208,7 +208,7 @@ TEST_F(EncodersTest, test_encA_falling_in_front) {
 
   ASSERT_EQ(encoders->getDirection(), Direction_t::Right);
   ASSERT_EQ(encoders->getHallActive(), Direction_t::Right);
-  ASSERT_EQ(encoders->getPosition(), 227);
+  ASSERT_EQ(encoders->getPosition(), 199);
   ASSERT_EQ(encoders->getCarriage(), Carriage_t::NoCarriage);
 }
 
