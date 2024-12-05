@@ -77,7 +77,7 @@ constexpr uint8_t ALL_MAGNETS_CLEARED_RIGHT[NUM_MACHINES] = {END_RIGHT[0] - 28U,
 constexpr uint8_t GARTER_SLOP = 2U;
 
 // How much earlier than theoretically ideal should we switch solenoids (in needles)
-constexpr int TIMING_ADVANCE_9XX = 4;
+constexpr int TIMING_ADVANCE_9XX = 0;
 constexpr int TIMING_ADVANCE_270 = 4;
 
 constexpr uint8_t MAGNET_DISTANCE_270 = 12U;
