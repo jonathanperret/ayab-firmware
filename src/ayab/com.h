@@ -89,7 +89,7 @@ public:
   virtual void sendMsg(AYAB_API_t id, const char *msg) = 0;
   virtual void send_reqLine(const uint8_t lineNumber,
                             Err_t error = ErrorCode::success) const = 0;
-  virtual void send_indState(Carriage_t carriage, uint8_t position,
+  virtual void send_indState(Carriage_t carriage, int16_t position,
                              Err_t error = ErrorCode::success) const = 0;
   virtual void onPacketReceived(const uint8_t *buffer, size_t size) = 0;
 };
@@ -113,7 +113,7 @@ public:
   static void send(uint8_t *payload, size_t length);
   static void sendMsg(AYAB_API_t id, const char *msg);
   static void send_reqLine(const uint8_t lineNumber, Err_t error = ErrorCode::success);
-  static void send_indState(Carriage_t carriage, uint8_t position,
+  static void send_indState(Carriage_t carriage, int16_t position,
                              Err_t error = ErrorCode::success);
   static void onPacketReceived(const uint8_t *buffer, size_t size);
 
@@ -128,7 +128,7 @@ public:
   void send(uint8_t *payload, size_t length) const final;
   void sendMsg(AYAB_API_t id, const char *msg) final;
   void send_reqLine(const uint8_t lineNumber, Err_t error = ErrorCode::success) const final;
-  void send_indState(Carriage_t carriage, uint8_t position,
+  void send_indState(Carriage_t carriage, int16_t position,
                              Err_t error = ErrorCode::success) const final;
   void onPacketReceived(const uint8_t *buffer, size_t size) final;
 

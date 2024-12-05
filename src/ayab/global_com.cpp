@@ -54,7 +54,7 @@ void GlobalCom::send_reqLine(const uint8_t lineNumber, Err_t error) {
   m_instance->send_reqLine(lineNumber, error);
 }
 
-void GlobalCom::send_indState(Carriage_t carriage, uint8_t position,
+void GlobalCom::send_indState(Carriage_t carriage, int16_t position,
                               Err_t error) {
   m_instance->send_indState(carriage, position, error);
 }

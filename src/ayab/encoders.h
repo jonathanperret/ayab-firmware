@@ -88,7 +88,7 @@ constexpr int TIMING_ADVANCE_270 = 4;
 
 constexpr uint8_t MAGNET_DISTANCE_270 = 12U;
 
-constexpr uint8_t START_OFFSET[NUM_MACHINES][NUM_DIRECTIONS][NUM_CARRIAGES] = {
+constexpr int8_t START_OFFSET[NUM_MACHINES][NUM_DIRECTIONS][NUM_CARRIAGES] = {
     // KH910: 16 solenoids, half-cycle is 8 needles
     //  - K: selectors 24 needles away from center -> solenoid activation points 16 needles away from center
     //  - L: selectors 12 needles away from center -> solenoid activation points 4 needles away from center
@@ -146,7 +146,7 @@ public:
   virtual Carriage_t getCarriage() = 0;
   virtual Direction_t getDirection() = 0;
   virtual Direction_t getHallActive() = 0;
-  virtual uint8_t getPosition() = 0;
+  virtual int16_t getPosition() = 0;
 };
 
 // Container class for the static methods for the encoders.
@@ -171,7 +171,7 @@ public:
   static Carriage_t getCarriage();
   static Direction_t getDirection();
   static Direction_t getHallActive();
-  static uint8_t getPosition();
+  static int16_t getPosition();
 };
 
 class Encoders : public EncodersInterface {
@@ -186,7 +186,7 @@ public:
   Carriage_t getCarriage() final;
   Direction_t getDirection() final;
   Direction_t getHallActive() final;
-  uint8_t getPosition() final;
+  int16_t getPosition() final;
 
 private:
   Machine_t m_machineType;
@@ -195,7 +195,7 @@ private:
   volatile Carriage_t m_carriage;
   volatile Direction_t m_direction;
   volatile Direction_t m_hallActive;
-  volatile uint8_t m_position;
+  volatile int16_t m_position;
   volatile bool m_oldState;
   volatile bool m_passedLeft;
   volatile bool m_passedRight;

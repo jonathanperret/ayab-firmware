@@ -53,6 +53,6 @@ Direction_t GlobalEncoders::getHallActive() {
   return m_instance->getHallActive();
 }
 
-uint8_t GlobalEncoders::getPosition() {
+int16_t GlobalEncoders::getPosition() {
   return m_instance->getPosition();
 }

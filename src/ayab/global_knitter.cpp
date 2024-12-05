@@ -68,7 +68,7 @@ void GlobalKnitter::indState(Err_t error) {
   m_instance->indState(error);
 }
 
-uint8_t GlobalKnitter::getStartOffset(const Direction_t direction) {
+int8_t GlobalKnitter::getStartOffset(const Direction_t direction) {
   return m_instance->getStartOffset(direction);
 }
 

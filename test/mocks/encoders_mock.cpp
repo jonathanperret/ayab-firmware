@@ -49,7 +49,7 @@ void Encoders::encA_interrupt() {
   gEncodersMock->encA_interrupt();
 }
 
-uint8_t Encoders::getPosition() {
+int16_t Encoders::getPosition() {
   assert(gEncodersMock != nullptr);
   return gEncodersMock->getPosition();
 }

@@ -46,7 +46,7 @@ public:
   virtual bool isReady() = 0;
   virtual void knit() = 0;
   virtual void indState(Err_t error = ErrorCode::success) = 0;
-  virtual uint8_t getStartOffset(const Direction_t direction) = 0;
+  virtual int8_t getStartOffset(const Direction_t direction) = 0;
   virtual Machine_t getMachineType() = 0;
   virtual bool setNextLine(uint8_t lineNumber) = 0;
   virtual void setLastLine() = 0;
@@ -81,7 +81,7 @@ public:
   static bool isReady();
   static void knit();
   static void indState(Err_t error = ErrorCode::success);
-  static uint8_t getStartOffset(const Direction_t direction);
+  static int8_t getStartOffset(const Direction_t direction);
   static Machine_t getMachineType();
   static bool setNextLine(uint8_t lineNumber);
   static void setLastLine();
@@ -101,13 +101,14 @@ public:
   bool isReady() final;
   void knit() final;
   void indState(Err_t error = ErrorCode::success) final;
-  uint8_t getStartOffset(const Direction_t direction) final;
+  int8_t getStartOffset(const Direction_t direction) final;
   Machine_t getMachineType() final;
   bool setNextLine(uint8_t lineNumber) final;
   void setLastLine() final;
   void setMachineType(Machine_t) final;
 
 private:
+  void copyEncodersState();
   void reqLine(uint8_t lineNumber);
   bool calculatePixelAndSolenoid();
   void stopKnitting() const;
@@ -120,7 +121,7 @@ private:
   bool m_continuousReportingEnabled;
 
   // current machine state
-  uint8_t m_position;
+  int16_t m_position;
   Direction_t m_direction;
   Direction_t m_hallActive;
   BeltShift_t m_beltShift;
@@ -130,7 +131,7 @@ private:
   uint8_t m_currentLineNumber;
   bool m_lastLineFlag;
 
-  uint8_t m_sOldPosition;
+  int16_t m_sOldPosition;
   bool m_firstRun;
   bool m_workedOnLine;
   Direction_t m_lastHall;
@@ -140,7 +141,7 @@ private:
 
   // resulting needle data
   uint8_t m_solenoidToSet;
-  uint8_t m_pixelToSet;
+  int16_t m_pixelToSet;
 
 #if AYAB_TESTS
   // Note: ideally tests would only rely on the public interface.

@@ -69,7 +69,7 @@ uint16_t Encoders::getHallValue(Direction_t pSensor) {
  */
 void Encoders::init(Machine_t machineType) {
   m_machineType = machineType;
-  m_position = 0U;
+  m_position = 0;
   m_direction = Direction_t::NoDirection;
   m_hallActive = Direction_t::NoDirection;
   m_beltShift = BeltShift::Unknown;
@@ -82,7 +82,7 @@ void Encoders::init(Machine_t machineType) {
 /*!
  * \brief Get position member.
  */
-uint8_t Encoders::getPosition() {
+int16_t Encoders::getPosition() {
   return m_position;
 }
 
@@ -136,7 +136,7 @@ void Encoders::encA_rising() {
 
   // Update carriage position
   if (Direction_t::Right == m_direction) {
-    m_position = m_position + (uint8_t) 1;
+    m_position = m_position + 1;
 
     // Reset carriage passed state when we know all magnets have cleared the turn mark.
     if (m_position > ALL_MAGNETS_CLEARED_LEFT[static_cast<uint8_t>(m_machineType)]) {
@@ -183,7 +183,7 @@ void Encoders::encA_rising() {
     }
 
     Carriage detected_carriage = Carriage_t::NoCarriage;
-    uint8_t start_position = END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(m_machineType)];
+    int16_t start_position = END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(m_machineType)];
 
     if (hallValue >= FILTER_L_MIN[static_cast<uint8_t>(m_machineType)]) {
       detected_carriage = Carriage_t::Knit;
@@ -240,7 +240,7 @@ void Encoders::encA_falling() {
 
   // Update carriage position
   if (Direction_t::Left == m_direction) {
-    m_position = m_position - (uint8_t) 1;
+    m_position = m_position - 1;
 
     // Reset carriage passed state when we know all magnets have cleared the turn mark.
     if (m_position < ALL_MAGNETS_CLEARED_RIGHT[static_cast<uint8_t>(m_machineType)]) {

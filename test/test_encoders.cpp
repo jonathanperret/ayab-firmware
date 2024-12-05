@@ -233,7 +233,7 @@ TEST_F(EncodersTest, test_encA_falling_set_K_carriage_KH910) {
 }
 
 TEST_F(EncodersTest, test_getPosition) {
-  uint8_t p = encoders->getPosition();
+  int16_t p = encoders->getPosition();
   ASSERT_EQ(p, 0x00);
 }
 

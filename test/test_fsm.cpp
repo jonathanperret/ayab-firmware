@@ -49,8 +49,8 @@ extern SolenoidsMock *solenoids;
 extern TesterMock *tester;
 
 // Defaults for position
-const uint8_t positionPassedLeft = (END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] + GARTER_SLOP) + 1;
-const uint8_t positionPassedRight = (END_RIGHT_MINUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] - GARTER_SLOP) - 1;
+const int16_t positionPassedLeft = (END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] + GARTER_SLOP) + 1;
+const int16_t positionPassedRight = (END_RIGHT_MINUS_OFFSET[static_cast<uint8_t>(Machine_t::Kh910)] - GARTER_SLOP) - 1;
 
 class FsmTest : public ::testing::Test {
 protected:
@@ -77,7 +77,7 @@ protected:
     // start in state `OpState::init`
     EXPECT_CALL(*arduinoMock, millis);
     fsm->init();
-    // expected_isr(NoDirection, NoDirection);
+    // setup_encodersMock(NoDirection, NoDirection);
     // EXPECT_CALL(*arduinoMock, digitalWrite(LED_PIN_A, LOW));
     // fsm->setState(OpState::init);
     // EXPECT_CALL(*comMock, update);
@@ -86,7 +86,7 @@ protected:
     expect_knitter_init();
     knitter->init();
     knitter->setMachineType(Machine_t::Kh910);
-    expected_isr(Direction_t::NoDirection, Direction_t::NoDirection, 0);
+    setup_encodersMock(Direction_t::NoDirection, Direction_t::NoDirection, 0);
   }
 
   void TearDown() override {
@@ -113,17 +113,18 @@ protected:
     EXPECT_CALL(*solenoidsMock, init);
   }
 
-  void expected_isr(Direction_t dir, Direction_t hall, uint8_t position) {
-    EXPECT_CALL(*encodersMock, encA_interrupt);
+  void clear_encodersMock() {
+    // test expectations without destroying instance
+    ASSERT_TRUE(Mock::VerifyAndClear(encodersMock));
+  }
+
+  void setup_encodersMock(Direction_t dir, Direction_t hall, int16_t position) {
+    clear_encodersMock();
     EXPECT_CALL(*encodersMock, getPosition).WillRepeatedly(Return(position));
     EXPECT_CALL(*encodersMock, getDirection).WillRepeatedly(Return(dir));
     EXPECT_CALL(*encodersMock, getHallActive).WillRepeatedly(Return(hall));
-    EXPECT_CALL(*encodersMock, getBeltShift).Times(AtLeast(1));
-    EXPECT_CALL(*encodersMock, getCarriage).Times(AtLeast(1));
-    knitter->isr();
-
-    // test expectations without destroying instance
-    ASSERT_TRUE(Mock::VerifyAndClear(encodersMock));
+    EXPECT_CALL(*encodersMock, getBeltShift).Times(AtLeast(0));
+    EXPECT_CALL(*encodersMock, getCarriage).Times(AtLeast(0));
   }
 
   void expect_reqLine() {
@@ -233,17 +234,17 @@ TEST_F(FsmTest, test_dispatch_init) {
   ASSERT_EQ(fsm->getState(), OpState::init);
 
   // no transition to state `OpState::ready`
-  expected_isr(Direction_t::Left, Direction_t::Left, 0);
+  setup_encodersMock(Direction_t::Left, Direction_t::Left, 0);
   expected_dispatch_init();
   ASSERT_TRUE(fsm->getState() == OpState::init);
 
   // no transition to state `OpState::ready`
-  expected_isr(Direction_t::Right, Direction_t::Right, 0);
+  setup_encodersMock(Direction_t::Right, Direction_t::Right, 0);
   expected_dispatch_init();
   ASSERT_TRUE(fsm->getState() == OpState::init);
 
   // transition to state `OpState::ready`
-  expected_isr(Direction_t::Left, Direction_t::Right, positionPassedRight);
+  setup_encodersMock(Direction_t::Left, Direction_t::Right, positionPassedRight);
   expect_get_ready();
   expected_dispatch();
   ASSERT_EQ(fsm->getState(), OpState::ready);
@@ -253,7 +254,7 @@ TEST_F(FsmTest, test_dispatch_init) {
   expected_dispatch_ready();
 
   // transition to state `OpState::ready`
-  expected_isr(Direction_t::Right, Direction_t::Left, positionPassedLeft);
+  setup_encodersMock(Direction_t::Right, Direction_t::Left, positionPassedLeft);
   expect_get_ready();
   expected_dispatch();
   ASSERT_TRUE(fsm->getState() == OpState::ready);

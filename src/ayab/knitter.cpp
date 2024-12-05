@@ -26,6 +26,12 @@
 #include "board.h"
 #include <Arduino.h>
 
+#ifndef AYAB_TESTS
+#include <util/atomic.h>
+#else
+#define ATOMIC_BLOCK(type)
+#endif
+
 #include "beeper.h"
 #include "com.h"
 #include "encoders.h"
@@ -39,6 +45,14 @@
 constexpr uint8_t UINT8_MAX = 0xFFU;
 constexpr uint16_t UINT16_MAX = 0xFFFFU;
 #endif
+
+static int positiveModulo(int a, int b) {
+  int result = a % b;
+  if (result < 0) {
+    result += b;
+  }
+  return result;
+}
 
 /*!
  * \brief Initialize Knitter object.
@@ -107,11 +121,17 @@ void Knitter::setUpInterrupt() {
 void Knitter::isr() {
   // update machine state data
   GlobalEncoders::encA_interrupt();
-  m_position = GlobalEncoders::getPosition();
-  m_direction = GlobalEncoders::getDirection();
-  m_hallActive = GlobalEncoders::getHallActive();
-  m_beltShift = GlobalEncoders::getBeltShift();
-  m_carriage = GlobalEncoders::getCarriage();
+}
+
+void Knitter::copyEncodersState() {
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  {
+    m_position = GlobalEncoders::getPosition();
+    m_direction = GlobalEncoders::getDirection();
+    m_hallActive = GlobalEncoders::getHallActive();
+    m_beltShift = GlobalEncoders::getBeltShift();
+    m_carriage = GlobalEncoders::getCarriage();
+  }
 }
 
 /*!
@@ -184,6 +204,8 @@ Err_t Knitter::startKnitting(uint8_t startNeedle,
  * Used in hardware test procedure.
  */
 void Knitter::encodePosition() {
+  copyEncodersState();
+
   if (m_sOldPosition != m_position) {
     // only act if there is an actual change of position
     // store current encoder position for next call of this function
@@ -198,6 +220,8 @@ void Knitter::encodePosition() {
  * \return `true` if ready to move from state `OpState::init` to `OpState::ready`, false otherwise.
  */
 bool Knitter::isReady() {
+  copyEncodersState();
+
 #ifdef DBG_NOMACHINE
   // TODO(who?): check if debounce is needed
   bool state = digitalRead(DBG_BTN_PIN);
@@ -237,6 +261,8 @@ bool Knitter::isReady() {
  * \brief Function that is repeatedly called during state `OpState::knit`
  */
 void Knitter::knit() {
+  copyEncodersState();
+
   if (m_firstRun) {
     m_firstRun = false;
     GlobalBeeper::finishedLine();
@@ -277,9 +303,12 @@ void Knitter::knit() {
   // these even outside of the working needles.
   // find the right byte from the currentLine array,
   // then read the appropriate Pixel(/Bit) for the current needle to set
-  uint8_t currentByte = m_pixelToSet >> 3;
-  bool pixelValue =
-      bitRead(m_lineBuffer[currentByte], m_pixelToSet & 0x07);
+  bool pixelValue = false;
+  if (m_pixelToSet >= 0 && m_pixelToSet < NUM_NEEDLES[static_cast<uint8_t>(m_machineType)]) {
+      uint8_t currentByte = m_pixelToSet >> 3;
+      pixelValue = bitRead(m_lineBuffer[currentByte], m_pixelToSet & 0x07);
+  }
+
   // write Pixel state to the appropriate needle
   GlobalSolenoids::setSolenoid(m_solenoidToSet, pixelValue);
 
@@ -325,7 +354,7 @@ Machine_t Knitter::getMachineType() {
  * \brief Get start offset.
  * \return Start offset, or 0 if unobtainable.
  */
-uint8_t Knitter::getStartOffset(const Direction_t direction) {
+int8_t Knitter::getStartOffset(const Direction_t direction) {
   if ((direction == Direction_t::NoDirection) ||
       (m_carriage == Carriage_t::NoCarriage) ||
       (m_machineType == Machine_t::NoMachine)) {
@@ -386,7 +415,7 @@ void Knitter::reqLine(uint8_t lineNumber) {
  * \return `true` if successful, `false` otherwise.
  */
 bool Knitter::calculatePixelAndSolenoid() {
-  uint8_t startOffset = 0;
+  int8_t startOffset = 0;
 
   bool beltShift = BeltShift_t::Shifted == m_beltShift;
 
@@ -435,9 +464,9 @@ bool Knitter::calculatePixelAndSolenoid() {
   m_pixelToSet = m_position - startOffset;
 
   if (!beltShift) {
-    m_solenoidToSet = (m_pixelToSet + bulkyOffset) % SOLENOIDS_NUM[static_cast<uint8_t>(m_machineType)];
+    m_solenoidToSet = positiveModulo(m_pixelToSet + bulkyOffset, SOLENOIDS_NUM[static_cast<uint8_t>(m_machineType)]);
   } else {
-    m_solenoidToSet = (m_pixelToSet + HALF_SOLENOIDS_NUM[static_cast<uint8_t>(m_machineType)]) % SOLENOIDS_NUM[static_cast<uint8_t>(m_machineType)];
+    m_solenoidToSet = positiveModulo(m_pixelToSet + HALF_SOLENOIDS_NUM[static_cast<uint8_t>(m_machineType)], SOLENOIDS_NUM[static_cast<uint8_t>(m_machineType)]);
   }
 
   // The 270 has 12 solenoids but they get shifted over 3 bits

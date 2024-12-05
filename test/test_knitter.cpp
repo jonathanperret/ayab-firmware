@@ -35,6 +35,7 @@
 
 using ::testing::_;
 using ::testing::AtLeast;
+using ::testing::AnyNumber;
 using ::testing::Mock;
 using ::testing::Return;
 using ::testing::TypedEq;
@@ -70,7 +71,7 @@ protected:
     Mock::AllowLeak(testerMock);
 
     // start in state `OpState::init`
-    expected_isr(Direction_t::NoDirection, Direction_t::NoDirection);
+    setup_encodersMock(Direction_t::NoDirection, Direction_t::NoDirection);
     EXPECT_CALL(*arduinoMock, millis);
     fsm->init();
     expect_knitter_init();
@@ -88,11 +89,11 @@ protected:
   SolenoidsMock *solenoidsMock;
   TesterMock *testerMock;
 
-  uint8_t get_position_past_left() {
+  int16_t get_position_past_left() {
     return (END_LEFT_PLUS_OFFSET[static_cast<uint8_t>(encoders->getMachineType())] + GARTER_SLOP) + 1;
   }
 
-  uint8_t get_position_past_right() {
+  int16_t get_position_past_right() {
     return (END_RIGHT_MINUS_OFFSET[static_cast<uint8_t>(encoders->getMachineType())] - GARTER_SLOP) - 1;
   }
 
@@ -110,9 +111,14 @@ protected:
     EXPECT_CALL(*solenoidsMock, init);
   }
 
-  void expect_isr(uint16_t pos, Direction_t dir, Direction_t hall,
+  void clear_encodersMock() {
+    // test expectations without destroying instance
+    ASSERT_TRUE(Mock::VerifyAndClear(encodersMock));
+  }
+
+  void setup_encodersMock(int16_t pos, Direction_t dir, Direction_t hall,
                   BeltShift_t belt, Carriage_t carriage) {
-    EXPECT_CALL(*encodersMock, encA_interrupt);
+    clear_encodersMock();
     EXPECT_CALL(*encodersMock, getPosition).WillRepeatedly(Return(pos));
     EXPECT_CALL(*encodersMock, getDirection).WillRepeatedly(Return(dir));
     EXPECT_CALL(*encodersMock, getHallActive).WillRepeatedly(Return(hall));
@@ -120,37 +126,20 @@ protected:
     EXPECT_CALL(*encodersMock, getCarriage).WillRepeatedly(Return(carriage));
   }
 
-  void expected_isr(uint16_t pos, Direction_t dir, Direction_t hall,
-                    BeltShift_t belt, Carriage_t carriage) {
-    expect_isr(pos, dir, hall, belt, carriage);
-    knitter->isr();
+  void setup_encodersMock(Direction_t dir, Direction_t hall) {
+    setup_encodersMock(1, dir, hall, BeltShift::Regular, Carriage_t::Knit);
   }
 
-  void expect_isr(Direction_t dir, Direction_t hall) {
-    expect_isr(1, dir, hall, BeltShift::Regular, Carriage_t::Knit);
+  void setup_encodersMock(int16_t pos, Direction_t dir, Direction_t hall) {
+    setup_encodersMock(pos, dir, hall, BeltShift::Regular, Carriage_t::Knit);
   }
 
-  void expected_isr(uint8_t pos, Direction_t dir, Direction_t hall) {
-    expect_isr(pos, dir, hall, BeltShift::Regular, Carriage_t::Knit);
-    knitter->isr();
+  void setup_encodersMock(int16_t pos) {
+    setup_encodersMock(pos, Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Garter);
   }
 
-  void expected_isr(Direction_t dir, Direction_t hall) {
-    expect_isr(dir, hall);
-    knitter->isr();
-  }
-
-  void expect_isr(uint16_t pos) {
-    expect_isr(pos, Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Garter);
-  }
-
-  void expected_isr(uint16_t pos) {
-    expect_isr(pos);
-    knitter->isr();
-  }
-
-  void expected_isr() {
-    expected_isr(1);
+  void setup_encodersMock() {
+    setup_encodersMock(1);
   }
 
   void expect_reqLine() {
@@ -186,16 +175,19 @@ protected:
   }
 
   void get_to_ready(Machine_t m) {
+    EXPECT_CALL(*encodersMock, init).Times(AnyNumber());
+    EXPECT_CALL(*encodersMock, getMachineType).WillRepeatedly(Return(m));
     expected_init_machine(m);
     // Machine is initialized when Left hall sensor
     // is passed in Right direction inside active needles.
-    uint8_t position = get_position_past_left();
-    expected_isr(position, Direction_t::Right, Direction_t::Left);
+    int16_t position = get_position_past_left();
+    setup_encodersMock(position, Direction_t::Right, Direction_t::Left);
     expected_get_ready();
   }
 
   void get_to_knit(Machine_t m) {
-    EXPECT_CALL(*encodersMock, init);
+    EXPECT_CALL(*encodersMock, init).Times(AnyNumber());
+    EXPECT_CALL(*encodersMock, getMachineType).WillRepeatedly(Return(m));
     get_to_ready(m);
     uint8_t pattern[] = {1};
     EXPECT_CALL(*beeperMock, ready);
@@ -269,7 +261,7 @@ TEST_F(KnitterTest, test_send) {
 }
 
 TEST_F(KnitterTest, test_isr) {
-  expected_isr(1);
+  setup_encodersMock(1);
 
   // test expectations without destroying instance
   ASSERT_TRUE(Mock::VerifyAndClear(solenoidsMock));
@@ -354,7 +346,7 @@ TEST_F(KnitterTest, test_setNextLine) {
   expected_dispatch_knit(true);
 
   // outside of the active needles
-  expected_isr(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
+  setup_encodersMock(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
   EXPECT_CALL(*solenoidsMock, setSolenoid).Times(1);
   expected_dispatch_knit(false);
 
@@ -397,19 +389,19 @@ TEST_F(KnitterTest, test_knit_Kh910) {
   expected_dispatch_knit(false);
 
   // no useful position calculated by `calculatePixelAndSolenoid()`
-  expected_isr(100, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
+  setup_encodersMock(100, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
   EXPECT_CALL(*solenoidsMock, setSolenoid).Times(0);
   expect_indState();
   expected_dispatch_knit(false);
 
   // don't set `m_workedonline` to `true`
   const uint8_t OFFSET = END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)];
-  expected_isr(8 + STOP_NEEDLE + OFFSET);
+  setup_encodersMock(8 + STOP_NEEDLE + OFFSET);
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expect_indState();
   expected_dispatch_knit(false);
 
-  expected_isr(START_NEEDLE);
+  setup_encodersMock(START_NEEDLE);
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expect_indState();
   expected_dispatch_knit(false);
@@ -441,25 +433,25 @@ TEST_F(KnitterTest, test_knit_Kh270) {
   expected_dispatch_knit(false);
 
   // second knit
-  expected_isr(START_NEEDLE);
+  setup_encodersMock(START_NEEDLE);
   expect_indState();
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expected_dispatch_knit(false);
 
   // no useful position calculated by `calculatePixelAndSolenoid()`
-  expected_isr(60, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
+  setup_encodersMock(60, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Knit);
   EXPECT_CALL(*solenoidsMock, setSolenoid).Times(0);
   expect_indState();
   expected_dispatch_knit(false);
 
   // don't set `m_workedonline` to `true`
   const uint8_t OFFSET = END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh270)];
-  expected_isr(8 + STOP_NEEDLE + OFFSET, Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Knit);
+  setup_encodersMock(8 + STOP_NEEDLE + OFFSET, Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Knit);
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expect_indState();
   expected_dispatch_knit(false);
 
-  expected_isr(START_NEEDLE, Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Knit);
+  setup_encodersMock(START_NEEDLE, Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Knit);
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expect_indState();
   expected_dispatch_knit(false);
@@ -477,7 +469,7 @@ TEST_F(KnitterTest, test_knit_line_request) {
 
   // Position has changed since last call to operate function
   // `m_pixelToSet` is set above `m_stopNeedle` + END_OF_LINE_OFFSET_R
-  expected_isr(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + 8 + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1);
+  setup_encodersMock(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + 8 + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1);
 
   EXPECT_CALL(*solenoidsMock, setSolenoid);
   expected_dispatch_knit(false);
@@ -498,13 +490,13 @@ TEST_F(KnitterTest, test_knit_lastLine) {
 
   // Run one knit inside the working needles.
   EXPECT_CALL(*solenoidsMock, setSolenoid);
-  expected_isr(knitter->getStartOffset(Direction_t::Left) + 20);
+  setup_encodersMock(knitter->getStartOffset(Direction_t::Left) + 20);
   // `m_workedOnLine` is set to true
   expected_dispatch_knit(false);
 
   // Position has changed since last call to operate function
   // `m_pixelToSet` is above `m_stopNeedle` + END_OF_LINE_OFFSET_R
-  expected_isr(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
+  setup_encodersMock(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
 
   // `m_lastLineFlag` is `true`
   knitter->setLastLine();
@@ -530,11 +522,12 @@ TEST_F(KnitterTest, test_knit_lastLine_and_no_req) {
   uint8_t wanted_pixel =
       knitter->m_stopNeedle + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1;
   knitter->m_firstRun = false;
-  knitter->m_direction = Direction_t::Left;
-  knitter->m_position = wanted_pixel + knitter->getStartOffset(Direction_t::Right);
   knitter->m_workedOnLine = true;
   knitter->m_lineRequested = false;
   knitter->m_lastLineFlag = true;
+
+  EXPECT_CALL(*encodersMock, getPosition).WillRepeatedly(Return(wanted_pixel + knitter->getStartOffset(Direction_t::Right)));
+  EXPECT_CALL(*encodersMock, getDirection).WillRepeatedly(Return(Direction_t::Left));
 
   // EXPECT_CALL(*arduinoMock, digitalWrite(LED_PIN_A, 1));
   EXPECT_CALL(*solenoidsMock, setSolenoid);
@@ -574,13 +567,13 @@ TEST_F(KnitterTest, test_knit_new_line) {
 
   // Run one knit inside the working needles.
   EXPECT_CALL(*solenoidsMock, setSolenoid);
-  expected_isr(knitter->getStartOffset(Direction_t::Left) + 20);
+  setup_encodersMock(knitter->getStartOffset(Direction_t::Left) + 20);
   // `m_workedOnLine` is set to true
   expected_dispatch_knit(false);
 
   // Position has changed since last call to operate function
   // `m_pixelToSet` is above `m_stopNeedle` + END_OF_LINE_OFFSET_R
-  expected_isr(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
+  setup_encodersMock(NUM_NEEDLES[static_cast<uint8_t>(Machine_t::Kh910)] + END_OF_LINE_OFFSET_R[static_cast<uint8_t>(Machine_t::Kh910)] + 1 + knitter->getStartOffset(Direction_t::Left));
 
   // set `m_lineRequested` to `false`
   EXPECT_CALL(*beeperMock, finishedLine);
@@ -606,50 +599,50 @@ TEST_F(KnitterTest, test_calculatePixelAndSolenoid) {
   expected_dispatch_init();
 
   // new position, different beltShift and active hall
-  expected_isr(100, Direction_t::Right, Direction_t::Right, BeltShift::Shifted, Carriage_t::Lace);
+  setup_encodersMock(100, Direction_t::Right, Direction_t::Right, BeltShift::Shifted, Carriage_t::Lace);
   expected_dispatch_test();
 
   // no direction, need to change position to enter test
-  expected_isr(101, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Lace);
+  setup_encodersMock(101, Direction_t::NoDirection, Direction_t::Right, BeltShift::Shifted, Carriage_t::Lace);
   expected_dispatch_test();
 
   // no belt, need to change position to enter test
-  expected_isr(100, Direction_t::Right, Direction_t::Right, BeltShift::Unknown, Carriage_t::Lace);
+  setup_encodersMock(100, Direction_t::Right, Direction_t::Right, BeltShift::Unknown, Carriage_t::Lace);
   expected_dispatch_test();
 
   // no belt on left side, need to change position to enter test
-  expected_isr(101, Direction_t::Left, Direction_t::Right, BeltShift::Unknown, Carriage_t::Garter);
+  setup_encodersMock(101, Direction_t::Left, Direction_t::Right, BeltShift::Unknown, Carriage_t::Garter);
   expected_dispatch_test();
 
   // left Lace carriage
-  expected_isr(100, Direction_t::Left, Direction_t::Right, BeltShift::Unknown, Carriage_t::Lace);
+  setup_encodersMock(100, Direction_t::Left, Direction_t::Right, BeltShift::Unknown, Carriage_t::Lace);
   expected_dispatch_test();
 
   // regular belt on left, need to change position to enter test
-  expected_isr(101, Direction_t::Left, Direction_t::Right, BeltShift::Regular, Carriage_t::Garter);
+  setup_encodersMock(101, Direction_t::Left, Direction_t::Right, BeltShift::Regular, Carriage_t::Garter);
   expected_dispatch_test();
 
   // shifted belt on left, need to change position to enter test
-  expected_isr(100, Direction_t::Left, Direction_t::Right, BeltShift::Shifted, Carriage_t::Garter);
+  setup_encodersMock(100, Direction_t::Left, Direction_t::Right, BeltShift::Shifted, Carriage_t::Garter);
   expected_dispatch_test();
 
   // off of right end, position is changed
-  expected_isr(END_RIGHT[static_cast<uint8_t>(Machine_t::Kh910)], Direction_t::Left, Direction_t::Right, BeltShift::Unknown, Carriage_t::Lace);
+  setup_encodersMock(END_RIGHT[static_cast<uint8_t>(Machine_t::Kh910)], Direction_t::Left, Direction_t::Right, BeltShift::Unknown, Carriage_t::Lace);
   expected_dispatch_test();
 
   // direction right, have not reached offset
-  expected_isr(39, Direction_t::Right, Direction_t::Left, BeltShift::Unknown, Carriage_t::Lace);
+  setup_encodersMock(39, Direction_t::Right, Direction_t::Left, BeltShift::Unknown, Carriage_t::Lace);
   expected_dispatch_test();
 
   // KH270
   knitter->setMachineType(Machine_t::Kh270);
 
   // K carriage direction left
-  expected_isr(0, Direction_t::Left, Direction_t::Right, BeltShift::Regular, Carriage_t::Knit);
+  setup_encodersMock(0, Direction_t::Left, Direction_t::Right, BeltShift::Regular, Carriage_t::Knit);
   expected_dispatch_test();
 
   // K carriage direction right
-  expected_isr(END_RIGHT[static_cast<uint8_t>(Machine_t::Kh270)], Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Knit);
+  setup_encodersMock(END_RIGHT[static_cast<uint8_t>(Machine_t::Kh270)], Direction_t::Right, Direction_t::Left, BeltShift::Regular, Carriage_t::Knit);
   expected_dispatch_test();
 
   // test expectations without destroying instance
@@ -681,7 +674,7 @@ TEST_F(KnitterTest, test_fsm_init_LL) {
   expected_init_machine(Machine_t::Kh910);
 
   // not ready
-  expected_isr(get_position_past_right(), Direction_t::Left, Direction_t::Left);
+  setup_encodersMock(get_position_past_right(), Direction_t::Left, Direction_t::Left);
   expected_dispatch_init();
   ASSERT_EQ(fsm->getState(), OpState::init);
 
@@ -695,7 +688,7 @@ TEST_F(KnitterTest, test_fsm_init_RR) {
   expected_init_machine(Machine_t::Kh910);
 
   // still not ready
-  expected_isr(get_position_past_left(), Direction_t::Right, Direction_t::Right);
+  setup_encodersMock(get_position_past_left(), Direction_t::Right, Direction_t::Right);
   expected_dispatch_init();
   ASSERT_EQ(fsm->getState(), OpState::init);
 
@@ -710,7 +703,7 @@ TEST_F(KnitterTest, test_fsm_init_RL) {
 
   // Machine is initialized when Left hall sensor
   // is passed in Right direction inside active needles.
-  expected_isr(get_position_past_left(), Direction_t::Right, Direction_t::Left);
+  setup_encodersMock(get_position_past_left(), Direction_t::Right, Direction_t::Left);
   expected_get_ready();
 
   // test expectations without destroying instance
@@ -724,7 +717,7 @@ TEST_F(KnitterTest, test_fsm_init_LR) {
 
   // New feature (August 2020): the machine is also initialized
   // when the right Hall sensor is passed in the Left direction.
-  expected_isr(get_position_past_right(), Direction_t::Left, Direction_t::Right);
+  setup_encodersMock(get_position_past_right(), Direction_t::Left, Direction_t::Right);
   expected_get_ready();
   ASSERT_EQ(fsm->getState(), OpState::ready);
 

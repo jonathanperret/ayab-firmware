@@ -93,7 +93,7 @@ void Com::send_reqLine(const uint8_t lineNumber, Err_t error) const {
  * \param position Position of knitting carriage in needles from left hand side.
  * \param initState State of readiness (0 = ready, other values = not ready).
  */
-void Com::send_indState(Carriage_t carriage, uint8_t position,
+void Com::send_indState(Carriage_t carriage, int16_t position,
                         Err_t error) const {
   uint16_t leftHallValue = GlobalEncoders::getHallValue(Direction_t::Left);
   uint16_t rightHallValue = GlobalEncoders::getHallValue(Direction_t::Right);
@@ -107,7 +107,7 @@ void Com::send_indState(Carriage_t carriage, uint8_t position,
       highByte(rightHallValue),
       lowByte(rightHallValue),
       static_cast<uint8_t>(carriage),
-      position,
+      lowByte(position), // TODO change API to support 16-bit position
       static_cast<uint8_t>(GlobalEncoders::getDirection()),
   };
   send(static_cast<uint8_t *>(payload), INDSTATE_LEN);
