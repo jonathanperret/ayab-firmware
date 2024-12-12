@@ -238,10 +238,17 @@ bool Knitter::isReady() {
  */
 void Knitter::knit() {
   if (m_firstRun) {
+    if (m_currentLineNumber != 0) {        
+      // Request first line data before doing anything else
+      m_currentLineNumber = 0;
+      reqLine(m_currentLineNumber);
+      return;
+    } else if (m_lineRequested) {
+      // Still waiting for first line data: keep waiting
+      return;
+    }
+    // First line data received, let's proceed
     m_firstRun = false;
-    GlobalBeeper::finishedLine();
-    ++m_currentLineNumber;
-    reqLine(m_currentLineNumber);
   }
 
 #ifdef DBG_NOMACHINE
