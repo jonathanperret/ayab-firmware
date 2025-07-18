@@ -44,6 +44,8 @@ Knitter _Knitter;
 Solenoids _Solenoids;
 Tester _Tester;
 
+char *BAD_TEXT = NULL;
+
 BeeperInterface    *GlobalBeeper::m_instance    = &_Beeper;
 ComInterface       *GlobalCom::m_instance       = &_Com;
 EncodersInterface  *GlobalEncoders::m_instance  = &_Encoders;
@@ -94,6 +96,7 @@ void stackCanaryCheck() {
 #endif // ENABLE_STACK_CANARY
 
 void setup() {
+  printf("%s", BAD_TEXT);
   stackCanarySetup();
 
   GlobalBeeper::init(false);
