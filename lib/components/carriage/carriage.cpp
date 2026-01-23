@@ -112,8 +112,8 @@ int16_t Carriage::getSelectPosition(Direction direction) {
       break;
     default:  // CarriageType::Knit
       // K: NC @ +24/Left, -24/Right and magnet @ 0
-      // solenoid selection @ +16/Left, -16/Right
-      return (direction == Direction::Left) ? _position + 16: _position - 16;
+      // solenoid selection @ +13/Left, -13/Right
+      return (direction == Direction::Left) ? _position + 13: _position - 13;
       break;
   }
 }
