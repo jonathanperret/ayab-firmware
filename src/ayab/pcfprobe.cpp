@@ -24,12 +24,13 @@
 #include <avr/boot.h>
 #include <avr/pgmspace.h>
 
+#include "beeper.h"
 #include "com.h"
 #include "pcfprobe.h"
 
 namespace {
 
-constexpr uint8_t PROBE_VERSION = 2U;
+constexpr uint8_t PROBE_VERSION = 3U;
 constexpr uint8_t ADDR_LO = 0x20U; ///< expander for solenoids 0-7
 constexpr uint8_t ADDR_HI = 0x21U; ///< expander for solenoids 8-15
 constexpr uint8_t WRITES_PER_CELL = 100U;
@@ -202,6 +203,9 @@ const uint8_t prefixes[] PROGMEM = {0x00U, 0x00U, 0x09U, 0x11U, 0xFFU};
 constexpr uint8_t NUM_PATTERNS = sizeof(patterns) / sizeof(patterns[0]);
 constexpr uint8_t NUM_STYLES = sizeof(prefixes);
 constexpr uint8_t NUM_CELLS = NUM_PATTERNS * NUM_STYLES;
+/// Steps shown to the user as "[n/total]": one per table row, the soak,
+/// and the summary.
+constexpr uint8_t NUM_STEPS = NUM_PATTERNS + 2U;
 
 // Progress of the probe. 0 is idle; the probe then advances by one stage
 // per call of pcfProbeStep().
@@ -214,7 +218,10 @@ Totals all = {0, 0, 0, 0, 0};
 Totals soak = {0, 0, 0, 0, 0};
 
 void reportHeader() {
-  snprintf_P(line, sizeof(line), PSTR("\nPCF probe %u start, wait 15 s\n"), PROBE_VERSION);
+  snprintf_P(line, sizeof(line), PSTR("\n=== PCF probe %u: %u steps, about 15 seconds ===\n"), PROBE_VERSION,
+             NUM_STEPS);
+  say();
+  snprintf_P(line, sizeof(line), PSTR("Please wait for TEST FINISHED before doing anything.\n"));
   say();
 
   // Controller identity: device signature and serial number.
@@ -246,7 +253,7 @@ void reportHeader() {
   snprintf_P(line, sizeof(line), PSTR("all off reads %04X\n"), readBoth(nullptr));
   say();
 
-  snprintf_P(line, sizeof(line), PSTR("bad/portFF of %u: nat p00 p09 p11 pFF\n"), WRITES_PER_CELL);
+  snprintf_P(line, sizeof(line), PSTR("step, bad/portFF of %u: nat p00 p09 p11 pFF\n"), WRITES_PER_CELL);
   say();
 }
 
@@ -257,7 +264,8 @@ void runCell() {
   uint8_t s = cell % NUM_STYLES;
   uint16_t pattern = pgm_read_word(&patterns[p]);
   if (s == 0U) {
-    rowPos = static_cast<uint8_t>(snprintf_P(line, sizeof(line), PSTR("%2u on"), bitsSet(pattern)));
+    rowPos = static_cast<uint8_t>(
+        snprintf_P(line, sizeof(line), PSTR("[%u/%u] %2u on"), p + 1U, NUM_STEPS, bitsSet(pattern)));
   }
   Totals t = {0, 0, 0, 0, 0};
   burst(s, s, pgm_read_byte(&prefixes[s]), pattern, 0U, WRITES_PER_CELL, t);
@@ -275,9 +283,10 @@ void runCell() {
 }
 
 void reportSummary() {
-  snprintf_P(line, sizeof(line), PSTR("soak p09 11 on n %u bad %u ff %u\n"), SOAK_WRITES, soak.bad, soak.portFF);
+  snprintf_P(line, sizeof(line), PSTR("[%u/%u] soak p09 11 on n %u bad %u ff %u\n"), NUM_STEPS - 1U, NUM_STEPS,
+             SOAK_WRITES, soak.bad, soak.portFF);
   say();
-  snprintf_P(line, sizeof(line), PSTR("stuck %u nak w %u r %u\n"), all.stuck + soak.stuck,
+  snprintf_P(line, sizeof(line), PSTR("[%u/%u] stuck %u nak w %u r %u\n"), NUM_STEPS, NUM_STEPS, all.stuck + soak.stuck,
              all.writeNak + soak.writeNak, all.readNak + soak.readNak);
   say();
   snprintf_P(line, sizeof(line), PSTR("vcc min %u max %u ram %u\n"), vccMillivolts(vccRawMax),
@@ -297,8 +306,12 @@ void reportSummary() {
     say();
   }
 
-  snprintf_P(line, sizeof(line), PSTR("PCF probe %u end, total bad %u\n\n"), PROBE_VERSION, all.bad + soak.bad);
+  snprintf_P(line, sizeof(line), PSTR("PCF probe %u end, total bad %u\n"), PROBE_VERSION, all.bad + soak.bad);
   say();
+  snprintf_P(line, sizeof(line), PSTR("=== TEST FINISHED: copy all the text above and send it ===\n\n"));
+  say();
+  // An audible sign that it is over, for a user who is not watching the screen.
+  GlobalBeeper::endWork();
 }
 
 } // namespace
