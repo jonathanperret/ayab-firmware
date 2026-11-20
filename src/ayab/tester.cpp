@@ -30,6 +30,10 @@
 #include "knitter.h"
 #include "tester.h"
 
+#ifndef AYAB_TESTS
+#include "pcfprobe.h"
+#endif // AYAB_TESTS
+
 // public methods
 
 /*!
@@ -230,6 +234,11 @@ void Tester::setUp() {
 
   // Enable beeper so that it can be tested
   GlobalBeeper::init(true);
+
+#ifndef AYAB_TESTS
+  // Temporary: port expander diagnostic, reported in the test window.
+  pcfProbeRun();
+#endif // AYAB_TESTS
 }
 
 /*!
