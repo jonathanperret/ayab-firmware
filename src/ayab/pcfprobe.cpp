@@ -30,7 +30,7 @@
 
 namespace {
 
-constexpr uint8_t PROBE_VERSION = 3U;
+constexpr uint8_t PROBE_VERSION = 4U;
 constexpr uint8_t ADDR_LO = 0x20U; ///< expander for solenoids 0-7
 constexpr uint8_t ADDR_HI = 0x21U; ///< expander for solenoids 8-15
 constexpr uint8_t WRITES_PER_CELL = 100U;
@@ -38,10 +38,15 @@ constexpr uint16_t SOAK_WRITES = 2000U;
 constexpr uint16_t SOAK_CHUNK = 200U; ///< soak writes done per call of pcfProbeStep()
 constexpr uint8_t MAX_DETAILS = 4U;
 
-/// One line of the report. Com's message buffer holds 64 bytes including
-/// the message id, so lines must stay under 62 characters.
-/// The firmware has little RAM to spare, so all text is kept in flash.
-char line[62];
+/// Size of the buffer for one line of the report. Com's message buffer
+/// holds 64 bytes including the message id, so lines must stay under 62
+/// characters.
+///
+/// The firmware has little RAM to spare, and whatever this file keeps in
+/// static variables is taken from the stack for good, during knitting too.
+/// So lines are built in a buffer on the stack, all text is kept in flash,
+/// and the static state below is held to a few dozen bytes.
+constexpr uint8_t LINE_LEN = 62U;
 
 // Survives a restart of the sketch that is not a power-on, so that a
 // controller which restarts by itself can be told from one that was reset
@@ -57,21 +62,11 @@ struct Totals {
   uint16_t readNak;  ///< reads not acknowledged
 };
 
-struct Detail {
-  uint8_t style;
-  uint8_t on;
-  uint16_t index;
-  uint16_t want;
-  uint16_t got;
-  uint16_t again;
-};
-
-Detail details[MAX_DETAILS];
-uint8_t numDetails = 0;
+uint8_t numDetails = 0; ///< wrong read-backs reported in detail so far
 uint16_t vccRawMin = 1023U; // raw ADC reading; a higher reading is a lower supply
 uint16_t vccRawMax = 0U;
 
-void say() {
+void say(const char *line) {
   GlobalCom::sendMsg(AYAB_API::testRes, line);
 }
 
@@ -125,11 +120,26 @@ uint8_t bitsSet(uint16_t v) {
   return n;
 }
 
+/// Report one wrong read-back in full, as soon as it happens.
+/// Style 0 is the native write, shown as "nat"; the others show their
+/// first byte.
+void reportDetail(uint8_t style, uint8_t prefix, uint16_t a, uint16_t index, uint16_t want, uint16_t got,
+                  uint16_t again) {
+  char line[LINE_LEN];
+  if (style == 0U) {
+    snprintf_P(line, sizeof(line), PSTR("bad nat %u on #%u want %04X got %04X re %04X\n"), bitsSet(a), index, want, got,
+               again);
+  } else {
+    snprintf_P(line, sizeof(line), PSTR("bad p%02X %u on #%u want %04X got %04X re %04X\n"), prefix, bitsSet(a), index,
+               want, got, again);
+  }
+  say(line);
+}
+
 /// `count` writes alternating between `a` and `a` with solenoid 0
 /// toggled, each followed by a read-back of both ports. `firstIndex`
 /// numbers the writes when a long run is done in several calls.
-void burst(uint8_t styleIndex, uint8_t style, uint8_t prefix, uint16_t a, uint16_t firstIndex, uint16_t count,
-           Totals &t) {
+void burst(uint8_t style, uint8_t prefix, uint16_t a, uint16_t firstIndex, uint16_t count, Totals &t) {
   for (uint16_t i = firstIndex; i < (firstIndex + count); i++) {
     uint16_t want = ((i & 1U) != 0U) ? static_cast<uint16_t>(a ^ 0x0001U) : a;
     uint8_t naks = 0;
@@ -137,6 +147,14 @@ void burst(uint8_t styleIndex, uint8_t style, uint8_t prefix, uint16_t a, uint16
       t.writeNak++;
     }
     uint16_t got = readBoth(&naks);
+#ifdef PCFPROBE_INJECT_FAULT
+    // Bench check of the reporting path, which a healthy board never
+    // exercises: pretend one read-back in every burst found the upper port
+    // at FF. Never define this in a build that leaves the bench.
+    if (i == 7U) {
+      got |= 0xFF00U;
+    }
+#endif // PCFPROBE_INJECT_FAULT
     if (naks != 0U) {
       t.readNak++;
     }
@@ -160,7 +178,8 @@ void burst(uint8_t styleIndex, uint8_t style, uint8_t prefix, uint16_t a, uint16
         t.stuck++;
       }
       if (numDetails < MAX_DETAILS) {
-        details[numDetails++] = {styleIndex, bitsSet(a), i, want, got, again};
+        numDetails++;
+        reportDetail(style, prefix, a, i, want, got, again);
       }
     }
     delay(1);
@@ -211,18 +230,20 @@ constexpr uint8_t NUM_STEPS = NUM_PATTERNS + 2U;
 // per call of pcfProbeStep().
 enum : uint8_t { IDLE = 0, HEADER = 1, TABLE = 2, SOAK = 3, SUMMARY = 4 };
 uint8_t stage = IDLE;
-uint8_t cell = 0;       ///< next table cell to run
-uint8_t rowPos = 0;     ///< write position in `line` while a table row is being built
-uint16_t soakDone = 0;  ///< soak writes done so far
+uint8_t cell = 0;              ///< next table cell to run
+uint8_t rowBad[NUM_STYLES];    ///< results of the row in progress: wrong read-backs per style
+uint8_t rowPortFF[NUM_STYLES]; ///< and ports found at FF
+uint16_t soakDone = 0;         ///< soak writes done so far
 Totals all = {0, 0, 0, 0, 0};
 Totals soak = {0, 0, 0, 0, 0};
 
 void reportHeader() {
+  char line[LINE_LEN];
   snprintf_P(line, sizeof(line), PSTR("\n=== PCF probe %u: %u steps, about 15 seconds ===\n"), PROBE_VERSION,
              NUM_STEPS);
-  say();
+  say(line);
   snprintf_P(line, sizeof(line), PSTR("Please wait for TEST FINISHED before doing anything.\n"));
-  say();
+  say(line);
 
   // Controller identity: device signature and serial number.
   snprintf_P(line, sizeof(line), PSTR("chip %02X%02X%02X "), boot_signature_byte_get(0), boot_signature_byte_get(2),
@@ -231,7 +252,7 @@ void reportHeader() {
     snprintf_P(&line[12U + 2U * i], 3, PSTR("%02X"), boot_signature_byte_get(0x0EU + i));
   }
   snprintf_P(&line[32], sizeof(line) - 32U, PSTR(" boot %u\n"), bootCount);
-  say();
+  say(line);
 
   // Bus check: pull-ups, then which addresses answer.
   TWCR = 0; // release the pins from the I2C hardware for the pull-up test
@@ -247,14 +268,14 @@ void reportHeader() {
     }
   }
   snprintf_P(&line[pos], sizeof(line) - pos, PSTR("\n"));
-  say();
+  say(line);
 
   writeBoth(0U, 0U, 0x0000U);
   snprintf_P(line, sizeof(line), PSTR("all off reads %04X\n"), readBoth(nullptr));
-  say();
+  say(line);
 
   snprintf_P(line, sizeof(line), PSTR("step, bad/portFF of %u: nat p00 p09 p11 pFF\n"), WRITES_PER_CELL);
-  say();
+  say(line);
 }
 
 /// One cell of the table: one number of solenoids energised, one write
@@ -263,53 +284,45 @@ void runCell() {
   uint8_t p = cell / NUM_STYLES;
   uint8_t s = cell % NUM_STYLES;
   uint16_t pattern = pgm_read_word(&patterns[p]);
-  if (s == 0U) {
-    rowPos = static_cast<uint8_t>(
-        snprintf_P(line, sizeof(line), PSTR("[%u/%u] %2u on"), p + 1U, NUM_STEPS, bitsSet(pattern)));
-  }
   Totals t = {0, 0, 0, 0, 0};
-  burst(s, s, pgm_read_byte(&prefixes[s]), pattern, 0U, WRITES_PER_CELL, t);
+  burst(s, pgm_read_byte(&prefixes[s]), pattern, 0U, WRITES_PER_CELL, t);
   writeBoth(0U, 0U, 0x0000U);
-  rowPos += static_cast<uint8_t>(snprintf_P(&line[rowPos], sizeof(line) - rowPos, PSTR(" %u/%u"), t.bad, t.portFF));
+  // At most WRITES_PER_CELL wrong read-backs, and two ports each: both fit a byte.
+  rowBad[s] = static_cast<uint8_t>(t.bad);
+  rowPortFF[s] = static_cast<uint8_t>(t.portFF);
   all.bad += t.bad;
   all.portFF += t.portFF;
   all.stuck += t.stuck;
   all.writeNak += t.writeNak;
   all.readNak += t.readNak;
   if (s == (NUM_STYLES - 1U)) {
-    snprintf_P(&line[rowPos], sizeof(line) - rowPos, PSTR("\n"));
-    say();
+    char line[LINE_LEN];
+    uint8_t pos =
+        static_cast<uint8_t>(snprintf_P(line, sizeof(line), PSTR("[%u/%u] %2u on"), p + 1U, NUM_STEPS, bitsSet(pattern)));
+    for (uint8_t k = 0; k < NUM_STYLES; k++) {
+      pos += static_cast<uint8_t>(snprintf_P(&line[pos], sizeof(line) - pos, PSTR(" %u/%u"), rowBad[k], rowPortFF[k]));
+    }
+    snprintf_P(&line[pos], sizeof(line) - pos, PSTR("\n"));
+    say(line);
   }
 }
 
 void reportSummary() {
+  char line[LINE_LEN];
   snprintf_P(line, sizeof(line), PSTR("[%u/%u] soak p09 11 on n %u bad %u ff %u\n"), NUM_STEPS - 1U, NUM_STEPS,
              SOAK_WRITES, soak.bad, soak.portFF);
-  say();
+  say(line);
   snprintf_P(line, sizeof(line), PSTR("[%u/%u] stuck %u nak w %u r %u\n"), NUM_STEPS, NUM_STEPS, all.stuck + soak.stuck,
              all.writeNak + soak.writeNak, all.readNak + soak.readNak);
-  say();
+  say(line);
   snprintf_P(line, sizeof(line), PSTR("vcc min %u max %u ram %u\n"), vccMillivolts(vccRawMax),
              vccMillivolts(vccRawMin), untouchedRam());
-  say();
-
-  for (uint8_t d = 0; d < numDetails; d++) {
-    // style 0 is the native write, shown as "nat"; the others show their first byte
-    if (details[d].style == 0U) {
-      snprintf_P(line, sizeof(line), PSTR("bad nat %u on #%u want %04X got %04X re %04X\n"), details[d].on,
-                 details[d].index, details[d].want, details[d].got, details[d].again);
-    } else {
-      snprintf_P(line, sizeof(line), PSTR("bad p%02X %u on #%u want %04X got %04X re %04X\n"),
-                 pgm_read_byte(&prefixes[details[d].style]), details[d].on, details[d].index, details[d].want,
-                 details[d].got, details[d].again);
-    }
-    say();
-  }
+  say(line);
 
   snprintf_P(line, sizeof(line), PSTR("PCF probe %u end, total bad %u\n"), PROBE_VERSION, all.bad + soak.bad);
-  say();
+  say(line);
   snprintf_P(line, sizeof(line), PSTR("=== TEST FINISHED: copy all the text above and send it ===\n\n"));
-  say();
+  say(line);
   // An audible sign that it is over, for a user who is not watching the screen.
   GlobalBeeper::endWork();
 }
@@ -352,7 +365,7 @@ void pcfProbeStep() {
 
   case SOAK:
     // In the style the MCP23008 driver uses, with 11 solenoids on.
-    burst(2U, 2U, 0x09U, 0xF676U, soakDone, SOAK_CHUNK, soak);
+    burst(2U, 0x09U, 0xF676U, soakDone, SOAK_CHUNK, soak);
     soakDone += SOAK_CHUNK;
     if (soakDone >= SOAK_WRITES) {
       writeBoth(0U, 0U, 0x0000U);
