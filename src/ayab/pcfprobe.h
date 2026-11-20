@@ -23,17 +23,26 @@
 #define PCFPROBE_H_
 
 /*!
- * \brief Exercise both port expanders and report the result as text.
+ * \brief Start a probe of both port expanders.
  *
- * Writes patterns to the two expanders in several ways (the PCF8574's
- * native single-byte write, and two-byte writes with different first
- * bytes, 0x09 being what the MCP23008 driver sends), reads both ports
- * back after every write, and sends a short report as `testRes` messages
- * for the user to copy from the hardware test window.
+ * The probe writes patterns to the two expanders in several ways (the
+ * PCF8574's native single-byte write, and two-byte writes with different
+ * first bytes, 0x09 being what the MCP23008 driver sends), reads both
+ * ports back after every write, and sends a short report as `testRes`
+ * messages for the user to copy from the hardware test window.
  *
- * Blocks for about fifteen seconds and energises solenoids in short bursts.
- * Leaves all solenoids off.
+ * This only arms the probe. The work is done by pcfProbeStep().
  */
-void pcfProbeRun();
+void pcfProbeStart();
+
+/*!
+ * \brief Advance the probe by one stage. Call repeatedly from the test loop.
+ *
+ * Does nothing unless a probe has been started. Each call takes from a few
+ * milliseconds to about half a second, so that the firmware keeps handling
+ * serial messages between calls; the whole probe takes about fifteen
+ * seconds. Solenoids are energised in short bursts and left off at the end.
+ */
+void pcfProbeStep();
 
 #endif // PCFPROBE_H_

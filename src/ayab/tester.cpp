@@ -186,6 +186,9 @@ Err_t Tester::startTest(Machine_t machineType) {
  * \brief Main loop for hardware tests.
  */
 void Tester::loop() {
+#ifndef AYAB_TESTS
+  pcfProbeStep();
+#endif // AYAB_TESTS
   unsigned long now = millis();
   if (now - m_lastTime >= TEST_LOOP_DELAY) {
     m_lastTime = now;
@@ -237,7 +240,8 @@ void Tester::setUp() {
 
 #ifndef AYAB_TESTS
   // Temporary: port expander diagnostic, reported in the test window.
-  pcfProbeRun();
+  // It runs from loop(), after test mode has been confirmed to the app.
+  pcfProbeStart();
 #endif // AYAB_TESTS
 }
 

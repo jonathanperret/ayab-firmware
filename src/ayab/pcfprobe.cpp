@@ -29,11 +29,12 @@
 
 namespace {
 
-constexpr uint8_t PROBE_VERSION = 1U;
+constexpr uint8_t PROBE_VERSION = 2U;
 constexpr uint8_t ADDR_LO = 0x20U; ///< expander for solenoids 0-7
 constexpr uint8_t ADDR_HI = 0x21U; ///< expander for solenoids 8-15
 constexpr uint8_t WRITES_PER_CELL = 100U;
 constexpr uint16_t SOAK_WRITES = 2000U;
+constexpr uint16_t SOAK_CHUNK = 200U; ///< soak writes done per call of pcfProbeStep()
 constexpr uint8_t MAX_DETAILS = 4U;
 
 /// One line of the report. Com's message buffer holds 64 bytes including
@@ -124,9 +125,11 @@ uint8_t bitsSet(uint16_t v) {
 }
 
 /// `count` writes alternating between `a` and `a` with solenoid 0
-/// toggled, each followed by a read-back of both ports.
-void burst(uint8_t styleIndex, uint8_t style, uint8_t prefix, uint16_t a, uint16_t count, Totals &t) {
-  for (uint16_t i = 0; i < count; i++) {
+/// toggled, each followed by a read-back of both ports. `firstIndex`
+/// numbers the writes when a long run is done in several calls.
+void burst(uint8_t styleIndex, uint8_t style, uint8_t prefix, uint16_t a, uint16_t firstIndex, uint16_t count,
+           Totals &t) {
+  for (uint16_t i = firstIndex; i < (firstIndex + count); i++) {
     uint16_t want = ((i & 1U) != 0U) ? static_cast<uint16_t>(a ^ 0x0001U) : a;
     uint8_t naks = 0;
     if (writeBoth(style, prefix, want) != 0U) {
@@ -161,7 +164,6 @@ void burst(uint8_t styleIndex, uint8_t style, uint8_t prefix, uint16_t a, uint16
     }
     delay(1);
   }
-  writeBoth(0U, 0U, 0x0000U);
 }
 
 /// A line is driven low, released, and read 0.2 ms later: it only comes
@@ -194,27 +196,30 @@ uint16_t untouchedRam() {
   return n;
 }
 
-} // namespace
+const uint16_t patterns[] PROGMEM = {0x8000U, 0x8002U, 0x8606U, 0xB636U, 0xF676U, 0xFFFFU};
+// style 0 is native; the others are two-byte writes with this first byte
+const uint8_t prefixes[] PROGMEM = {0x00U, 0x00U, 0x09U, 0x11U, 0xFFU};
+constexpr uint8_t NUM_PATTERNS = sizeof(patterns) / sizeof(patterns[0]);
+constexpr uint8_t NUM_STYLES = sizeof(prefixes);
+constexpr uint8_t NUM_CELLS = NUM_PATTERNS * NUM_STYLES;
 
-void pcfProbeRun() {
-  static const uint16_t patterns[] = {0x8000U, 0x8002U, 0x8606U, 0xB636U, 0xF676U, 0xFFFFU};
-  // style 0 is native; the others are two-byte writes with this first byte
-  static const uint8_t prefixes[] = {0x00U, 0x00U, 0x09U, 0x11U, 0xFFU};
+// Progress of the probe. 0 is idle; the probe then advances by one stage
+// per call of pcfProbeStep().
+enum : uint8_t { IDLE = 0, HEADER = 1, TABLE = 2, SOAK = 3, SUMMARY = 4 };
+uint8_t stage = IDLE;
+uint8_t cell = 0;       ///< next table cell to run
+uint8_t rowPos = 0;     ///< write position in `line` while a table row is being built
+uint16_t soakDone = 0;  ///< soak writes done so far
+Totals all = {0, 0, 0, 0, 0};
+Totals soak = {0, 0, 0, 0, 0};
 
-  paintFreeRam();
-
-  if (bootMagic != 0xB007U) {
-    bootMagic = 0xB007U;
-    bootCount = 0U;
-  }
-  bootCount++;
-
-  snprintf_P(line, sizeof(line), PSTR("\nPCF probe %u start, takes 15 s\n"), PROBE_VERSION);
+void reportHeader() {
+  snprintf_P(line, sizeof(line), PSTR("\nPCF probe %u start, wait 15 s\n"), PROBE_VERSION);
   say();
 
   // Controller identity: device signature and serial number.
   snprintf_P(line, sizeof(line), PSTR("chip %02X%02X%02X "), boot_signature_byte_get(0), boot_signature_byte_get(2),
-           boot_signature_byte_get(4));
+             boot_signature_byte_get(4));
   for (uint8_t i = 0; i < 10U; i++) {
     snprintf_P(&line[12U + 2U * i], 3, PSTR("%02X"), boot_signature_byte_get(0x0EU + i));
   }
@@ -226,8 +231,8 @@ void pcfProbeRun() {
   bool sda = pulledUp(SDA);
   bool scl = pulledUp(SCL);
   Wire.begin();
-  uint8_t pos = static_cast<uint8_t>(
-      snprintf_P(line, sizeof(line), PSTR("vcc %u sda %u scl %u ack"), vccMillivolts(vccRaw()), sda ? 1U : 0U, scl ? 1U : 0U));
+  uint8_t pos = static_cast<uint8_t>(snprintf_P(line, sizeof(line), PSTR("vcc %u sda %u scl %u ack"),
+                                                vccMillivolts(vccRaw()), sda ? 1U : 0U, scl ? 1U : 0U));
   for (uint8_t a = 0x03U; a <= 0x77U; a++) {
     Wire.beginTransmission(a);
     if ((Wire.endTransmission() == 0U) && (pos < (sizeof(line) - 5U))) {
@@ -241,34 +246,39 @@ void pcfProbeRun() {
   snprintf_P(line, sizeof(line), PSTR("all off reads %04X\n"), readBoth(nullptr));
   say();
 
-  // Table: solenoids energised against write style.
   snprintf_P(line, sizeof(line), PSTR("bad/portFF of %u: nat p00 p09 p11 pFF\n"), WRITES_PER_CELL);
   say();
-  Totals all = {0, 0, 0, 0, 0};
-  for (uint8_t p = 0; p < (sizeof(patterns) / sizeof(patterns[0])); p++) {
-    pos = static_cast<uint8_t>(snprintf_P(line, sizeof(line), PSTR("%2u on"), bitsSet(patterns[p])));
-    for (uint8_t s = 0; s < sizeof(prefixes); s++) {
-      Totals t = {0, 0, 0, 0, 0};
-      burst(s, s, prefixes[s], patterns[p], WRITES_PER_CELL, t);
-      pos += static_cast<uint8_t>(snprintf_P(&line[pos], sizeof(line) - pos, PSTR(" %u/%u"), t.bad, t.portFF));
-      all.bad += t.bad;
-      all.portFF += t.portFF;
-      all.stuck += t.stuck;
-      all.writeNak += t.writeNak;
-      all.readNak += t.readNak;
-      delay(100);
-    }
-    snprintf_P(&line[pos], sizeof(line) - pos, PSTR("\n"));
+}
+
+/// One cell of the table: one number of solenoids energised, one write
+/// style. A row is sent when its last cell is done.
+void runCell() {
+  uint8_t p = cell / NUM_STYLES;
+  uint8_t s = cell % NUM_STYLES;
+  uint16_t pattern = pgm_read_word(&patterns[p]);
+  if (s == 0U) {
+    rowPos = static_cast<uint8_t>(snprintf_P(line, sizeof(line), PSTR("%2u on"), bitsSet(pattern)));
+  }
+  Totals t = {0, 0, 0, 0, 0};
+  burst(s, s, pgm_read_byte(&prefixes[s]), pattern, 0U, WRITES_PER_CELL, t);
+  writeBoth(0U, 0U, 0x0000U);
+  rowPos += static_cast<uint8_t>(snprintf_P(&line[rowPos], sizeof(line) - rowPos, PSTR(" %u/%u"), t.bad, t.portFF));
+  all.bad += t.bad;
+  all.portFF += t.portFF;
+  all.stuck += t.stuck;
+  all.writeNak += t.writeNak;
+  all.readNak += t.readNak;
+  if (s == (NUM_STYLES - 1U)) {
+    snprintf_P(&line[rowPos], sizeof(line) - rowPos, PSTR("\n"));
     say();
   }
+}
 
-  // Soak in the style the MCP23008 driver uses, with 11 solenoids on.
-  Totals soak = {0, 0, 0, 0, 0};
-  burst(2U, 2U, 0x09U, 0xF676U, SOAK_WRITES, soak);
+void reportSummary() {
   snprintf_P(line, sizeof(line), PSTR("soak p09 11 on n %u bad %u ff %u\n"), SOAK_WRITES, soak.bad, soak.portFF);
   say();
-  snprintf_P(line, sizeof(line), PSTR("stuck %u nak w %u r %u\n"), all.stuck + soak.stuck, all.writeNak + soak.writeNak,
-           all.readNak + soak.readNak);
+  snprintf_P(line, sizeof(line), PSTR("stuck %u nak w %u r %u\n"), all.stuck + soak.stuck,
+             all.writeNak + soak.writeNak, all.readNak + soak.readNak);
   say();
   snprintf_P(line, sizeof(line), PSTR("vcc min %u max %u ram %u\n"), vccMillivolts(vccRawMax),
              vccMillivolts(vccRawMin), untouchedRam());
@@ -277,17 +287,72 @@ void pcfProbeRun() {
   for (uint8_t d = 0; d < numDetails; d++) {
     // style 0 is the native write, shown as "nat"; the others show their first byte
     if (details[d].style == 0U) {
-      snprintf_P(line, sizeof(line), PSTR("bad nat %u on #%u want %04X got %04X re %04X\n"), details[d].on, details[d].index,
-               details[d].want, details[d].got, details[d].again);
+      snprintf_P(line, sizeof(line), PSTR("bad nat %u on #%u want %04X got %04X re %04X\n"), details[d].on,
+                 details[d].index, details[d].want, details[d].got, details[d].again);
     } else {
-      snprintf_P(line, sizeof(line), PSTR("bad p%02X %u on #%u want %04X got %04X re %04X\n"), prefixes[details[d].style],
-               details[d].on, details[d].index, details[d].want, details[d].got, details[d].again);
+      snprintf_P(line, sizeof(line), PSTR("bad p%02X %u on #%u want %04X got %04X re %04X\n"),
+                 pgm_read_byte(&prefixes[details[d].style]), details[d].on, details[d].index, details[d].want,
+                 details[d].got, details[d].again);
     }
     say();
   }
-  numDetails = 0;
 
-  writeBoth(0U, 0U, 0x0000U);
   snprintf_P(line, sizeof(line), PSTR("PCF probe %u end, total bad %u\n\n"), PROBE_VERSION, all.bad + soak.bad);
   say();
+}
+
+} // namespace
+
+void pcfProbeStart() {
+  paintFreeRam();
+
+  if (bootMagic != 0xB007U) {
+    bootMagic = 0xB007U;
+    bootCount = 0U;
+  }
+  bootCount++;
+
+  cell = 0U;
+  soakDone = 0U;
+  numDetails = 0U;
+  vccRawMin = 1023U;
+  vccRawMax = 0U;
+  all = {0, 0, 0, 0, 0};
+  soak = {0, 0, 0, 0, 0};
+  stage = HEADER;
+}
+
+void pcfProbeStep() {
+  switch (stage) {
+  case HEADER:
+    reportHeader();
+    stage = TABLE;
+    break;
+
+  case TABLE:
+    runCell();
+    cell++;
+    if (cell >= NUM_CELLS) {
+      stage = SOAK;
+    }
+    break;
+
+  case SOAK:
+    // In the style the MCP23008 driver uses, with 11 solenoids on.
+    burst(2U, 2U, 0x09U, 0xF676U, soakDone, SOAK_CHUNK, soak);
+    soakDone += SOAK_CHUNK;
+    if (soakDone >= SOAK_WRITES) {
+      writeBoth(0U, 0U, 0x0000U);
+      stage = SUMMARY;
+    }
+    break;
+
+  case SUMMARY:
+    reportSummary();
+    stage = IDLE;
+    break;
+
+  default:
+    break;
+  }
 }
