@@ -30,7 +30,7 @@
 
 namespace {
 
-constexpr uint8_t PROBE_VERSION = 5U;
+constexpr uint8_t PROBE_VERSION = 6U;
 constexpr uint8_t ADDR_LO = 0x20U; ///< expander for solenoids 0-7
 constexpr uint8_t ADDR_HI = 0x21U; ///< expander for solenoids 8-15
 constexpr uint8_t WRITES_PER_CELL = 100U;
@@ -65,6 +65,8 @@ struct Totals {
 };
 
 uint8_t numDetails = 0; ///< wrong read-backs reported in detail so far
+uint16_t ffLowBank = 0;  ///< times the port for solenoids 0-7 was found at FF without having been written so
+uint16_t ffHighBank = 0; ///< the same for the port for solenoids 8-15
 uint16_t vccRawMin = 1023U; // raw ADC reading; a higher reading is a lower supply
 uint16_t vccRawMax = 0U;
 
@@ -171,9 +173,11 @@ void burst(uint8_t style, uint8_t prefix, uint16_t a, uint16_t firstIndex, uint1
       t.bad++;
       if ((lowByte(got) == 0xFFU) && (lowByte(want) != 0xFFU)) {
         t.portFF++;
+        ffLowBank++;
       }
       if ((highByte(got) == 0xFFU) && (highByte(want) != 0xFFU)) {
         t.portFF++;
+        ffHighBank++;
       }
       uint16_t again = readBoth(nullptr);
       if (again == got) {
@@ -337,9 +341,11 @@ void replayCheck(uint8_t style, uint8_t prefix, uint8_t n, uint8_t repeat, uint1
     }
     if ((lowByte(got) == 0xFFU) && (lowByte(want) != 0xFFU)) {
       all.portFF++;
+      ffLowBank++;
     }
     if ((highByte(got) == 0xFFU) && (highByte(want) != 0xFFU)) {
       all.portFF++;
+      ffHighBank++;
     }
     uint16_t again = readBoth(nullptr);
     if (again == got) {
@@ -411,6 +417,9 @@ void reportSummary() {
   snprintf_P(line, sizeof(line), PSTR("[%u/%u] stuck %u nak w %u r %u\n"), NUM_STEPS, NUM_STEPS, all.stuck + soak.stuck,
              all.writeNak + soak.writeNak, all.readNak + soak.readNak);
   say(line);
+  // A whole bank found on when it was not asked for: what was seen on the machine.
+  snprintf_P(line, sizeof(line), PSTR("whole bank on by itself: 0-7 %u times, 8-15 %u times\n"), ffLowBank, ffHighBank);
+  say(line);
   snprintf_P(line, sizeof(line), PSTR("vcc min %u max %u ram %u\n"), vccMillivolts(vccRawMax),
              vccMillivolts(vccRawMin), untouchedRam());
   say(line);
@@ -437,6 +446,8 @@ void pcfProbeStart() {
   cell = 0U;
   soakDone = 0U;
   numDetails = 0U;
+  ffLowBank = 0U;
+  ffHighBank = 0U;
   vccRawMin = 1023U;
   vccRawMax = 0U;
   all = {0, 0, 0, 0, 0};
