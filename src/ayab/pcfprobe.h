@@ -29,7 +29,9 @@
  * PCF8574's native single-byte write, and two-byte writes with different
  * first bytes, 0x09 being what the MCP23008 driver sends), reads both
  * ports back after every write, and sends a short report as `testRes`
- * messages for the user to copy from the hardware test window.
+ * messages for the user to copy from the hardware test window. It also
+ * replays how the fault was first seen: solenoids enabled one by one from
+ * 0 to 15, counting wrong read-backs per solenoid.
  *
  * This only arms the probe. The work is done by pcfProbeStep().
  */
@@ -39,8 +41,8 @@ void pcfProbeStart();
  * \brief Advance the probe by one stage. Call repeatedly from the test loop.
  *
  * Does nothing unless a probe has been started. Each call takes from a few
- * milliseconds to about half a second, so that the firmware keeps handling
- * serial messages between calls; the whole probe takes about fifteen
+ * milliseconds to about two seconds, so that the firmware keeps handling
+ * serial messages between calls; the whole probe takes about twenty
  * seconds. Solenoids are energised in short bursts and left off at the end.
  */
 void pcfProbeStep();

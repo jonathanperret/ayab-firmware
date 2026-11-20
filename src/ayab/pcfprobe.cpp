@@ -30,13 +30,15 @@
 
 namespace {
 
-constexpr uint8_t PROBE_VERSION = 4U;
+constexpr uint8_t PROBE_VERSION = 5U;
 constexpr uint8_t ADDR_LO = 0x20U; ///< expander for solenoids 0-7
 constexpr uint8_t ADDR_HI = 0x21U; ///< expander for solenoids 8-15
 constexpr uint8_t WRITES_PER_CELL = 100U;
 constexpr uint16_t SOAK_WRITES = 2000U;
 constexpr uint16_t SOAK_CHUNK = 200U; ///< soak writes done per call of pcfProbeStep()
 constexpr uint8_t MAX_DETAILS = 4U;
+constexpr uint8_t REPLAY_REPEATS = 10U;  ///< times each replay sequence is run
+constexpr uint8_t REPLAY_SETTLE_MS = 4U; ///< wait after each replay write, so that coil current builds up
 
 /// Size of the buffer for one line of the report. Com's message buffer
 /// holds 64 bytes including the message id, so lines must stay under 62
@@ -222,15 +224,18 @@ const uint8_t prefixes[] PROGMEM = {0x00U, 0x00U, 0x09U, 0x11U, 0xFFU};
 constexpr uint8_t NUM_PATTERNS = sizeof(patterns) / sizeof(patterns[0]);
 constexpr uint8_t NUM_STYLES = sizeof(prefixes);
 constexpr uint8_t NUM_CELLS = NUM_PATTERNS * NUM_STYLES;
-/// Steps shown to the user as "[n/total]": one per table row, the soak,
-/// and the summary.
-constexpr uint8_t NUM_STEPS = NUM_PATTERNS + 2U;
+/// Steps shown to the user as "[n/total]": one per table row, one per
+/// replay, the soak, and the summary.
+/// The replay runs four times: one solenoid at a time and adding up, each
+/// with the native write and with the two-byte write starting 0x09.
+constexpr uint8_t NUM_REPLAYS = 4U;
+constexpr uint8_t NUM_STEPS = NUM_PATTERNS + NUM_REPLAYS + 2U;
 
 // Progress of the probe. 0 is idle; the probe then advances by one stage
 // per call of pcfProbeStep().
-enum : uint8_t { IDLE = 0, HEADER = 1, TABLE = 2, SOAK = 3, SUMMARY = 4 };
+enum : uint8_t { IDLE = 0, HEADER = 1, TABLE = 2, REPLAY = 3, SOAK = 4, SUMMARY = 5 };
 uint8_t stage = IDLE;
-uint8_t cell = 0;              ///< next table cell to run
+uint8_t cell = 0;              ///< next table cell to run, then next replay
 uint8_t rowBad[NUM_STYLES];    ///< results of the row in progress: wrong read-backs per style
 uint8_t rowPortFF[NUM_STYLES]; ///< and ports found at FF
 uint16_t soakDone = 0;         ///< soak writes done so far
@@ -239,7 +244,7 @@ Totals soak = {0, 0, 0, 0, 0};
 
 void reportHeader() {
   char line[LINE_LEN];
-  snprintf_P(line, sizeof(line), PSTR("\n=== PCF probe %u: %u steps, about 15 seconds ===\n"), PROBE_VERSION,
+  snprintf_P(line, sizeof(line), PSTR("\n=== PCF probe %u: %u steps, about 20 seconds ===\n"), PROBE_VERSION,
              NUM_STEPS);
   say(line);
   snprintf_P(line, sizeof(line), PSTR("Please wait for TEST FINISHED before doing anything.\n"));
@@ -307,6 +312,97 @@ void runCell() {
   }
 }
 
+/// One check of the replay: read both ports back and count a wrong value
+/// against solenoid `n`.
+void replayCheck(uint8_t style, uint8_t prefix, uint8_t n, uint8_t repeat, uint16_t want, uint8_t *counts) {
+  uint8_t naks = 0;
+  uint16_t got = readBoth(&naks);
+#ifdef PCFPROBE_INJECT_FAULT
+  // Bench check of the reporting path (see burst()): in the first run of
+  // each sequence, pretend the read-back after enabling solenoid 13 found
+  // the upper port at FF.
+  if ((n == 13U) && (repeat == 0U) && (want != 0U)) {
+    got |= 0xFF00U;
+  }
+#else
+  (void)repeat;
+#endif // PCFPROBE_INJECT_FAULT
+  if (naks != 0U) {
+    all.readNak++;
+  }
+  if (got != want) {
+    all.bad++;
+    if (counts[n] < 9U) {
+      counts[n]++;
+    }
+    if ((lowByte(got) == 0xFFU) && (lowByte(want) != 0xFFU)) {
+      all.portFF++;
+    }
+    if ((highByte(got) == 0xFFU) && (highByte(want) != 0xFFU)) {
+      all.portFF++;
+    }
+    uint16_t again = readBoth(nullptr);
+    if (again == got) {
+      all.stuck++;
+    }
+    if (numDetails < MAX_DETAILS) {
+      numDetails++;
+      reportDetail(style, prefix, want, n, want, got, again);
+    }
+  }
+}
+
+/// Replay of how the fault was first seen, by hand, in hardware test mode:
+/// solenoids enabled one by one from 0 to 15, with trouble starting at the
+/// last four.
+///
+/// `cumulative` false: each solenoid is switched on, checked, switched off
+/// and checked again. `cumulative` true: each is switched on in addition to
+/// those before it, and checked. The sequence is run REPLAY_REPEATS times.
+/// The report line holds one digit per solenoid, 0 to 15: how many checks
+/// went wrong at that solenoid (9 means nine or more).
+void replay(uint8_t which) {
+  bool cumulative = (which >= 2U);
+  uint8_t style = ((which & 1U) != 0U) ? 2U : 0U; // index into prefixes: native, or two bytes starting 0x09
+  uint8_t prefix = pgm_read_byte(&prefixes[style]);
+  uint8_t counts[16] = {0};
+
+  for (uint8_t r = 0; r < REPLAY_REPEATS; r++) {
+    uint16_t state = 0x0000U;
+    if (writeBoth(style, prefix, state) != 0U) {
+      all.writeNak++;
+    }
+    for (uint8_t n = 0; n < 16U; n++) {
+      uint16_t bit = static_cast<uint16_t>(1U) << n;
+      state = cumulative ? static_cast<uint16_t>(state | bit) : bit;
+      if (writeBoth(style, prefix, state) != 0U) {
+        all.writeNak++;
+      }
+      delay(REPLAY_SETTLE_MS);
+      replayCheck(style, prefix, n, r, state, counts);
+      if (!cumulative) {
+        state = 0x0000U;
+        if (writeBoth(style, prefix, state) != 0U) {
+          all.writeNak++;
+        }
+        delay(REPLAY_SETTLE_MS);
+        replayCheck(style, prefix, n, r, state, counts);
+      }
+    }
+  }
+  writeBoth(0U, 0U, 0x0000U);
+
+  char line[LINE_LEN];
+  uint8_t pos = static_cast<uint8_t>(snprintf_P(line, sizeof(line), cumulative ? PSTR("[%u/%u] add %S ") : PSTR("[%u/%u] one %S "),
+                                                NUM_PATTERNS + 1U + which, NUM_STEPS, (style == 0U) ? PSTR("nat") : PSTR("p09")));
+  for (uint8_t n = 0; n < 16U; n++) {
+    line[pos++] = static_cast<char>('0' + counts[n]);
+  }
+  line[pos++] = '\n';
+  line[pos] = '\0';
+  say(line);
+}
+
 void reportSummary() {
   char line[LINE_LEN];
   snprintf_P(line, sizeof(line), PSTR("[%u/%u] soak p09 11 on n %u bad %u ff %u\n"), NUM_STEPS - 1U, NUM_STEPS,
@@ -359,6 +455,18 @@ void pcfProbeStep() {
     runCell();
     cell++;
     if (cell >= NUM_CELLS) {
+      char line[LINE_LEN];
+      snprintf_P(line, sizeof(line), PSTR("one by one / adding up: bad per solenoid 0..15\n"));
+      say(line);
+      cell = 0U;
+      stage = REPLAY;
+    }
+    break;
+
+  case REPLAY:
+    replay(cell);
+    cell++;
+    if (cell >= NUM_REPLAYS) {
       stage = SOAK;
     }
     break;
