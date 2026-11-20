@@ -30,6 +30,10 @@
 #include "knitter.h"
 #include "tester.h"
 
+#ifndef AYAB_TESTS
+#include "pcfprobe.h"
+#endif // AYAB_TESTS
+
 // public methods
 
 /*!
@@ -182,6 +186,9 @@ Err_t Tester::startTest(Machine_t machineType) {
  * \brief Main loop for hardware tests.
  */
 void Tester::loop() {
+#ifndef AYAB_TESTS
+  pcfProbeStep();
+#endif // AYAB_TESTS
   unsigned long now = millis();
   if (now - m_lastTime >= TEST_LOOP_DELAY) {
     m_lastTime = now;
@@ -230,6 +237,12 @@ void Tester::setUp() {
 
   // Enable beeper so that it can be tested
   GlobalBeeper::init(true);
+
+#ifndef AYAB_TESTS
+  // Temporary: port expander diagnostic, reported in the test window.
+  // It runs from loop(), after test mode has been confirmed to the app.
+  pcfProbeStart();
+#endif // AYAB_TESTS
 }
 
 /*!
