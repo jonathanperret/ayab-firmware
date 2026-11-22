@@ -30,7 +30,7 @@
 
 namespace {
 
-constexpr uint8_t PROBE_VERSION = 6U;
+constexpr uint8_t PROBE_VERSION = 7U;
 constexpr uint8_t ADDR_LO = 0x20U; ///< expander for solenoids 0-7
 constexpr uint8_t ADDR_HI = 0x21U; ///< expander for solenoids 8-15
 constexpr uint8_t WRITES_PER_CELL = 100U;
@@ -39,6 +39,21 @@ constexpr uint16_t SOAK_CHUNK = 200U; ///< soak writes done per call of pcfProbe
 constexpr uint8_t MAX_DETAILS = 4U;
 constexpr uint8_t REPLAY_REPEATS = 10U;  ///< times each replay sequence is run
 constexpr uint8_t REPLAY_SETTLE_MS = 4U; ///< wait after each replay write, so that coil current builds up
+
+// Hand-clocked write test (see handClocked() below).
+constexpr uint8_t HAND_TRIALS = 10U;     ///< trials per variant
+constexpr uint8_t HAND_PATTERN = 0x7FU;  ///< solenoids 8 to 14, on the expander that resets
+constexpr uint8_t HAND_ON_MS = 5U;       ///< time the solenoids are on before being switched off
+constexpr uint16_t HAND_HOLD_US = 300U;  ///< how long a bus state is held when a variant holds it
+constexpr uint8_t HAND_HALF_US = 4U;     ///< half a clock period: about 100 kHz, like the I2C hardware
+constexpr uint8_t HAND_REST_MS = 30U;    ///< rest between trials, everything off
+constexpr uint8_t HAND_SDA = _BV(PC4);   ///< the I2C pins as plain port C pins
+constexpr uint8_t HAND_SCL = _BV(PC5);
+// What a variant does differently from an ordinary write.
+constexpr uint8_t HAND_WIRE = 0x01U; ///< not by hand at all: the I2C hardware, as a reference
+constexpr uint8_t HAND_LOW = 0x02U;  ///< clock held low for HAND_HOLD_US before the acknowledge pulse
+constexpr uint8_t HAND_HIGH = 0x04U; ///< clock left high for HAND_HOLD_US during the acknowledge pulse
+constexpr uint8_t HAND_DATA = 0x08U; ///< data line also held low by the controller from the last data bit on
 
 /// Size of the buffer for one line of the report. Com's message buffer
 /// holds 64 bytes including the message id, so lines must stay under 62
@@ -229,17 +244,25 @@ constexpr uint8_t NUM_PATTERNS = sizeof(patterns) / sizeof(patterns[0]);
 constexpr uint8_t NUM_STYLES = sizeof(prefixes);
 constexpr uint8_t NUM_CELLS = NUM_PATTERNS * NUM_STYLES;
 /// Steps shown to the user as "[n/total]": one per table row, one per
-/// replay, the soak, and the summary.
+/// replay, one per hand-clocked variant, the soak, and the summary.
 /// The replay runs four times: one solenoid at a time and adding up, each
 /// with the native write and with the two-byte write starting 0x09.
 constexpr uint8_t NUM_REPLAYS = 4U;
-constexpr uint8_t NUM_STEPS = NUM_PATTERNS + NUM_REPLAYS + 2U;
+const uint8_t handVariants[] PROGMEM = {HAND_WIRE,
+                                        0U,
+                                        HAND_LOW,
+                                        HAND_HIGH,
+                                        HAND_LOW | HAND_HIGH,
+                                        HAND_DATA,
+                                        HAND_HIGH | HAND_DATA};
+constexpr uint8_t NUM_HAND = sizeof(handVariants);
+constexpr uint8_t NUM_STEPS = NUM_PATTERNS + NUM_REPLAYS + NUM_HAND + 2U;
 
 // Progress of the probe. 0 is idle; the probe then advances by one stage
 // per call of pcfProbeStep().
-enum : uint8_t { IDLE = 0, HEADER = 1, TABLE = 2, REPLAY = 3, SOAK = 4, SUMMARY = 5 };
+enum : uint8_t { IDLE = 0, HEADER = 1, TABLE = 2, REPLAY = 3, HAND = 4, SOAK = 5, SUMMARY = 6 };
 uint8_t stage = IDLE;
-uint8_t cell = 0;              ///< next table cell to run, then next replay
+uint8_t cell = 0;              ///< next table cell to run, then next replay, then next hand-clocked variant
 uint8_t rowBad[NUM_STYLES];    ///< results of the row in progress: wrong read-backs per style
 uint8_t rowPortFF[NUM_STYLES]; ///< and ports found at FF
 uint16_t soakDone = 0;         ///< soak writes done so far
@@ -248,7 +271,7 @@ Totals soak = {0, 0, 0, 0, 0};
 
 void reportHeader() {
   char line[LINE_LEN];
-  snprintf_P(line, sizeof(line), PSTR("\n=== PCF probe %u: %u steps, about 20 seconds ===\n"), PROBE_VERSION,
+  snprintf_P(line, sizeof(line), PSTR("\n=== PCF probe %u: %u steps, about 25 seconds ===\n"), PROBE_VERSION,
              NUM_STEPS);
   say(line);
   snprintf_P(line, sizeof(line), PSTR("Please wait for TEST FINISHED before doing anything.\n"));
@@ -409,6 +432,162 @@ void replay(uint8_t which) {
   say(line);
 }
 
+// The I2C lines driven as plain open-drain pins: a line is either pulled
+// low by the controller or released to the pull-up resistor.
+inline void handScl(bool released) {
+  if (released) {
+    DDRC &= static_cast<uint8_t>(~HAND_SCL);
+  } else {
+    DDRC |= HAND_SCL;
+  }
+}
+
+inline void handSda(bool released) {
+  if (released) {
+    DDRC &= static_cast<uint8_t>(~HAND_SDA);
+  } else {
+    DDRC |= HAND_SDA;
+  }
+}
+
+/// True when the data line is low, which during an acknowledge bit means
+/// the expander is acknowledging.
+inline bool handSdaLow() {
+  return (PINC & HAND_SDA) == 0U;
+}
+
+void handBits(uint8_t value) {
+  for (uint8_t mask = 0x80U; mask != 0U; mask >>= 1) {
+    handSda((value & mask) != 0U);
+    delayMicroseconds(HAND_HALF_US);
+    handScl(true);
+    delayMicroseconds(HAND_HALF_US);
+    handScl(false);
+  }
+}
+
+/// Write HAND_PATTERN to the expander for solenoids 8-15 without the I2C
+/// hardware, so that what the two bus lines do around the moment the
+/// outputs switch is chosen by `flags`. Notes in `acks` whether the
+/// expander was acknowledging at three moments of the acknowledge bit:
+/// [0] at the end of the clock's low time, [1] just after the clock rose,
+/// [2] at the end of its high time.
+void handWrite(uint8_t flags, uint8_t *acks) {
+  // Take the pins from the I2C hardware. Wire switches on the internal
+  // pull-ups by setting the port bits; these must be cleared before the
+  // pins are made outputs, or the lines would be driven high.
+  TWCR = 0;
+  PORTC &= static_cast<uint8_t>(~(HAND_SDA | HAND_SCL));
+
+  // Start, then the address with the write bit and its acknowledge.
+  handSda(false);
+  delayMicroseconds(HAND_HALF_US);
+  handScl(false);
+  handBits(static_cast<uint8_t>(ADDR_HI << 1));
+  handSda(true);
+  delayMicroseconds(HAND_HALF_US);
+  handScl(true);
+  delayMicroseconds(HAND_HALF_US);
+  if (!handSdaLow()) {
+    all.writeNak++;
+  }
+  handScl(false);
+
+  // The data byte, then its acknowledge bit, which is where the expander
+  // applies the byte to its outputs.
+  handBits(HAND_PATTERN);
+  handSda((flags & HAND_DATA) == 0U);
+  delayMicroseconds(((flags & HAND_LOW) != 0U) ? HAND_HOLD_US : HAND_HALF_US);
+  if (handSdaLow()) {
+    acks[0]++;
+  }
+  handScl(true);
+  delayMicroseconds(HAND_HALF_US);
+  if (handSdaLow()) {
+    acks[1]++;
+  }
+  if ((flags & HAND_HIGH) != 0U) {
+    delayMicroseconds(HAND_HOLD_US);
+  }
+  if (handSdaLow()) {
+    acks[2]++;
+  }
+  handScl(false);
+  delayMicroseconds(HAND_HALF_US);
+
+  // Stop, and hand the pins back.
+  handSda(false);
+  delayMicroseconds(HAND_HALF_US);
+  handScl(true);
+  delayMicroseconds(HAND_HALF_US);
+  handSda(true);
+  delayMicroseconds(HAND_HALF_US);
+  Wire.begin();
+}
+
+/// Does the state of the bus lines matter when the expander resets?
+///
+/// On the affected machines the expander for solenoids 8-15 ends up with
+/// its whole port on when several solenoids are switched off and back on
+/// within a millisecond or so. Each trial does that to seven solenoids;
+/// the write that switches them back on is clocked by hand, with the bus
+/// lines held in a different state around the acknowledge bit in each
+/// variant. The time from switching off to the acknowledge pulse is the
+/// same in all of them.
+///
+/// The report line gives the number of trials that ended with the port at
+/// FF, then in how many trials the expander was acknowledging at each of
+/// the three moments noted by handWrite().
+void handClocked(uint8_t which) {
+  uint8_t flags = pgm_read_byte(&handVariants[which]);
+  uint16_t on = static_cast<uint16_t>(HAND_PATTERN) << 8;
+  uint8_t resets = 0;
+  uint8_t acks[3] = {0, 0, 0};
+
+  for (uint8_t i = 0; i < HAND_TRIALS; i++) {
+    if (writeBoth(0U, 0U, on) != 0U) {
+      all.writeNak++;
+    }
+    delay(HAND_ON_MS);
+    if (writePort(ADDR_HI, 0U, 0U, 0x00U) != 0U) {
+      all.writeNak++;
+    }
+    if ((flags & HAND_LOW) == 0U) {
+      delayMicroseconds(HAND_HOLD_US);
+    }
+    if ((flags & HAND_WIRE) != 0U) {
+      if (writePort(ADDR_HI, 0U, 0U, HAND_PATTERN) != 0U) {
+        all.writeNak++;
+      }
+    } else {
+      handWrite(flags, acks);
+    }
+    delay(2);
+    uint16_t got = readBoth(nullptr);
+    if (got != on) {
+      all.bad++;
+      if (highByte(got) == 0xFFU) {
+        resets++;
+        all.portFF++;
+        ffHighBank++;
+      }
+    }
+    writeBoth(0U, 0U, 0x0000U);
+    delay(HAND_REST_MS);
+  }
+
+  char line[LINE_LEN];
+  uint8_t step = NUM_PATTERNS + NUM_REPLAYS + 1U + which;
+  if ((flags & HAND_WIRE) != 0U) {
+    snprintf_P(line, sizeof(line), PSTR("[%u/%u] wire     ff %u\n"), step, NUM_STEPS, resets);
+  } else {
+    snprintf_P(line, sizeof(line), PSTR("[%u/%u] hand %c%c%c ff %u ack %u %u %u\n"), step, NUM_STEPS,
+               ((flags & HAND_LOW) != 0U) ? 'L' : '-', ((flags & HAND_HIGH) != 0U) ? 'H' : '-',
+               ((flags & HAND_DATA) != 0U) ? 'D' : '-', resets, acks[0], acks[1], acks[2]);
+  }
+  say(line);
+}
+
 void reportSummary() {
   char line[LINE_LEN];
   snprintf_P(line, sizeof(line), PSTR("[%u/%u] soak p09 11 on n %u bad %u ff %u\n"), NUM_STEPS - 1U, NUM_STEPS,
@@ -478,6 +657,20 @@ void pcfProbeStep() {
     replay(cell);
     cell++;
     if (cell >= NUM_REPLAYS) {
+      char line[LINE_LEN];
+      snprintf_P(line, sizeof(line), PSTR("7 off, back on by hand-clocked write: ff and acks of %u\n"), HAND_TRIALS);
+      say(line);
+      snprintf_P(line, sizeof(line), PSTR("L/H: clock held low/high 0.3 ms; D: data held low\n"));
+      say(line);
+      cell = 0U;
+      stage = HAND;
+    }
+    break;
+
+  case HAND:
+    handClocked(cell);
+    cell++;
+    if (cell >= NUM_HAND) {
       stage = SOAK;
     }
     break;

@@ -33,6 +33,11 @@
  * replays how the fault was first seen: solenoids enabled one by one from
  * 0 to 15, counting wrong read-backs per solenoid.
  *
+ * Last, it switches seven solenoids off and back on with the second write
+ * clocked by hand instead of by the I2C hardware, holding the bus lines in
+ * a different state around the acknowledge bit each time, to see whether
+ * the state of the bus matters when an expander resets.
+ *
  * This only arms the probe. The work is done by pcfProbeStep().
  */
 void pcfProbeStart();
@@ -42,7 +47,7 @@ void pcfProbeStart();
  *
  * Does nothing unless a probe has been started. Each call takes from a few
  * milliseconds to about two seconds, so that the firmware keeps handling
- * serial messages between calls; the whole probe takes about twenty
+ * serial messages between calls; the whole probe takes about twenty-five
  * seconds. Solenoids are energised in short bursts and left off at the end.
  */
 void pcfProbeStep();
