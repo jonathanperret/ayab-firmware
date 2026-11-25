@@ -43,7 +43,8 @@ jobs:
           files: |
             ./test/build/xml_out/*
       - name: Analyze with SonarQube
-        if: ${{ env.SONAR_TOKEN != '' }}
+        # Only in the main repository: a fork's token is refused by the service.
+        if: ${{ env.SONAR_TOKEN != '' && github.repository == 'AllYarnsAreBeautiful/ayab-firmware' }}
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           args: >

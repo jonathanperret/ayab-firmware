@@ -1,0 +1,57 @@
+* What-if: a short current pulse through the driver, seen at the expander. Assumptions throughout.
+* Reference (node 0) is the controller's ground pad.
+* Each track is an inductance with 150 ohm across it as a stand-in for its losses (unknown).
+.param ipk = 0.3      ; peak of the assumed pulse, amperes
+.param tr = 20n       ; its rise time; it falls in the same time
+
+Vbulk capp capn 8.9
+LGB capn 0 130.7n
+RdLGB capn 0 150
+L9 capp com 97.2n
+RdL9 capp com 150
+Ipulse com j PULSE(0 {ipk} 20n {tr} {tr} 1p 1)   ; a triangle: up in tr, down in tr
+LG1 j 0 92.6n
+RdLG1 j 0 150
+
+* expander's ground branch, with C6
+LB1 j c6n 22.1n
+RdLB1 j c6n 150
+LB2 c6n vss 7.8n
+RdLB2 c6n vss 150
+* 5 V from the controller
+V5 n5 0 5
+L5F n5 c6p 171.0n
+RdL5F n5 c6p 150
+LC6 c6p c6a 1n
+RC6 c6a c6b 20m
+C6 c6b c6n 1u
+L5B c6p vdd 90.1n
+RdL5B c6p vdd 150
+* the expander between its supply and ground pins
+Cchip vdd vss 100p
+Rchip vdd vss 5k
+
+* a bus line held high by its pull-up at the controller
+Rpu n5 hc 5k
+Chc hc 0 10p
+LBH hc hu 133.5n
+RdLBH hc hu 150
+Chu hu vss 10p
+Dhl vss hu DESD
+Dhh hu vdd DESD
+* a bus line held low by the controller
+Rlo lc 0 25
+LBL lc lu 133.5n
+RdLBL lc lu 150
+Clu lu vss 10p
+Dll vss lu DESD
+Dlh lu vdd DESD
+.model DESD D(IS=1e-12 N=1 RS=5 CJO=3p)
+
+.control
+set wr_singlescale
+save all @dhl[id] @dhh[id] @dll[id] @dlh[id]
+tran 0.1n 300n
+wrdata fast_whatif.txt v(com,j) v(vss) v(vdd,vss) v(hu,vss) v(lu,vss) @dhl[id] @dhh[id] @dll[id] @dlh[id] v(j)
+.endc
+.end

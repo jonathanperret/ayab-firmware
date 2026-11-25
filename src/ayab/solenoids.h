@@ -84,8 +84,8 @@ private:
   uint16_t solenoidState = 0x0000U;
   void write(uint16_t state);
 
-  Adafruit_MCP23008 mcp_0 = Adafruit_MCP23008();
-  Adafruit_MCP23008 mcp_1 = Adafruit_MCP23008();
+  // Adafruit_MCP23008 mcp_0 = Adafruit_MCP23008();
+  // Adafruit_MCP23008 mcp_1 = Adafruit_MCP23008();
 };
 
 #endif // SOLENOIDS_H_

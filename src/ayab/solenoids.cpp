@@ -29,13 +29,14 @@
  * \brief Initialize I2C connection for solenoids.
  */
 void Solenoids::init() {
-  mcp_0.begin(I2Caddr_sol1_8);
-  mcp_1.begin(I2Caddr_sol9_16);
+  Wire.begin();
+  // mcp_0.begin(I2Caddr_sol1_8);
+  // mcp_1.begin(I2Caddr_sol9_16);
 
-  for (uint8_t i = 0; i < SOLENOID_BUFFER_SIZE / 2; i++) {
-    mcp_0.pinMode(i, OUTPUT);
-    mcp_1.pinMode(i, OUTPUT);
-  }
+  // for (uint8_t i = 0; i < SOLENOID_BUFFER_SIZE / 2; i++) {
+  //   mcp_0.pinMode(i, OUTPUT);
+  //   mcp_1.pinMode(i, OUTPUT);
+  // }
   solenoidState = 0x0000U;
 }
 
@@ -95,7 +96,14 @@ void Solenoids::setSolenoids(uint16_t state) {
 // GCOVR_EXCL_START
 void Solenoids::write(uint16_t newState) {
   (void)newState;
-  mcp_0.writeGPIO(lowByte(newState));
-  mcp_1.writeGPIO(highByte(newState));
+
+  Wire.beginTransmission(0x20);  // transmit to device
+  Wire.write(lowByte(newState));               // sends one byte
+  Wire.endTransmission();        // stop transmitting
+  Wire.beginTransmission(0x21);  // transmit to device
+  Wire.write(highByte(newState));              // sends one byte
+  Wire.endTransmission();        // stop transmitting
+  // mcp_0.writeGPIO(lowByte(newState));
+  // mcp_1.writeGPIO(highByte(newState));
 }
 // GCOVR_EXCL_STOP

@@ -1,0 +1,298 @@
+{
+ "experiment": "ontime",
+ "label": "time on, machine, 9 V",
+ "rows": [
+  {
+   "pat": 182,
+   "on": 5,
+   "mode": "off only",
+   "times": [
+    100,
+    300,
+    1000,
+    2000,
+    5000,
+    10000,
+    30000,
+    100000
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "pat": 182,
+   "on": 5,
+   "mode": "off, back on ~90us",
+   "times": [
+    100,
+    300,
+    1000,
+    2000,
+    5000,
+    10000,
+    30000,
+    100000
+   ],
+   "cells": [
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "pat": 246,
+   "on": 6,
+   "mode": "off only",
+   "times": [
+    100,
+    300,
+    1000,
+    2000,
+    5000,
+    10000,
+    30000,
+    100000
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "pat": 246,
+   "on": 6,
+   "mode": "off, back on ~90us",
+   "times": [
+    100,
+    300,
+    1000,
+    2000,
+    5000,
+    10000,
+    30000,
+    100000
+   ],
+   "cells": [
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  }
+ ]
+}

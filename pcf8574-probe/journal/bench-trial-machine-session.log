@@ -1,0 +1,93 @@
+AYAB interface machine session, 2026-11-20T18:21:53, port /dev/cu.usbserial-10
+controller: READY boot 2 mcusr 00 sig 1E950F serial 423233303738FF191804 vcc 5001 pullups sda=1 scl=1 acks 20 21 init ok state 0000
+  I2C addresses answering: 20 21   (expected: 20 21)
+18:21:55  > r
+18:21:55  < OK r 0000
+  read-back with all off: OK r 0000
+18:21:55  > v
+18:21:55  < OK v 5001
+  controller supply: OK v 5001 mV
+
+Each cell: writes that read back wrong, out of 300 (in brackets: how many showed a whole port at FF).
+solenoids on          native              [00][data]          [09][data] AYAB     [11][data]          [FF][data]          
+18:21:58  > b 300 8000 8001 5 0 00
+18:21:58  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:00  > b 300 8000 8001 5 1 00
+18:22:00  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:03  > b 300 8000 8001 5 1 09
+18:22:03  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:06  > b 300 8000 8001 5 1 11
+18:22:06  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:08  > b 300 8000 8001 5 1 FF
+18:22:08  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+ 1  (state 8000)      0 (0)               0 (0)               0 (0)               0 (0)               0 (0)               
+18:22:11  > b 300 8002 8003 5 0 00
+18:22:11  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:14  > b 300 8002 8003 5 1 00
+18:22:14  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:16  > b 300 8002 8003 5 1 09
+18:22:16  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:19  > b 300 8002 8003 5 1 11
+18:22:19  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 4979 vccMax 5001
+18:22:22  > b 300 8002 8003 5 1 FF
+18:22:22  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5001
+ 2  (state 8002)      0 (0)               0 (0)               0 (0)               0 (0)               0 (0)               
+18:22:24  > b 300 8606 8607 5 0 00
+18:22:24  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:27  > b 300 8606 8607 5 1 00
+18:22:27  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:30  > b 300 8606 8607 5 1 09
+18:22:30  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5001
+18:22:32  > b 300 8606 8607 5 1 11
+18:22:32  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:35  > b 300 8606 8607 5 1 FF
+18:22:35  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5001
+ 5  (state 8606)      0 (0)               0 (0)               0 (0)               0 (0)               0 (0)               
+18:22:38  > b 300 B636 B637 5 0 00
+18:22:38  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:40  > b 300 B636 B637 5 1 00
+18:22:40  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:43  > b 300 B636 B637 5 1 09
+18:22:43  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:46  > b 300 B636 B637 5 1 11
+18:22:46  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:22:48  > b 300 B636 B637 5 1 FF
+18:22:48  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+ 9  (state B636)      0 (0)               0 (0)               0 (0)               0 (0)               0 (0)               
+18:22:51  > b 300 F676 F677 5 0 00
+18:22:51  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5023
+18:22:54  > b 300 F676 F677 5 1 00
+18:22:54  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5023
+18:22:56  > b 300 F676 F677 5 1 09
+18:22:56  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5023
+18:22:59  > b 300 F676 F677 5 1 11
+18:22:59  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5023
+18:23:02  > b 300 F676 F677 5 1 FF
+18:23:02  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5023
+11  (state F676)      0 (0)               0 (0)               0 (0)               0 (0)               0 (0)               
+18:23:04  > b 300 FFFF FFFE 5 0 00
+18:23:04  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5046
+18:23:07  > b 300 FFFF FFFE 5 1 00
+18:23:07  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5046
+18:23:10  > b 300 FFFF FFFE 5 1 09
+18:23:10  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5046
+18:23:13  > b 300 FFFF FFFE 5 1 11
+18:23:13  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5046
+18:23:15  > b 300 FFFF FFFE 5 1 FF
+18:23:15  < OK b writes 300 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5023 vccMax 5046
+16  (state FFFF)      0 (0)               0 (0)               0 (0)               0 (0)               0 (0)               
+
+Soak: 3000 writes of [09][data] with 12 solenoids on ...
+18:23:29  > b 3000 F676 F677 3 1 09
+18:23:29  < OK b writes 3000 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+  OK b writes 3000 mismatches 0 portAllHigh 0 stillWrongOnReread 0 writeNak 0 readNak 0 vccMin 5001 vccMax 5023
+18:23:29  > v
+18:23:29  < OK v 5001
+18:23:29  > r
+18:23:29  < OK r 0000
+  controller supply afterwards: OK v 5001 mV;  read-back: OK r 0000
+
+SUMMARY
+  wrong read-backs in total: 0
+  controller restarts seen during the session: 0
+  log saved as machine_session_20261120_182153.log

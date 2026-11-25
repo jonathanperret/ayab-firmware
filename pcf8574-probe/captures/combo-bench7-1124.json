@@ -1,0 +1,762 @@
+{
+ "label": "bench board, the user's 7 solenoids, 9 V, 0x21",
+ "addr": 33,
+ "rows": [
+  {
+   "k": 4,
+   "pat": 15,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 23,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 39,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 71,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 135,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 27,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 43,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 75,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 139,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 51,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 83,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 147,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 99,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 163,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 195,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 29,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 45,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 77,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 141,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 53,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 85,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 149,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 101,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 165,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 197,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 57,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 89,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 153,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 105,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 169,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 201,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 113,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 177,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 209,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 225,
+   "resets": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 30,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 46,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 78,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 142,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 54,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 86,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 150,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 102,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 166,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 198,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 58,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 90,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 154,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 106,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 170,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 202,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 114,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 178,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 210,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 226,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 60,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 92,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 156,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 108,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 172,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 204,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 116,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 180,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 212,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 228,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 120,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 184,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 216,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 232,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 4,
+   "pat": 240,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 31,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 47,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 79,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 143,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 55,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 87,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 151,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 103,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 167,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 199,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 59,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 91,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 155,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 107,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 171,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 203,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 115,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 179,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 211,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 227,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 61,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 93,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 157,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 109,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 173,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 205,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 117,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 181,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 213,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 229,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 121,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 185,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 217,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 233,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 241,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 62,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 94,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 158,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 110,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 174,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 206,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 118,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 182,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 214,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 230,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 122,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 186,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 218,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 234,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 242,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 124,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 188,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 220,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 236,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 244,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  },
+  {
+   "k": 5,
+   "pat": 248,
+   "resets": 10,
+   "raw": "OK t resets 10 other 0 wnak 10 dirty 0"
+  }
+ ]
+}

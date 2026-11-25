@@ -1,0 +1,195 @@
+{
+ "experiment": "stagger",
+ "label": "machine, 9 V",
+ "rows": [
+  {
+   "pat": 182,
+   "on": 5,
+   "gaps": [
+    0,
+    200,
+    500,
+    1000,
+    2000,
+    5000
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "pat": 246,
+   "on": 6,
+   "gaps": [
+    0,
+    200,
+    500,
+    1000,
+    2000,
+    5000
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "pat": 254,
+   "on": 7,
+   "gaps": [
+    0,
+    200,
+    500,
+    1000,
+    2000,
+    5000
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  }
+ ]
+}
