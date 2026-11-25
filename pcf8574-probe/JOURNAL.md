@@ -6580,3 +6580,8 @@ Other housekeeping today, at the user's request or decision:
 - Not yet done: the swap of the two probes between channels to see
   whether yellow's leftover overshoot belongs to the probe or to
   channel 1 (entry 175); offered, optional.
+
+2026-11-25 12:41 — At the user's request the probe folder was committed for the
+first time, on the branch pcf8574-probe (201 files: journal, pictures,
+tools, sketches, captures). Not pushed. From here on, changes to
+scripts and sketches are tracked.
