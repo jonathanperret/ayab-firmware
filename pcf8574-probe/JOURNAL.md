@@ -4628,7 +4628,7 @@ supply collapse or anything not involving the bus should not care.
 Hardware counterpart, if wanted: a few hundred ohms in series with SDA and
 SCL at the expander limits any such current.
 
-## 2026-11-23 00:38 — 163. Hand-clocked write test added to the in-firmware probe (version 7), pushed to the PR. Not run on hardware
+## 2026-11-23 00:38 — 163. Bit-banged write test added to the in-firmware probe (version 7), pushed to the PR. Not run on hardware
 
 User: "add the bit-banged I2C test to the probe in the PR". Done as commit
 1673053 on branch pcf8574-probe, pushed; the Archive Build action passed,
@@ -4642,7 +4642,7 @@ through port C pins 4 and 5 with the I2C hardware switched off.
 | Line | Back-on write |
 |---|---|
 | wire | I2C hardware, as a reference |
-| hand --- | by hand, ordinary timing |
+| hand --- | bit-banged, ordinary timing |
 | hand L-- | clock held low 0.3 ms before the acknowledge pulse |
 | hand -H- | clock left high 0.3 ms during the acknowledge pulse |
 | hand LH- | both |
@@ -4658,7 +4658,7 @@ variants without the low hold wait 0.3 ms before starting).
 What to read from it:
 
 - "wire" and "hand ---" should both show resets on an affected board with
-  solenoid power; if "hand ---" does not, the hand-clocked write itself
+  solenoid power; if "hand ---" does not, the bit-banged write itself
   differs from the hardware's in some way that matters.
 - The three acknowledge counts place the reset within the acknowledge
   bit: lost already while the clock is low, lost at the rising edge, or
@@ -4679,7 +4679,7 @@ Run by the user, reported in chat. Set-up as they described it: bench
 board, seven equivalent solenoids on S-3 (solenoids 8-15; one pin of the
 connector has nothing on it), latest PR firmware (commit 1673053, probe
 version 7) flashed, 9 V from the bench supply. These are not the
-machine's solenoids. This is also the first time the hand-clocked stage
+machine's solenoids. This is also the first time the bit-banged stage
 has run on any board.
 
 ```
@@ -4723,7 +4723,7 @@ PCF probe 7 end, total bad 2679
 
 What the lines say, before any interpretation:
 
-- The probe ran to its end. The hand-clocked write works as a write: the
+- The probe ran to its end. The bit-banged write works as a write: the
   expander acknowledged the address (no extra complaints) and the data
   byte (first count 10 on every line).
 - The fault reproduces with these seven solenoids, on the bank 8-15 only
@@ -5656,7 +5656,7 @@ driver's loop is of similar size (the one difference found: its
 driver's return current does not pass the controller's ground point);
 why the UMW part and reportedly not the TI part; the three-coil gap of
 entry 167. Which of "supply across the chip collapses" or "a pin is
-driven outside the supply" does step 5 is open; the hand-clocked test
+driven outside the supply" does step 5 is open; the bit-banged test
 (entry 164) only ruled out the version that needs the controller to
 hold a bus line low.
 
@@ -6585,3 +6585,39 @@ Other housekeeping today, at the user's request or decision:
 first time, on the branch pcf8574-probe (201 files: journal, pictures,
 tools, sketches, captures). Not pushed. From here on, changes to
 scripts and sketches are tracked.
+
+## 201. 2026-11-25 12:44 — A summary document alongside the journal
+
+At the user's request there is now a short document,
+[SUMMARY.md](SUMMARY.md), giving the findings and the current status of
+the investigation: what is established, what the layout shows, what is
+not established, ideas withdrawn, next steps, state of the equipment.
+Unlike this journal it is rewritten as things change, and is to be
+kept up to date whenever a finding, a withdrawal or the plan changes.
+
+## 202. 2026-11-25 12:49 — "Bit-banged" replaces "hand-clocked"; probe version 8; summary given entry numbers
+
+The user prefers the standard term "bit-banging" to my "hand-clocked /
+clocking by hand", and asked for it to be changed everywhere.
+
+- [SUMMARY.md](SUMMARY.md): reworded.
+- This journal: six places in the prose of entries 163, 164 and 182
+  reworded. The probe reports pasted in entries 164 and 165 are left as
+  printed, since they are what version 7 of the probe actually wrote
+  ("hand ---", "back on by hand-clocked write").
+- Probe firmware (src/ayab/pcfprobe.cpp and .h): the test's names and
+  comments say bit-banged; its report lines now read "back on by
+  bit-banged write" and "bitbang LHD ...", with the reference line as
+  "wire        ff". Probe version raised from 7 to 8 so that the two
+  report formats can be told apart. No change to what the test does.
+  Built for the uno target: RAM 1597 bytes (unchanged), flash 19902
+  bytes (4 more, from the longer text). Not run on a board.
+- The PR description is being updated to match.
+
+The user also asked why the summary gave a date and no entry number for
+"only 0x21 resets". Because I wrote that line from memory of the
+session of 2026-11-22 without looking the entries up. Now cited:
+entries 134 and 142; and entry numbers added to the other lines of the
+summary that had none (the table of sequences, the two-board
+statement, the reason the MCP23008-style write triggers it, the state
+of the machine's controller).

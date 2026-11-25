@@ -34,7 +34,7 @@
  * 0 to 15, counting wrong read-backs per solenoid.
  *
  * Last, it switches seven solenoids off and back on with the second write
- * clocked by hand instead of by the I2C hardware, holding the bus lines in
+ * bit-banged instead of sent by the I2C hardware, holding the bus lines in
  * a different state around the acknowledge bit each time, to see whether
  * the state of the bus matters when an expander resets.
  *
