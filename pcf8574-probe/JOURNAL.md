@@ -7242,3 +7242,47 @@ Things to watch when it runs: the bit-banged write's timing is close
 to the hardware's but not identical, hence the bit-banged column as
 the proper comparison for the high-speed one; and the other expander
 on the bus enters high-speed mode too, which should not matter.
+
+## 211. 2026-11-25 20:28 — Wording: reverse recovery, not "storage time"; and a bench reminder
+
+The user points out that "diode storage time" sounds like something
+that belongs to step-recovery diodes, and asks whether we are not
+simply dealing with reverse recovery time. Yes. What happens to the
+clamp diodes when the outputs switch on is ordinary reverse recovery,
+and the quantity a datasheet would give for it is the reverse recovery
+time (trr) or charge (Qrr). "Storage time" is properly the name of the
+first phase of a recovery, and I had been using it loosely, in entries
+208 to 210, for something else again: the simulator's diode parameter
+TT ("transit time"), which says how much charge the diode holds per
+ampere of forward current. TT is not a recovery time: the recovery
+that results depends on the circuit.
+
+For this circuit (six coils at 40 mA each, so 0.24 A through the
+diodes, the loop's 320 nH limiting how fast the current can reverse),
+what the values of TT used in entry 208 correspond to:
+
+| TT in the simulator | reverse current lasts | of which rising to its peak | peak reverse current | then falling in | charge recovered |
+|---|---|---|---|---|---|
+| 10 ns | 14 ns | 10 ns | 0.27 A | 4.5 ns | 2.2 nC |
+| 30 ns | 22 ns | 18 ns | 0.51 A | 4.0 ns | 6.0 nC |
+| 100 ns | 39 ns | 35 ns | 1.03 A | 3.4 ns | 20.7 nC |
+
+So where entry 208 says "storage time 30 ns", read: a diode whose
+reverse recovery in this circuit lasts about 22 ns and returns 6 nC.
+
+The user's remark also points at the weak spot of those results. The
+simulator's diode ends its recovery abruptly, in 3 to 5 ns whatever
+the charge: that is the behaviour a step-recovery diode is built for,
+and an ordinary diode usually ends more gently. The fast edge that
+disturbed the 5 V across the expander in entry 208 comes entirely
+from that abrupt end. How the UMW clamp diodes end their recovery is
+not known, so that part of entry 208 is an upper bound on abruptness,
+not a prediction.
+
+Wording corrected in tools/sim_pulse.py, the circuit file, the diagram
+and its picture ("reverse recovery assumed"). Entries 208 to 210 are
+left as written; this entry is the correction.
+
+Reminder recorded for the next bench session, at the user's request:
+run the high-speed mode comparison of entry 210 (flash edgetest, then
+tools/hs_session.py).

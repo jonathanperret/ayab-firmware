@@ -50,7 +50,7 @@ Read from the layout file; these are facts about the copper, and their link to t
 
 ## Not established
 
-- **The way in.** Candidates: the supply across the expander collapsing for tens of nanoseconds; a jump of its ground against the controller's; a disturbance through the port pins, which connect straight to the driver's inputs. Simulations built on the layout's track lengths (entries 207, 208) show that switching the outputs on while the coils' current still flows must itself produce a pulse in the 9 V and ground tracks, as that current moves from the clamp diodes to the driver: about 30 A/µs, enough to move the expander's ground by a volt or two against the controller for some tens of nanoseconds. With that alone the 5 V across the expander stays within a few hundredths of a volt; if the clamp diodes also let go abruptly, the model has it swinging by a volt or more. The model orders the cases by coil current and so cannot explain why three coils reset at small currents and not at large ones. These are models with assumed diode behaviour, not measurements.
+- **The way in.** Candidates: the supply across the expander collapsing for tens of nanoseconds; a jump of its ground against the controller's; a disturbance through the port pins, which connect straight to the driver's inputs. Simulations built on the layout's track lengths (entries 207, 208) show that switching the outputs on while the coils' current still flows must itself produce a pulse in the 9 V and ground tracks, as that current moves from the clamp diodes to the driver: about 30 A/µs, enough to move the expander's ground by a volt or two against the controller for some tens of nanoseconds. With that alone the 5 V across the expander stays within a few hundredths of a volt; if the clamp diodes' reverse recovery also ends abruptly, the model has it swinging by a volt or more. The model orders the cases by coil current and so cannot explain why three coils reset at small currents and not at large ones. These are models with an assumed reverse recovery for the clamp diodes, which no datasheet gives; they are not measurements.
 - **What exactly the driver does at that instant.** A current pulse through diodes that are still conducting fits most of the evidence, but not the finding that a small diode current is enough.
 - **Why the UMW parts and reportedly not the TI ones.** No TI parts are available to compare.
 
@@ -67,13 +67,14 @@ Measurements so far cannot decide these. The oscilloscope used (20 MHz, 16 milli
 
 In order, each followed by a rerun of the threshold table, which takes about a minute:
 
-1. A ceramic capacitor directly between pins 16 and 8 of the 0x21 expander. Tests the supply-collapse idea; would also be a one-part fix. The simulations predict no effect unless the clamp diodes let go abruptly (entries 207, 208), so the outcome says which it is.
+1. A ceramic capacitor directly between pins 16 and 8 of the 0x21 expander. Tests the supply-collapse idea; would also be a one-part fix. The simulations predict no effect unless the clamp diodes' reverse recovery ends abruptly (entries 207, 208, 211), so the outcome says which it is.
 2. A wire from the driver's ground pin straight to the ground pad by the supply jack, twisted with one from its clamp pin to the 9 V pad. Tests the ground-return idea.
 3. Schottky diodes across the coils. Tests whether the driver's own clamp diodes are the source.
 4. Coil current measured with a current-sense amplifier in the coils' common supply wire: replaces the calculated currents with measured ones and settles the inductance. Hold five coils on throughout and pulse a sixth, so the amplifier works inside its specified range (entry 203).
 5. With the faster oscilloscope and short probe grounds: the expander's supply pin, its ground against the controller's, and a port pin, in the microsecond around a reset.
 6. Tell a real disturbance on the expander's supply pin from pickup in the probe leads. Three coils are switched off, then back on after a gap; the run repeats this for seven gaps from 0.2 to 3.2 ms while the scope watches the supply pin. With three coils the short gaps (large coil current) never reset and the middle gaps (small current) always do (entry 188). Pickup should shrink as the current shrinks; if the burst is instead largest at the gaps that reset, it is real and tied to the reset (entry 191).
 7. Re-measure, after a fixed rest, the earlier observation that coils left off make a reset less likely.
+8. Compare reset rates with the expander in its high-speed mode, where its bus input filters are at their fast setting (entry 210). Needs no parts; firmware and script are ready. More resets in that mode would implicate the bus inputs.
 
 Waiting on, all ordered: through-hole ceramic capacitors, Schottky diodes (1N5819) and the faster oscilloscope.
 

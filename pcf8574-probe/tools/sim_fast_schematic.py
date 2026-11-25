@@ -91,7 +91,7 @@ else:
     # clamp diodes: from the outputs up to the clamp rail
     wire((910, 300), (910, 266)); wire((910, 234), (910, 200))
     out.append('<path %s d="M894 266 H926 L910 234 Z"/>' % P); out.append('<path %s d="M894 234 H926"/>' % W)
-    text(990, 322, "clamp diodes,", "s", "end"); text(990, 338, "storage time assumed", "v", "end")
+    text(990, 322, "clamp diodes,", "s", "end"); text(990, 338, "reverse recovery assumed", "v", "end")
     # the coils: a constant current from the 9 V side into the outputs
     out.append('<circle %s cx="1100" cy="250" r="26"/>' % P)
     out.append('<path %s d="M1100 236 V264 M1100 264 l-6 -11 M1100 264 l6 -11"/>' % W)

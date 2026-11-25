@@ -13,7 +13,7 @@ current. Before the switch-on that current circulates through the clamp diode; t
 switches on over a time T_SW, the current moves over to the driver, and the diode, still full of
 charge, conducts backwards for a moment. Both effects pull current from the 9 V rail to ground.
 
-Still assumed, because nothing measured gives them: the diode's charge-storage time TT, the time the
+Still assumed, because nothing measured gives them: the clamp diode's reverse recovery (set in the simulator by its transit-time parameter TT), the time the
 driver takes to switch on, and the capacitance on each output. N coils are lumped into one branch."""
 import os, sys, json, subprocess
 import numpy as np
@@ -33,7 +33,7 @@ NETLIST = """* The fast event with the pulse produced by the driver's clamp diod
 * Reference (node 0) is the controller's ground pad. Tracks: inductance with 150 ohm across (losses unknown).
 .param n = {n}          ; coils switched on together
 .param i0 = {i0}        ; current in each coil at that moment, amperes (from the slow model)
-.param tt = {tt}        ; clamp diode charge-storage time, seconds (ASSUMED)
+.param tt = {tt}        ; clamp diode transit time, which sets its reverse recovery, seconds (ASSUMED)
 .param tsw = {tsw}      ; time the driver takes to switch on, seconds (ASSUMED)
 .param cout = 30p       ; capacitance on each output, farads (ASSUMED)
 
@@ -116,23 +116,23 @@ def summary(w):
 if __name__ == "__main__":
     TSW = 20e-9
     print("Six coils at 40 mA each (switched back on 0.2 ms after a long pulse), driver switching on in 20 ns.")
-    print("diode storage time | clamp rail lowest | supply current peak | diode reverse peak | fastest change | expander ground vs controller | 5 V across expander")
+    print("diode transit time | clamp rail lowest | supply current peak | diode reverse peak | fastest change | expander ground vs controller | 5 V across expander")
     for tt in (0, 10e-9, 30e-9, 100e-9, 300e-9, 1e-6):
         s = summary(run(6, 0.040, max(tt, 1e-12), TSW))
         print("  %6.0f ns        | %5.1f V           | %.2f A              | %.2f A             | %4.0f A/us      | %+.1f / %+.1f V                  | %.2f .. %.2f V" % (tt * 1e9, s["rail"], s["ipk"], s["rev"], s["rate"], s["gnd_hi"], s["gnd_lo"], s["sup_lo"], s["sup_hi"]))
-    print("\nSame, without any diode storage, against how fast the driver switches on:")
+    print("\nSame, with no reverse recovery in the diode, against how fast the driver switches on:")
     for tsw in (5e-9, 20e-9, 50e-9, 100e-9, 200e-9):
         s = summary(run(6, 0.040, 1e-12, tsw))
         print("  switch-on in %3.0f ns: clamp rail lowest %5.1f V, fastest change %4.0f A/us, expander ground %+.1f / %+.1f V" % (tsw * 1e9, s["rail"], s["rate"], s["gnd_hi"], s["gnd_lo"]))
     TT = 100e-9
-    print("\nWith storage time %.0f ns and switch-on in 20 ns: coils and current per coil (from the slow model's table), against what the bench did" % (TT * 1e9))
+    print("\nWith diode transit time %.0f ns and switch-on in 20 ns: coils and current per coil (from the slow model's table), against what the bench did" % (TT * 1e9))
     print("coils x mA each | bench      | clamp rail lowest | fastest change | expander ground vs controller | bus line held low, vs expander ground")
     cases = [(6, 39.5, "resets"), (6, 6.7, "resets"), (6, 2.0, "no reset"), (4, 45.0, "resets"), (3, 45.0, "no reset"), (3, 28.9, "no reset"), (3, 15.6, "resets"), (3, 6.7, "resets"), (3, 2.0, "no reset"), (1, 45.0, "no reset"), (6, 0.0, "no reset (from rest)")]
     for n, ma, bench in cases:
         s = summary(run(n, ma * 1e-3, TT, TSW))
         print("  %d x %4.1f mA   | %-10s | %5.1f V           | %4.0f A/us      | %+.2f / %+.2f V                | %+.1f .. %+.1f V" % (n, ma, bench, s["rail"], s["rate"], s["gnd_hi"], s["gnd_lo"], s["low_lo"], s["low_hi"]))
-    # picture: the part that needs no assumption about the diode (no storage) against a modest storage time
-    runs = [("no diode storage", run(6, 0.040, 1e-12, TSW), "#2a78d6"), ("diode storage 30 ns", run(6, 0.040, 30e-9, TSW), "#eb6834")]
+    # picture: the part that needs no assumption about the diode (no reverse recovery) against a modest one
+    runs = [("no reverse recovery in the diodes", run(6, 0.040, 1e-12, TSW), "#2a78d6"), ("with reverse recovery (transit time 30 ns)", run(6, 0.040, 30e-9, TSW), "#eb6834")]
     SEC, GRID, SURF, INK = "#52514e", "#e1e0d9", "#fcfcfb", "#0b0b0b"
     fig, ax = plt.subplots(2, 2, figsize=(13, 8), facecolor=SURF, sharex=True)
     panels = [(ax[0][0], "isup", "Current drawn from the bulk capacitors, A"), (ax[0][1], "rail", "The driver's clamp rail against its ground, V"),
@@ -143,8 +143,8 @@ if __name__ == "__main__":
         a.set_title(title, loc="left", color=INK, fontsize=11); a.legend(fontsize=9, frameon=False)
     ax[0][0].set_xlim(0, 200)
     for a in ax[1]: a.set_xlabel("nanoseconds (the driver starts to switch on at 20)", color=SEC)
-    fig.suptitle("Six coils at 40 mA switched back on: the pulse as the circuit produces it (switch-on in 20 ns and the diode's storage time are assumed)", x=0.01, ha="left", color=INK, fontsize=11.5)
+    fig.suptitle("Six coils at 40 mA switched back on: the pulse as the circuit produces it (switch-on in 20 ns and the diode's reverse recovery are assumed)", x=0.01, ha="left", color=INK, fontsize=11.5)
     plt.tight_layout(rect=(0, 0, 1, 0.95)); plt.savefig(os.path.join(HERE, "journal", "sim-pulse-from-driver.png"), dpi=95, facecolor=SURF)
-    w = run(6, 0.040, 1e-12, TSW)   # leave the no-storage case as the circuit file
+    w = run(6, 0.040, 1e-12, TSW)   # leave the case without reverse recovery as the circuit file
     s0 = summary(w); dur = np.ptp(w["t"][w["rail"] < 4.45]) * 1e9
-    print("\nno storage, six coils at 40 mA: the clamp rail is below half its rest value for %.0f ns" % dur)
+    print("\nno reverse recovery, six coils at 40 mA: the clamp rail is below half its rest value for %.0f ns" % dur)

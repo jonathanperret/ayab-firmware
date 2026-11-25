@@ -2,7 +2,7 @@
 * Reference (node 0) is the controller's ground pad. Tracks: inductance with 150 ohm across (losses unknown).
 .param n = 6          ; coils switched on together
 .param i0 = 0.04        ; current in each coil at that moment, amperes (from the slow model)
-.param tt = 1e-12        ; clamp diode charge-storage time, seconds (ASSUMED)
+.param tt = 1e-12        ; clamp diode transit time, which sets its reverse recovery, seconds (ASSUMED)
 .param tsw = 2e-08      ; time the driver takes to switch on, seconds (ASSUMED)
 .param cout = 30p       ; capacitance on each output, farads (ASSUMED)
 

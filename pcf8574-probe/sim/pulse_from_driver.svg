@@ -58,7 +58,7 @@
 <path stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" d="M894 266 H926 L910 234 Z"/>
 <path stroke="#2b2d33" stroke-width="2" fill="none" d="M894 234 H926"/>
 <text class="s" x="990" y="322" text-anchor="end">clamp diodes,</text>
-<text class="v" x="990" y="338" text-anchor="end">storage time assumed</text>
+<text class="v" x="990" y="338" text-anchor="end">reverse recovery assumed</text>
 <circle stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" cx="1100" cy="250" r="26"/>
 <path stroke="#2b2d33" stroke-width="2" fill="none" d="M1100 236 V264 M1100 264 l-6 -11 M1100 264 l6 -11"/>
 <path stroke="#2b2d33" stroke-width="2" fill="none" d="M1100 200 L1100 224"/>
