@@ -26,6 +26,10 @@ cd "$parent_path"
 
 mkdir -p build
 cd build
+# CMake 4 refuses projects that ask for a minimum version below 3.5, as the
+# arduino-mock library fetched during the build does (and what it fetches in
+# turn). This tells CMake, here and in those nested builds, to accept them.
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 cmake ..
 
 make_verbose=""
