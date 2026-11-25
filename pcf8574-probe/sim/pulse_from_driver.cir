@@ -1,0 +1,62 @@
+* The fast event with the pulse produced by the driver's clamp diode and switch. See tools/sim_pulse.py.
+* Reference (node 0) is the controller's ground pad. Tracks: inductance with 150 ohm across (losses unknown).
+.param n = 6          ; coils switched on together
+.param i0 = 0.04        ; current in each coil at that moment, amperes (from the slow model)
+.param tt = 1e-12        ; clamp diode charge-storage time, seconds (ASSUMED)
+.param tsw = 2e-08      ; time the driver takes to switch on, seconds (ASSUMED)
+.param cout = 30p       ; capacitance on each output, farads (ASSUMED)
+
+Vbulk capp capn 8.9
+LGB capn 0 130.7n
+RdGB capn 0 150
+L9 capp com 97.2n
+Rd9 capp com 150
+* the coils: a constant current for the length of the event, from the 9 V side into the outputs
+Icoil com out DC {n*i0}
+* the clamp diodes (n in parallel), with the forward behaviour fitted in the slow model
+Dclamp out com DCL area={n}
+.model DCL D(IS=7.883e-10 N=1.981 RS=1.083 TT={tt} CJO=20p)
+Cout out j {n*cout}
+* the driver's outputs: conductance rising from nothing to n/Ron over tsw, then the fixed drop
+Vctl ctl 0 PWL(0 0 20n 0 {20n+tsw} 1)
+Bsw out d1 I = V(out,d1) * (1e-9 + V(ctl) * n / 3.149)
+Vdrop d1 j 0.725
+LG1 j 0 92.6n
+RdG1 j 0 150
+
+LB1 j c6n 22.1n
+RdB1 j c6n 150
+LB2 c6n vss 7.8n
+RdB2 c6n vss 150
+V5 n5 0 5
+L5F n5 c6p 171.0n
+Rd5F n5 c6p 150
+LC6 c6p c6a 1n
+RC6 c6a c6b 20m
+C6 c6b c6n 1u
+L5B c6p vdd 90.1n
+Rd5B c6p vdd 150
+Cchip vdd vss 100p
+Rchip vdd vss 5k
+Rpu n5 hc 5k
+Chc hc 0 10p
+LBH hc hu 133.5n
+RdBH hc hu 150
+Chu hu vss 10p
+Dhl vss hu DESD
+Dhh hu vdd DESD
+Rlo lc 0 25
+LBL lc lu 133.5n
+RdBL lc lu 150
+Clu lu vss 10p
+Dll vss lu DESD
+Dlh lu vdd DESD
+.model DESD D(IS=1e-12 N=1 RS=5 CJO=3p)
+
+.control
+set wr_singlescale
+save all @dclamp[id]
+tran 0.05n 400n
+wrdata pulse_from_driver.txt v(com,j) v(vss) v(vdd,vss) v(hu,vss) v(lu,vss) i(Vbulk) @dclamp[id] v(out,j)
+.endc
+.end

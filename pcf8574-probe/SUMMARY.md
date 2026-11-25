@@ -50,7 +50,7 @@ Read from the layout file; these are facts about the copper, and their link to t
 
 ## Not established
 
-- **The way in.** Candidates: the supply across the expander collapsing for tens of nanoseconds (favoured by the layout); a jump of its ground against the controller's; a disturbance through the port pins, which connect straight to the driver's inputs.
+- **The way in.** Candidates: the supply across the expander collapsing for tens of nanoseconds; a jump of its ground against the controller's; a disturbance through the port pins, which connect straight to the driver's inputs. Simulations built on the layout's track lengths (entries 207, 208) show that switching the outputs on while the coils' current still flows must itself produce a pulse in the 9 V and ground tracks, as that current moves from the clamp diodes to the driver: about 30 A/µs, enough to move the expander's ground by a volt or two against the controller for some tens of nanoseconds. With that alone the 5 V across the expander stays within a few hundredths of a volt; if the clamp diodes also let go abruptly, the model has it swinging by a volt or more. The model orders the cases by coil current and so cannot explain why three coils reset at small currents and not at large ones. These are models with assumed diode behaviour, not measurements.
 - **What exactly the driver does at that instant.** A current pulse through diodes that are still conducting fits most of the evidence, but not the finding that a small diode current is enough.
 - **Why the UMW parts and reportedly not the TI ones.** No TI parts are available to compare.
 
@@ -67,7 +67,7 @@ Measurements so far cannot decide these. The oscilloscope used (20 MHz, 16 milli
 
 In order, each followed by a rerun of the threshold table, which takes about a minute:
 
-1. A ceramic capacitor directly between pins 16 and 8 of the 0x21 expander. Tests the supply-collapse idea; would also be a one-part fix.
+1. A ceramic capacitor directly between pins 16 and 8 of the 0x21 expander. Tests the supply-collapse idea; would also be a one-part fix. The simulations predict no effect unless the clamp diodes let go abruptly (entries 207, 208), so the outcome says which it is.
 2. A wire from the driver's ground pin straight to the ground pad by the supply jack, twisted with one from its clamp pin to the 9 V pad. Tests the ground-return idea.
 3. Schottky diodes across the coils. Tests whether the driver's own clamp diodes are the source.
 4. Coil current measured with a current-sense amplifier in the coils' common supply wire: replaces the calculated currents with measured ones and settles the inductance. Hold five coils on throughout and pulse a sixth, so the amplifier works inside its specified range (entry 203).

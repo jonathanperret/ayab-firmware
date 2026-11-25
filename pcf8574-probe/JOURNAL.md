@@ -6933,3 +6933,199 @@ Also noted from the user: they do not intend to edit the schematic in
 LTspice; they wanted a second simulator's confirmation of the model,
 which entry 205 gives. The converter and runner stay in tools/ but
 will not be developed further.
+
+## 207. 2026-11-25 19:22 — What-if simulation of the fast pulse: the 5 V across the expander hardly moves
+
+*Run with: [tools/sim_fast.py](tools/sim_fast.py), [tools/pcb_paths.py](tools/pcb_paths.py). No board involved.*
+
+The user asked whether the simulation can show the 5 V line being
+disturbed. Built the fast part as a what-if, as announced in entry 204:
+it is not a fitted model.
+
+What is assumed and what is estimated:
+
+- The pulse: a triangular current from the driver's clamp pin to its
+  ground pin. Its size is not measured. Base case 0.3 A rising in 20 ns
+  (15 A/us), chosen because it makes the clamp rail at the driver dip
+  to about 4.5 V, in the range seen on the scope (entry 179: median
+  5.9 V, lowest 2.8 V, on a scope too slow for it).
+- Track inductances from lengths and widths in the layout file, each
+  track taken on its own: 9 V to the driver 100 mm (97 nH); ground
+  from the driver to the controller's pad 86 mm (93 nH); ground bus
+  from there to the capacitors 128 mm (131 nH); ground from the driver
+  to C6 24 mm (22 nH) and on to the expander 10 mm (8 nH); 5 V from the
+  controller to C6's tap 132 mm (171 nH) and from C6 to the expander's
+  supply pin 76 mm (90 nH); a bus line 100 mm (134 nH).
+- Left out: coupling between tracks, track capacitance; losses are a
+  placeholder (150 ohm across each inductance). The expander is 100 pF
+  and 5 kohm between its supply pins, 10 pF and protection diodes on
+  each bus pin.
+
+Circuit: [sim/fast_whatif.cir](sim/fast_whatif.cir) (ngspice).
+
+![What-if: 0.3 A in 20 ns through the driver](journal/sim-fast-whatif.png)
+
+| Assumed pulse | clamp rail at the driver, lowest | expander ground against controller ground | 5 V across the expander | bus line held high, against expander ground | bus line held low | current into pin protection diodes |
+|---|---|---|---|---|---|---|
+| 0.3 A in 20 ns (15 A/us) | 4.5 V | +0.8 / -1.1 V | 4.98 to 5.01 V | 4.6 to 5.4 V | -0.6 to 1.4 V | up to 8 mA |
+| 0.15 A in 10 ns (15 A/us) | 4.5 V | +0.8 / -1.1 V | 4.99 to 5.01 V | 4.6 to 5.4 V | -0.6 to 1.4 V | 7 mA |
+| 0.6 A in 40 ns (15 A/us) | 4.5 V | +0.8 / -1.0 V | 4.98 to 5.01 V | 4.5 to 5.4 V | -0.6 to 1.4 V | 8 mA |
+| 0.1 A in 20 ns (5 A/us) | 7.4 V | +0.3 / -0.4 V | 5.00 V | 4.8 to 5.2 V | -0.4 to 0.5 V | 1 mA |
+| 1 A in 20 ns (50 A/us) | -5.6 V | +2.7 / -3.2 V | 4.94 to 5.06 V | 3.6 to 5.6 V | -1.0 to 3.9 V | 66 mA |
+
+(Two false starts: a first run began from an inconsistent state and
+showed ringing and currents that were artefacts of that; and the pulse
+was at first a step, not a triangle. Both corrected before these
+figures.)
+
+What this shows, within the model:
+
+- What matters is how fast the current changes, not its peak: the
+  three cases at 15 A/us give the same voltages.
+- The 5 V across the expander barely moves: a few hundredths of a volt
+  even for the largest pulse. C6 sits between the expander's ground
+  branch and the 5 V bus, so the expander's supply rides up and down
+  with its ground. The 76 mm between C6 and the supply pin carry almost
+  no current and so drop almost nothing.
+- What does move is the expander's ground, together with its supply,
+  against the controller: about a volt each way for the base case,
+  three volts for the largest. Lines arriving from the controller then
+  appear displaced by that much at the expander's pins.
+- The base case's ground movement (1.9 V peak to peak, 20 ns each way)
+  is compatible with the 0.5 to 0.8 V bursts measured between those
+  two points on the slow scope (entry 183), given what that scope
+  loses.
+
+What it does to the candidates:
+
+- "The supply across the expander collapses" (my favourite since entry
+  194, on the strength of the 76 mm) is not supported: by conduction
+  the model gives hundredths of a volt. Coupling by the pulse's
+  magnetic field into that loop is not in the model; a rough estimate
+  for the 22 mm where the 5 V bus runs alongside the driver's ground
+  track 20 mm away gives a few nanohenries, hence tens of millivolts.
+  Not enough either, unless the pulse is very much faster than
+  assumed.
+- "A pin is driven outside the expander's supply" fits the model for a
+  bus line the controller holds low. But the bit-banged test (entry
+  164) reset just as often with no line held low by the controller,
+  where the model gives almost no pin current. So the bus pins do not
+  explain it either, as concluded then.
+- That leaves, of the candidates on record, the port pins (wired
+  straight to the driver's inputs), which this model does not
+  represent, and the possibility that the real pulse is much larger or
+  faster than the one assumed here.
+
+Predictions to test on the bench, so that the model can be wrong in a
+definite way: a capacitor directly across the expander's supply pins
+should change nothing; a wire from the driver's ground pin to the
+ground pad by the jack should reduce the ground movement at the
+expander. If the capacitor does cure the reset, the model is missing
+what matters.
+
+2026-11-25 19:28 — At the user's request, the circuit of the what-if simulation of
+entry 207 as a diagram, drawn by
+[tools/sim_fast_schematic.py](tools/sim_fast_schematic.py) from the
+same figures the simulation uses ([sim/fast_whatif.svg](sim/fast_whatif.svg)):
+
+![Circuit of the fast what-if simulation](journal/sim-fast-whatif-circuit.png)
+
+## 208. 2026-11-25 19:42 — The pulse produced by the circuit itself: the two simulations joined
+
+*Run with: [tools/sim_pulse.py](tools/sim_pulse.py). No board involved.*
+
+The user asked where the assumed pulse of entry 207 comes from, then
+whether the first simulation could not provide it. It can, in part.
+
+How they are joined ([sim/pulse_from_driver.cir](sim/pulse_from_driver.cir)):
+for the tens of nanoseconds of the event a coil's current cannot
+change, so the coils become a constant current, whose size at the
+moment of switching back on comes from the slow model (entry 204), as
+do the clamp diode's forward behaviour and the driver's on-voltage and
+resistance. Before the switch-on that current circulates through the
+clamp diode. The driver then switches on and the current has to move
+from the diode's loop to the loop through the supply: 9 V track,
+driver, ground tracks. The rest of the circuit is that of entry 207.
+Still assumed: how long the driver takes to switch on (20 ns), the
+diode's charge-storage time, 30 pF on each output.
+
+![The pulse as the circuit produces it, with and without diode storage](journal/sim-pulse-from-driver.png)
+
+Six coils at 40 mA each, driver switching on in 20 ns, against the
+diode's storage time:
+
+| Storage time | supply current peak | diode reverse peak | fastest change | expander ground against controller | 5 V across the expander |
+|---|---|---|---|---|---|
+| none | 0.37 A | 0.13 A | 35 A/us | +1.6 / -2.0 V | 4.93 to 5.03 V |
+| 10 ns | 0.51 A | 0.27 A | 82 A/us | +1.6 / -4.4 V | 4.83 to 5.18 V |
+| 30 ns | 0.75 A | 0.51 A | 180 A/us | +2.0 / -8.9 V | 3.75 to 6.13 V |
+| 100 ns | 1.27 A | 1.03 A | 426 A/us | +2.1 / -18.5 V | 0.24 to 8.82 V |
+
+Without storage, against the driver's switch-on time (5 to 200 ns):
+fastest change 40 down to 27 A/us, expander ground +1.6/-2.0 V down to
++1.3/-1.6 V. Hardly any dependence.
+
+What this shows:
+
+1. A pulse needs no special assumption. Moving the coils' current from
+   the diode loop to the supply loop is one: the current in the 9 V
+   and ground tracks has to rise from nothing to the coils' total
+   (0.24 A here), and it can only rise as fast as the supply voltage
+   divided by the loop's inductance allows, about 9 V / 320 nH =
+   28 A/us. Until it has, the diodes keep conducting and hold the
+   clamp rail at the driver near 0 V. The model has the rail below
+   half its rest value for about 30 ns in this case. From rest (no
+   coil current) there is nothing to move: 14 A/us and under a volt on
+   the expander's ground, from the output capacitance alone.
+2. That rate is twice the one I assumed in entry 207 and does not
+   depend on how fast the driver switches. More coils or more current
+   do not make this part faster, only longer.
+3. The diode's stored charge adds to it: the current overshoots, and
+   when the diode finally lets go it does so abruptly, which is where
+   the really fast change comes from. In the model this dominates
+   everything as soon as the storage time exceeds about 10 ns, and the
+   voltages become absurd (minus 18 V on the expander's ground at
+   100 ns). Real diodes let go more gently than the simulator's, and
+   the storage time of these is unknown, so those rows show a
+   tendency, not sizes.
+4. Correction to entry 207: "the 5 V across the expander hardly moves"
+   holds for the slow pulse assumed there, and for the part of this
+   one that needs no diode storage. It does not hold once the edges
+   get fast: at 180 A/us the supply across the expander swings from
+   3.75 to 6.13 V, ringing at about 50 MHz (the 76 mm track against
+   the expander's own capacitance). So the supply collapse is not
+   ruled out; whether it happens depends on how abruptly the diode
+   lets go, which the model cannot tell.
+
+Against the bench (storage 100 ns, coils and currents from the table
+of entry 204):
+
+| coils x mA each | bench | fastest change | expander ground, lowest |
+|---|---|---|---|
+| 6 x 39.5 | resets | 423 A/us | -18.4 V |
+| 6 x 6.7 | resets | 162 | -8.2 |
+| 6 x 2.0 | no reset | 87 | -4.8 |
+| 4 x 45 | resets | 455 | -17.6 |
+| 3 x 45 | no reset | 454 | -16.1 |
+| 3 x 28.9 | no reset | 356 | -13.2 |
+| 3 x 15.6 | resets | 250 | -9.9 |
+| 3 x 6.7 | resets | 153 | -6.5 |
+| 3 x 2.0 | no reset | 80 | -3.7 |
+| 1 x 45 | no reset | 437 | -9.9 |
+| 6 x 0 (from rest) | no reset | 14 | -0.9 |
+
+The model orders the cases by coil current, as any model of this kind
+must: more current, bigger pulse. The bench does not: three coils at
+45 mA do not reset while three at 7 to 16 mA do, and one coil at 45 mA
+never does. So the model reproduces "needs coil current still flowing"
+and "from rest never", and fails on what separates reset from no reset
+among the cases with current. Something not in it decides that.
+
+2026-11-25 20:14 — The user asks to be shown the simulation's schematic whenever
+it changes. Circuit of the joined simulation of entry 208
+([sim/pulse_from_driver.svg](sim/pulse_from_driver.svg), drawn by
+[tools/sim_fast_schematic.py](tools/sim_fast_schematic.py) with the
+argument "pulse"): the assumed pulse of entry 207 is replaced by the
+coils as a constant current, the clamp diodes, and the driver's switch.
+
+![Circuit of the joined simulation](journal/sim-pulse-from-driver-circuit.png)

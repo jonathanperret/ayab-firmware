@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -20 1510 730" font-family="system-ui, Helvetica, Arial, sans-serif" font-size="13">
+<style>.t{fill:#0b0b0b;font-weight:600}.s{fill:#52514e}.v{fill:#1c5cab;font-weight:600}</style>
+<rect x="-110" y="-20" width="1510" height="730" fill="#fcfcfb"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M140 50 L140 275"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M140 335 L140 560"/>
+<circle stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" cx="140" cy="305" r="30"/>
+<text class="t" x="140" y="299" text-anchor="middle">+</text>
+<text class="t" x="140" y="321" text-anchor="middle">−</text>
+<text class="s" x="100" y="303" text-anchor="end">controller's 5 V</text>
+<text class="v" x="100" y="319" text-anchor="end">5 V</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M140 50 L240 50"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 50 L450 50"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M550 50 L760 50"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M450 50 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="500" y="20" text-anchor="middle">5 V, controller to C6's tap</text>
+<text class="v" x="500" y="4" text-anchor="middle">171 nH (132 mm)</text>
+<circle cx="240" cy="50" r="4" fill="#2b2d33"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M760 50 L760 110"/>
+<circle cx="760" cy="110" r="4" fill="#2b2d33"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M520 110 L590 110"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M690 110 L760 110"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M590 110 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="640" y="132" text-anchor="middle">5 V, C6 to expander supply pin</text>
+<text class="v" x="640" y="148" text-anchor="middle">90 nH (76 mm)</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M520 110 L520 150"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M760 110 L760 240"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M760 262 L760 400"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M736 240 H784 M736 262 H784"/>
+<text class="s" x="724" y="248" text-anchor="end">C6, 1 µF</text>
+<text class="s" x="724" y="264" text-anchor="end">(with 1 nH, 20 mΩ)</text>
+<rect stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" x="460" y="150" width="120" height="180"/>
+<text class="t" x="520" y="232" text-anchor="middle">expander U3</text>
+<text class="s" x="520" y="250" text-anchor="middle">100 pF, 5 kΩ</text>
+<text class="s" x="520" y="266" text-anchor="middle">across its supply</text>
+<text class="s" x="520" y="168" text-anchor="middle">supply pin</text>
+<text class="s" x="520" y="322" text-anchor="middle">ground pin</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M520 330 L520 400"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M520 400 L590 400"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M690 400 L760 400"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M590 400 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="640" y="422" text-anchor="middle">ground, C6 to expander</text>
+<text class="v" x="640" y="438" text-anchor="middle">8 nH (10 mm)</text>
+<circle cx="760" cy="400" r="4" fill="#2b2d33"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M760 400 L830 400"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M930 400 L1000 400"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M830 400 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="880" y="422" text-anchor="middle">ground, driver to C6</text>
+<text class="v" x="880" y="438" text-anchor="middle">22 nH (24 mm)</text>
+<circle cx="1000" cy="400" r="4" fill="#2b2d33"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1000 200 L1000 270"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1000 330 L1000 400"/>
+<circle stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" cx="1000" cy="300" r="30"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1000 284 V316 M1000 316 l-7 -12 M1000 316 l7 -12"/>
+<text class="s" x="1040" y="298" text-anchor="start">driver U5:</text>
+<text class="v" x="1040" y="314" text-anchor="start">assumed pulse</text>
+<text class="s" x="1040" y="330" text-anchor="start">0.3 A, up in 20 ns,</text>
+<text class="s" x="1040" y="346" text-anchor="start">down in 20 ns</text>
+<text class="s" x="1000" y="190" text-anchor="middle">clamp pin</text>
+<text class="s" x="1012" y="420" text-anchor="start">ground pin</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1000 200 L1060 200"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1160 200 L1220 200"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1060 200 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="1110" y="170" text-anchor="middle">9 V, capacitors to driver</text>
+<text class="v" x="1110" y="154" text-anchor="middle">97 nH (100 mm)</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1220 200 L1220 350"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1220 410 L1220 560"/>
+<circle stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" cx="1220" cy="380" r="30"/>
+<text class="t" x="1220" y="374" text-anchor="middle">+</text>
+<text class="t" x="1220" y="396" text-anchor="middle">−</text>
+<text class="s" x="1260" y="378" text-anchor="start">bulk capacitors</text>
+<text class="v" x="1260" y="394" text-anchor="start">8.9 V</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M1000 400 L1000 480"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M300 480 L600 480"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M700 480 L1000 480"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M600 480 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="650" y="502" text-anchor="middle">ground, driver to controller pad</text>
+<text class="v" x="650" y="518" text-anchor="middle">93 nH (86 mm)</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M300 480 L300 560"/>
+<circle cx="300" cy="560" r="4" fill="#2b2d33"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M140 560 L300 560"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M300 560 L710 560"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M810 560 L1220 560"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M710 560 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="760" y="582" text-anchor="middle">ground bus, controller pad to capacitors</text>
+<text class="v" x="760" y="598" text-anchor="middle">131 nH (128 mm)</text>
+<text class="s" x="220" y="584" text-anchor="middle">controller's ground pad</text>
+<text class="s" x="220" y="600" text-anchor="middle">(the reference)</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 50 L240 97"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 153 L240 200"/>
+<rect stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" x="228" y="97" width="24" height="56"/>
+<text class="s" x="260" y="123" text-anchor="start">pull-up</text>
+<text class="v" x="260" y="139" text-anchor="start">5 kΩ</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 200 L300 200"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M400 200 L460 200"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M300 200 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="350" y="170" text-anchor="middle">one bus line, controller to expander</text>
+<text class="v" x="350" y="154" text-anchor="middle">134 nH (100 mm)</text>
+<circle cx="240" cy="200" r="4" fill="#2b2d33"/>
+<text class="s" x="232" y="222" text-anchor="end">10 pF</text>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 280 L240 300"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 300 L240 402"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 458 L240 560"/>
+<rect stroke="#2b2d33" stroke-width="2" fill="#fcfcfb" x="228" y="402" width="24" height="56"/>
+<text class="s" x="260" y="428" text-anchor="start">controller holding</text>
+<text class="v" x="260" y="444" text-anchor="start">the line low, 25 Ω</text>
+<circle cx="240" cy="560" r="4" fill="#2b2d33"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M240 280 L300 280"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M400 280 L460 280"/>
+<path stroke="#2b2d33" stroke-width="2" fill="none" d="M300 280 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+<text class="s" x="350" y="302" text-anchor="middle">one bus line, controller to expander</text>
+<text class="v" x="350" y="318" text-anchor="middle">134 nH (100 mm)</text>
+<text class="s" x="452" y="194" text-anchor="end">pin</text>
+<text class="s" x="452" y="274" text-anchor="end">pin</text>
+<text class="s" x="470" y="206" text-anchor="start">held high</text>
+<text class="s" x="470" y="286" text-anchor="start">held low</text>
+<text class="s" x="650" y="640" text-anchor="middle">Every pin of the expander that a bus line reaches has 10 pF and protection diodes to the expander's own supply and ground.</text>
+<text class="s" x="650" y="660" text-anchor="middle">Each track is an inductance, estimated from its length and width; 150 Ω across each stands in for its losses. Coupling between tracks is not modelled.</text>
+<text class="t" x="650" y="690" text-anchor="middle">Circuit of the fast what-if simulation (sim/fast_whatif.cir). The pulse is assumed, not measured.</text>
+</svg>
