@@ -6904,3 +6904,32 @@ captures leave open.
 Limits: flat schematics made of LTspice's library symbols; transient
 analyses; the waveform reader handles the binary format LTspice writes
 by default.
+
+## 206. 2026-11-25 19:06 — The test job in CI: two repairs to the test script, one failure left that is not in the code
+
+The user pointed out that tests fail in CI. The "Run Tests" job had
+failed on every push to this branch since the first, on 2026-11-20;
+the firmware build ("Archive Build"), which the web tool uses, has
+passed throughout. Nothing to do with the investigation's changes:
+
+1. CMake 4 on the CI machines refuses projects asking for a minimum
+   version below 3.5, as the arduino-mock library fetched during the
+   test build does. Fixed in test/test.sh by exporting
+   CMAKE_POLICY_VERSION_MINIMUM=3.5 (commit 5f09720). After that the
+   tests build and run in CI: 103 of 103 pass.
+2. The coverage tool there no longer accepts "--branches"; replaced by
+   "--txt-metric branch" (commit 48d9f21). The coverage step then
+   passes.
+3. Left: the last step sends the results to SonarCloud and is refused
+   (HTTP 403 on the token). That is the fork's credentials for that
+   service, not something in the repository. The job therefore still
+   shows as failed, while the "Test Results" check passes.
+
+Not reproduced locally: on this Mac the same test build stops inside
+the old test framework that the mock library pulls in, with a compiler
+error from Apple's compiler; CI's compiler builds it.
+
+Also noted from the user: they do not intend to edit the schematic in
+LTspice; they wanted a second simulator's confirmation of the model,
+which entry 205 gives. The converter and runner stay in tools/ but
+will not be developed further.
