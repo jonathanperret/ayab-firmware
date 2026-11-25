@@ -36,6 +36,14 @@
 //                   apart
 //               4 = one three-byte write [OO][BB][PP]: off, back on in two
 //                   stages about 90 us apart
+//               5 = as mode 1, but bit-banged through the pins instead of
+//                   sent by the I2C hardware
+//               6 = as mode 5, with the expander first put in its high-speed
+//                   mode (start, the code 0000 1000, repeated start): its bus
+//                   input filters are then at their fast setting until the
+//                   stop that ends the write
+//               7 = as mode 4, bit-banged
+//               8 = as mode 7, in high-speed mode
 //     G   gap in microseconds (modes 2 and 3)
 //     U   time the pattern is left on before the event, microseconds
 //     N   number of trials
@@ -113,6 +121,86 @@ static void wr3(uint8_t a, uint8_t first, uint8_t second, uint8_t v) {
 
 // Reads and returns the port of the expander at address a. If the chip does
 // not answer, the result is FF and no error is recorded.
+// ---- Bit-banged writes (modes 5 to 8) --------------------------------
+// The two bus lines as plain port C pins. A line is driven low by making
+// its pin an output (the port bit is kept at 0) and released by making it
+// an input, leaving the board's pull-up to raise it.
+static const uint8_t BB_SDA = _BV(PC4);
+static const uint8_t BB_SCL = _BV(PC5);
+static const uint8_t BB_HALF_US = 4; // half a clock period: about 100 kHz
+static inline void bbScl(bool released) {
+  if (released)
+    DDRC &= (uint8_t)~BB_SCL;
+  else
+    DDRC |= BB_SCL;
+}
+static inline void bbSda(bool released) {
+  if (released)
+    DDRC &= (uint8_t)~BB_SDA;
+  else
+    DDRC |= BB_SDA;
+}
+// Clock one byte out, most significant bit first, then read the
+// acknowledge bit. Returns true if the byte was acknowledged. On entry and
+// on exit the clock is low.
+static bool bbByte(uint8_t value) {
+  for (uint8_t mask = 0x80; mask != 0; mask >>= 1) {
+    bbSda((value & mask) != 0);
+    delayMicroseconds(BB_HALF_US);
+    bbScl(true);
+    delayMicroseconds(BB_HALF_US);
+    bbScl(false);
+  }
+  bbSda(true);
+  delayMicroseconds(BB_HALF_US);
+  bbScl(true);
+  delayMicroseconds(BB_HALF_US);
+  bool ack = (PINC & BB_SDA) == 0;
+  bbScl(false);
+  return ack;
+}
+// Write up to three data bytes to expander "a" by bit-banging. With
+// "fast" set, the write is preceded by the high-speed code, which the
+// expander does not acknowledge and which switches its input filters to
+// their fast setting until the stop. Every data or address byte that is
+// not acknowledged adds one to wnak.
+static void bbWrite(uint8_t a, const uint8_t *data, uint8_t count, bool fast) {
+  // Take the pins from the I2C hardware. Wire switches on the internal
+  // pull-ups by setting the port bits; clear them before driving.
+  TWCR = 0;
+  PORTC &= (uint8_t)~(BB_SDA | BB_SCL);
+  // Start: data falls while the clock is high.
+  bbSda(false);
+  delayMicroseconds(BB_HALF_US);
+  bbScl(false);
+  if (fast) {
+    bbByte(0x08); // the high-speed code; no acknowledge is expected
+    // Repeated start.
+    bbSda(true);
+    delayMicroseconds(BB_HALF_US);
+    bbScl(true);
+    delayMicroseconds(BB_HALF_US);
+    bbSda(false);
+    delayMicroseconds(BB_HALF_US);
+    bbScl(false);
+  }
+  if (!bbByte((uint8_t)(a << 1)))
+    wnak++;
+  for (uint8_t k = 0; k < count; k++) {
+    if (!bbByte(data[k]))
+      wnak++;
+  }
+  // Stop: data rises while the clock is high. Then hand the pins back.
+  bbSda(false);
+  delayMicroseconds(BB_HALF_US);
+  bbScl(true);
+  delayMicroseconds(BB_HALF_US);
+  bbSda(true);
+  delayMicroseconds(BB_HALF_US);
+  Wire.begin();
+  Wire.setWireTimeout(25000, true);
+}
+
 static uint8_t rd1(uint8_t a) {
   Wire.requestFrom(a, (uint8_t)1);
   return Wire.read();
@@ -269,6 +357,14 @@ void loop() {
           // Off, intermediate stage "back", full pattern, in one
           // transaction.
           wr3(addr, off, back, pat);
+        } else if (mode == 5 || mode == 6) {
+          // As mode 1, bit-banged; mode 6 in high-speed mode.
+          const uint8_t bytes[2] = {off, pat};
+          bbWrite(addr, bytes, 2, mode == 6);
+        } else if (mode == 7 || mode == 8) {
+          // As mode 4, bit-banged; mode 8 in high-speed mode.
+          const uint8_t bytes[3] = {off, back, pat};
+          bbWrite(addr, bytes, 3, mode == 8);
         } else {
           // Mode 3 (and any other number): switch off, one solenoid per
           // write starting from bit 0, each solenoid that is on in the

@@ -7204,3 +7204,41 @@ What this changes:
   exactly what such filters are there to reject, and TI state 100 ns
   for theirs while UMW state nothing. Entry numbers of the earlier
   work on the high-speed mode are in the first days of this journal.
+
+## 210. 2026-11-25 20:25 — High-speed mode and resets: never tried; a test prepared
+
+The user asked whether I ever tried to see if enabling fast mode on the
+expander changes how often it resets. No. What was done (entry 4,
+2026-11-20, bare board, no coils): the UMW expander's bus input filter
+ignores a 62 ns pulse and acts on 125 ns or more in normal mode; after
+the high-speed code it also acts on 62 ns; and the byte 0x09 of the
+MCP23008-style write does not put it in that mode. Whether resets with
+coils become more or less frequent when the filter is at its fast
+setting was never looked at.
+
+Why it is worth doing: the simulations (entries 207, 208) put
+disturbances of some tens of nanoseconds on the bus lines at the
+expander. In normal mode the filter should reject those; in high-speed
+mode it lets shorter ones through. If the bus lines are the way in,
+resets should become more frequent in high-speed mode: three coils
+might start to reset, and the borderline sequences should move. If
+nothing changes, the bus inputs are not the way in. It needs no parts.
+
+Prepared, not run (no board is connected):
+
+- edgetest gets four modes: 5 and 7 repeat modes 1 and 4 with the write
+  bit-banged through the pins; 6 and 8 do the same after the
+  high-speed code (start, 0000 1000, repeated start), so that the
+  expander's filters are at their fast setting from before the
+  switch-off until the stop. Builds: 7038 bytes of flash, 473 bytes of
+  RAM. Not flashed. The bit-banging follows the routines of the probe
+  firmware, which ran on the bench board on 2026-11-24.
+- [tools/hs_session.py](tools/hs_session.py) runs seven sequences
+  three ways (hardware, bit-banged, high-speed) in rested blocks with
+  the order rotated, because borderline cases drift with use (entry
+  186).
+
+Things to watch when it runs: the bit-banged write's timing is close
+to the hardware's but not identical, hence the bit-banged column as
+the proper comparison for the high-speed one; and the other expander
+on the bus enters high-speed mode too, which should not matter.
