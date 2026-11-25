@@ -7129,3 +7129,78 @@ argument "pulse"): the assumed pulse of entry 207 is replaced by the
 coils as a constant current, the clamp diodes, and the driver's switch.
 
 ![Circuit of the joined simulation](journal/sim-pulse-from-driver-circuit.png)
+
+## 209. 2026-11-25 20:19 — The datasheets checked for the simulation's assumed values; datasheets moved into the project
+
+The user asked whether I had checked the UMW datasheets in case some
+of the values I assumed in the simulations are in them. I had not, for
+these values. Done now, with the TI and ST driver datasheets and TI's
+expander datasheet alongside.
+
+The datasheets are now in the project, moved from the Downloads folder
+at the user's request, under clearer names:
+
+| File in [datasheets/](datasheets/) | Was | Part |
+|---|---|---|
+| umw-uln2803a.pdf | umw-uln2803a.pdf | UMW ULN2803A driver |
+| ti-uln2803a.pdf | ti-uln2803a.pdf | TI ULN2803A |
+| st-uln2803a.pdf | uln2803a.pdf | ST ULN2803A |
+| umw-pcf8574.pdf | C22396383.pdf | UMW PCF8574 expander |
+| ti-pcf8574.pdf | PCF8574.pdf | TI PCF8574 |
+| ti-ina180.pdf | (fetched for entry 203) | TI INA180 current-sense amplifier |
+
+Earlier entries that name these files in Downloads now mean these.
+
+Driver (UMW datasheet, electrical characteristics at 25 degrees C),
+against what the simulations use:
+
+| Quantity | UMW datasheet | TI | ST | In the simulations |
+|---|---|---|---|---|
+| Turn-on delay | 1 us max, no typical | 20 ns typ (output high to low) | 0.25 us typ, 1 us max | 20 ns to switch on, assumed |
+| Turn-off delay | 1 us max | 130 ns typ | 0.25 us typ, 1 us max | not used |
+| Output on-voltage | 0.9 V typ, 1.1 max at 100 mA | (same table) | | fitted: 0.73 V + 3.1 ohm x I, i.e. 1.04 V at 100 mA, 0.89 V at 53 mA |
+| Clamp diode forward drop | 1.7 V typ, 2 V max at 350 mA | 1.7 / 2 V | 1.7 / 2 V | fitted at 0.5 to 50 mA: 0.97 V at 50 mA; the fitted law gives 1.40 V at 350 mA |
+| Input current when on | 0.93 mA typ at 3.85 V | | | not modelled; agrees with the 4.0 V seen on the port pin and a 1 kohm pull-up |
+| Input capacitance | 15 pF typ, 30 max | 15 / 25 pF | 15 / 25 pF | not modelled |
+| Output capacitance | not given | not given | not given | 30 pF per output, assumed |
+| Clamp diode recovery or storage time | not given | not given | not given | the main unknown |
+| Output rise or fall time | not given | not given | not given | |
+
+Expander (UMW datasheet), against TI's and the simulations:
+
+| Quantity | UMW | TI | In the simulations |
+|---|---|---|---|
+| Power-on reset voltage | 1 V typ, 2.4 V max | 1.3 V typ, 2.4 V max | not modelled as such: this is how far the supply across the chip must fall |
+| Pin capacitance | not given | SCL 1.5 pF typ / 7 max, SDA 3 / 7, port pins 4 / 10 | 10 pF per bus pin, assumed |
+| Supply current | 40 uA typ, 100 max when clocked | 2.5 uA typ standby | 5 kohm (1 mA), assumed: too much, of no consequence |
+| Output data valid after the clock edge | 4 us max | (similar) | |
+| Bus spike rejection | "filters" on SDA and SCL in the block diagram, no figure; a high-speed mode that switches those filters | spikes up to 100 ns rejected | not modelled |
+| Latch-up immunity | not stated | exceeds 100 mA | not modelled |
+| Capacitance between supply pins | not given | not given | 100 pF, assumed |
+
+What this changes:
+
+- Nothing in the fitted slow model: the driver's on-voltage and the
+  clamp diode's drop that the fit found agree with the datasheet where
+  they can be compared (the diode a little low at 350 mA, far outside
+  the fitted range).
+- The driver's switching time is not pinned down: UMW give only a
+  maximum delay of 1 us. The joined simulation showed it hardly
+  matters between 5 and 200 ns for the part that needs no diode
+  storage (entry 208); I did not try 1 us.
+- The quantities the fast result hangs on, the clamp diode's storage
+  time and how abruptly it lets go, are in none of the three driver
+  datasheets. They have to be measured.
+- A number for the reset criterion: the UMW expander's power-on reset
+  trips at 1 V typically and 2.4 V at most. For the "supply collapse"
+  route the 5 V across the chip would have to fall below that, i.e. by
+  2.6 to 4 V, for long enough, which the datasheet does not specify.
+  The simulation of entry 208 reaches that only with a diode storage
+  time of 30 ns or more (3.75 V lowest at 30 ns; 0.24 V at 100 ns).
+- One thing to follow up: the UMW expander's bus inputs have filters
+  that it can switch to a faster setting (its high-speed mode, which
+  the TI part does not have). Spikes of tens of nanoseconds on bus
+  lines, which the simulations do produce at the expander's pins, are
+  exactly what such filters are there to reject, and TI state 100 ns
+  for theirs while UMW state nothing. Entry numbers of the earlier
+  work on the high-speed mode are in the first days of this journal.

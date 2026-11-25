@@ -90,5 +90,6 @@ Waiting on, all ordered: through-hole ceramic capacitors, Schottky diodes (1N581
 | [tools/](tools/) | scripts for the boards, the supply, the scope and the analysis |
 | [edgetest/](edgetest/) and the other sketch folders | test firmware |
 | [captures/](captures/) | raw scope captures and result tables |
+| [datasheets/](datasheets/) | the UMW, TI and ST driver datasheets, the UMW and TI expander datasheets, the INA180 |
 | [sim/](sim/) | the slow model of a coil and its driver channel, for ngspice (`coil_driver.cir`) and LTspice (`coil_driver.asc`); `tools/ltspice_run.py` runs an LTspice schematic in the background and reads the results back |
 | `src/ayab/pcfprobe.cpp` in the firmware | the self-contained probe that runs from hardware-test mode (version 8) |
