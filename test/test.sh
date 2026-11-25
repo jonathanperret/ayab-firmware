@@ -59,5 +59,5 @@ if [[ $sonar -eq 1 ]]; then
 else
   gcovr -r . $GCOVR_ARGS  --html-details -o ./test/build/coverage.html
 fi
-gcovr -r . $GCOVR_ARGS --branches
+gcovr -r . $GCOVR_ARGS --txt-metric branch
 gcovr -r . $GCOVR_ARGS # --fail-under-line 90 --fail-under-branch 90
