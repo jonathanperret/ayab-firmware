@@ -1,2 +1,4 @@
 .pio/
 __pycache__/
+sim/build/
+sim/live/

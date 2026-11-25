@@ -1,0 +1,36 @@
+* One solenoid coil of the AYAB interface board and its driver channel: slow model
+* Fitted to scope captures of the driver output (journal entries 177-179, 204). Not a model of
+* anything faster than about 20 microseconds: no capacitances, no diode recovery, no wiring inductance.
+*
+* Run:  ngspice -b coil_driver.cir      (writes coil_driver_<case>.txt: time, output volts, coil amps)
+* The two cases are the two captures the model was fitted to: coils on for 5.26 ms and for 0.34 ms.
+
+.param n_coils = 6          ; coils switched together (they share the supply wiring)
+.param t_on = 5.26m           ; how long the driver is on (overridden below for the second case)
+
+Vsup  sup 0  8.94             ; supply at the coils with nothing on
+Rwire sup a  { 0.65 * n_coils } ; shared supply wiring, per coil when n_coils switch together
+Rcoil a   b  150.0              ; coil resistance (measured)
+L1    b   c  0.14298128140120056             ; inductance the coil shows at first
+L2    c   out 0.08528342773401326            ; extra inductance once the field has entered the iron ...
+Riron c   out 91.20259415494075            ; ... and the resistance standing for currents induced in the iron
+Dclamp out sup DCLAMP         ; the driver's clamp diode, back to the supply
+.model DCLAMP D(IS=7.88255805089608e-10 N=1.981281271172871 RS=1.0831916962631623)
+
+* Driver channel: a switch, then its fixed drop and its resistance to ground
+S1    out d1 ctl 0 SWDRV
+Vdrop d1  d2 0.7249998552760946
+Ron   d2  0  3.149192104933128
+.model SWDRV SW(RON=0.01 ROFF=1G VT=0.5 VH=0.1)
+Vctl  ctl 0  PULSE(0 1 1m 1u 1u {t_on} 1)   ; on at 1 ms, off t_on later
+
+.control
+set wr_singlescale
+foreach ton 5.26m 0.34m
+  alterparam t_on = $ton
+  reset
+  tran 2u 13m 0 2u
+  wrdata coil_driver_{$ton}.txt v(out) i(L1)
+end
+.endc
+.end

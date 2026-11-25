@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -44 1130 380" font-family="system-ui, sans-serif" font-size="13">
+  <!-- The circuit that tools/sim_fit.py simulates: one coil and its driver channel.
+       Elements with an id starting "v-" are filled in with the current values by the watch page. -->
+  <style>
+    .w{stroke:#c9ccd3;stroke-width:2;fill:none} .p{stroke:#c9ccd3;stroke-width:2;fill:#16181c}
+    .t{fill:#e8e8e8} .s{fill:#9aa} .v{fill:#e6c229;font-weight:600} .dot{fill:#c9ccd3}
+    .hl{stroke:#4f9cff;stroke-width:2;fill:none;stroke-dasharray:5 4}
+  </style>
+  <!-- rails -->
+  <path class="w" d="M70 110 H150 M230 110 H290 M370 110 H430 M530 110 H590 M750 110 H860"/>
+  <path class="w" d="M70 290 H860"/>
+  <!-- supply -->
+  <path class="w" d="M70 110 V170 M70 230 V290"/>
+  <circle class="p" cx="70" cy="200" r="30"/><text class="t" x="70" y="194" text-anchor="middle">+</text><text class="t" x="70" y="214" text-anchor="middle">−</text>
+  <text class="t" x="110" y="196">supply</text><text class="v" x="110" y="214">8.94 V</text>
+  <!-- shared wiring -->
+  <rect class="p" x="150" y="98" width="80" height="24"/><text class="t" x="190" y="88" text-anchor="middle">shared wiring</text><text class="v" x="190" y="142" text-anchor="middle">0.65 Ω per coil on</text>
+  <!-- coil resistance -->
+  <rect class="p" x="290" y="98" width="80" height="24"/><text class="t" x="330" y="88" text-anchor="middle">coil resistance</text><text class="v" x="330" y="142" text-anchor="middle">150 Ω (fixed)</text>
+  <!-- L1 -->
+  <path class="w" d="M430 110 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+  <text class="t" x="480" y="76" text-anchor="middle">inductance at first</text><text class="v" id="v-0" x="480" y="142" text-anchor="middle">…</text>
+  <!-- L2 parallel RI -->
+  <g id="g-two">
+    <path class="w" d="M590 110 V70 H620 M720 70 H750 V110 M590 110 V160 H630 M710 160 H750 V110"/>
+    <path class="w" d="M620 70 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0 q12.5 -26 25 0"/>
+    <rect class="p" x="630" y="148" width="80" height="24"/>
+    <text class="t" x="670" y="36" text-anchor="middle">extra inductance later</text><text class="v" id="v-1" x="760" y="62">…</text>
+    <text class="t" x="670" y="192" text-anchor="middle">stands for the iron</text><text class="v" id="v-2" x="760" y="176">…</text>
+  </g>
+  <text class="s" x="480" y="160" text-anchor="middle">└──────── the coil ────────┘</text>
+  <!-- output node -->
+  <circle class="dot" cx="860" cy="110" r="4"/><text class="t" x="872" y="104">driver output</text>
+  <text class="s" x="872" y="122">(the probe reads here,</text><text class="s" x="872" y="138">plus its overshoot <tspan class="v" id="v-6">…</tspan>)</text>
+  <!-- clamp diode back to the supply -->
+  <path class="w" d="M860 110 V-14 H312 M280 -14 H70 V110"/>
+  <path class="p" d="M312 -26 V-2 L280 -14 Z"/><path class="w" d="M280 -26 V-2"/>
+  <text class="t" x="326" y="-22">clamp diode: carries the coil's current back to the supply after a switch-off</text>
+  <text class="v" x="326" y="4">saturation <tspan id="v-3">…</tspan> A, steepness <tspan id="v-4">…</tspan>, series <tspan id="v-5">…</tspan> Ω</text>
+  <!-- driver: switch, drop, resistance to ground -->
+  <path class="w" d="M860 110 V170 M860 196 V214 M860 244 V262 M860 286 V290"/>
+  <path class="w" d="M860 170 L876 194"/><circle class="dot" cx="860" cy="170" r="3"/><circle class="dot" cx="860" cy="196" r="3"/>
+  <circle class="p" cx="860" cy="229" r="15"/><text class="t" x="860" y="234" text-anchor="middle" font-size="11">V</text>
+  <rect class="p" x="850" y="262" width="20" height="24"/>
+  <text class="t" x="888" y="186">driver switch (on / off)</text>
+  <text class="t" x="888" y="234">its fixed drop, about 0.7 V</text>
+  <text class="t" x="888" y="278">its resistance, about 3 Ω</text>
+  <text class="s" x="70" y="318">ground</text>
+</svg>

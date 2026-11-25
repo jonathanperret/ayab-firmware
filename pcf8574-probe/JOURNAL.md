@@ -6621,3 +6621,286 @@ entries 134 and 142; and entry numbers added to the other lines of the
 summary that had none (the table of sequences, the two-board
 statement, the reason the MCP23008-style write triggers it, the state
 of the machine's controller).
+
+2026-11-25 12:51 — At the user's request the description of PR #3 on the fork
+was cleared, and it will not be maintained from now on: the PR exists
+only to trigger a firmware build. What the probe prints and how to read
+it is in the firmware's own comments (src/ayab/pcfprobe.h) and in this
+journal (entries 163-165, 202).
+
+2026-11-25 12:52 — The user has ordered Schottky diodes (1N5819). With the
+through-hole ceramic capacitors and the faster scope, everything the
+next steps need is now on order. For the diode test: one across each
+coil, cathode (the banded end) towards the coils' 9 V side, so that it
+takes the coil's current at switch-off in place of the driver's own
+clamp diode; three or four coils fitted is enough to see the threshold
+move. [SUMMARY.md](SUMMARY.md) updated.
+
+## 203. 2026-11-25 14:08 — INA180: the output floor checked against the datasheet; my figure was wrong
+
+The user asked whether the floor I had mentioned for the INA180's
+output (entry 190 and its follow-up: "a few millivolts typically, up to
+some tens by its data sheet, from memory") is really in the datasheet.
+Checked in TI's datasheet SBOS741H (revised July 2022), electrical
+characteristics at 25 degrees C, 5 V supply:
+
+| Item | Typical | Maximum | Condition |
+|---|---|---|---|
+| Swing to ground | 0.5 mV above ground | 5 mV above ground | 10 kohm load, input overdriven |
+| Swing to the supply rail | 20 mV below it | 30 mV below it | same |
+| Offset at the input, sensing near ground | ±25 uV | ±150 uV | |
+| Offset at the input, at 12 V | ±100 uV | ±500 uV | |
+| Gain error | ±0.1 % | ±1 % | output between 0.5 V and supply minus 0.5 V |
+| Bandwidth, A1 | 350 kHz | | 10 pF load |
+| Slew rate | 2 V/us | | |
+
+So the floor exists and is in the datasheet, but it is ten times
+smaller than I said: 0.5 mV typical and 5 mV at most, not "tens". With
+the user's breakout (gain 20, 0.1 ohm, 2 V per ampere) that is 0.25 mA
+typical, 2.5 mA at most.
+
+What limits small currents more than the floor, for a breakout in the
+9 V wire:
+
+- The offset: up to ±500 uV at the input is ±10 mV at the output, i.e.
+  ±5 mA (typically ±1 mA). A negative offset pushes small currents
+  below the floor, where they all read the same.
+- The gain accuracy is only specified for outputs above 0.5 V, which is
+  250 mA here. One coil (107 mV) is below that.
+
+Both are cured the same way as proposed, with a better reason and a
+better number: hold five coils on throughout (0.53 V at the output) and
+pulse a sixth, so that the part of interest sits inside the range the
+datasheet specifies. The offset then drops out as a constant.
+
+Also in hand since the last entries, not yet journalled:
+
+- The user does not trust the component tester's inductance readings;
+  the current measurement is to decide. Until then the question of a
+  smaller inductance at the start is open.
+- Correction to entry 188, part C: the "0.1 ms on" case was really on
+  for 0.34 ms and the "5 ms" case for 5.26 ms, measured on the captures
+  (the requested time does not include the write that switches the
+  outputs off). With 0.34 ms a single inductance of about 240 mH gives
+  roughly the current that part C attributed to a smaller starting
+  inductance, so that argument falls. The rows labelled "0.1 ms on" in
+  entries 167 and 188 are 0.34 ms.
+- A slow model of one coil and its driver channel is being fitted to
+  the captures ([tools/sim_extract.py](tools/sim_extract.py),
+  [tools/sim_fit.py](tools/sim_fit.py)), with a one-inductance and a
+  two-inductance variant, and can be watched while it runs
+  ([tools/sim_watch.py](tools/sim_watch.py), http://localhost:8011/).
+  Results to follow.
+- [tools/coil_current_preview.py](tools/coil_current_preview.py) draws
+  what the current capture should show for each description of the coil
+  (journal/coil-current-preview.png).
+
+## 204. 2026-11-25 14:30 — Slow model of a coil and its driver channel: fitted, and written for ngspice and LTspice
+
+*Run with: [tools/sim_extract.py](tools/sim_extract.py), [tools/sim_fit.py](tools/sim_fit.py), [tools/sim_spice.py](tools/sim_spice.py), [tools/sim_ltspice.py](tools/sim_ltspice.py), [tools/asc_netlist.py](tools/asc_netlist.py). No board involved: existing captures only.*
+
+The user asked whether there is enough data for a SPICE simulation.
+Answered: for the slow part (coil currents, clamp diode conduction),
+yes; for the fast event that resets the expander, no, since the
+driver's behaviour in the first tens of nanoseconds, the expander's
+sensitivity and the size of the pulse are all unknown. Agreed to build
+the slow model first.
+
+Data: averaged curves from the captures of entries 177-179 (yellow on
+the driver output, 16 MS/s), in sim/measured.json: the output above
+its rest level after a switch-off of six coils that had been on 5.26 ms
+and 0.34 ms, and the on-level after a switch-on from rest.
+
+Model (diagram in [sim/schematic.svg](sim/schematic.svg)): supply
+8.94 V, shared wiring 0.65 ohm per coil on, coil resistance 150 ohm
+(fixed), an inductance L1, then L2 with a resistance RI across it
+(standing for currents induced in the iron); driver on = a fixed drop
+plus a resistance; driver off = a clamp diode back to the supply; plus
+the yellow probe's overshoot. Fitted by a global search followed by a
+local one, in two variants.
+
+![One inductance: best fit](journal/sim-slow-model-fit-one-inductance.png)
+
+![Two inductances: best fit, with the one-inductance fit dashed](journal/sim-slow-model-fit-two-inductances.png)
+
+| | One inductance | Two inductances |
+|---|---|---|
+| Error (rms over all fitted points) | 91 mV | 26 mV |
+| Inductance | 264 mH | 143 mH at first, plus 85 mH through 91 ohm (change-over 0.94 ms); 228 mH in all |
+| Clamp diode drop at 50 mA / 5 mA | 0.99 / 0.75 V | 0.97 / 0.81 V |
+| Driver on | 0.75 V + 2.7 ohm x current | 0.73 V + 3.1 ohm x current |
+| Probe overshoot | 0.24 V | 0.19 V |
+| Current at switch-off after 5.26 ms / 0.34 ms on | 50.1 / 9.6 mA | 50.0 / 14.9 mA |
+| Diode current below 0.5 mA after | 4.0 / 1.8 ms | 3.7 / 1.25 ms |
+
+Why the one-inductance model fails, as seen in the pictures: it puts
+the end of the diodes' conduction after the short on-time at 2.1 ms
+where the capture has 1.4 ms, and it has the output drop straight to
+its rest level when the current stops, where the captures show it
+still several tenths of a volt above rest and sinking over a further
+1.5 ms. That slow tail is a voltage the coil keeps producing after its
+own current has stopped; in the two-inductance model it is the field
+still dying away in the iron.
+
+How firmly the split is fixed. With L1 held at a value and everything
+else refitted:
+
+| L1 held at | best error | rest of the coil | total |
+|---|---|---|---|
+| 60 mH | 34 mV | +151 mH through 234 ohm | 211 mH |
+| 80 mH | 34 mV | +138 mH through 214 ohm | 218 mH |
+| 100 mH | 31 mV | +122 mH through 176 ohm | 222 mH |
+| 120 mH | 28 mV | +105 mH through 137 ohm | 225 mH |
+| 143 mH | 27 mV | +87 mH through 101 ohm | 230 mH |
+| 170 mH | 27 mV | +64 mH through 51 ohm | 234 mH |
+
+(At 200 and 228 mH the local refit ended at about 200 mV; I take those
+as failed refits, the one-inductance search above being the proper
+figure for "no second element", 91 mV.)
+
+What this shows:
+
+- The total is well fixed: 211 to 234 mH whatever the split.
+- A second element is needed: without it the error is three times
+  larger and two visible features are missed.
+- The starting inductance is NOT fixed by these captures: anything from
+  about 60 to 170 mH fits within 27 to 34 mV. The best fit says 143
+  mH, but the preference over 80 mH is slight.
+
+So, on the question of entry 188 part C and entry 203: the claim "the
+coil shows a smaller inductance at first" comes back, for a different
+and better reason than the one I first gave (which rested on a wrong
+on-time): the tail after the diodes stop, and the timing of the knee.
+How much smaller is open. The current measurement will settle it; this
+model predicts 5.5 mA at 0.1 ms after a switch-on from rest if L1 is
+143 mH, 9 mA if it is 80 mH.
+
+Coil current at the moment of switching back on, from the two-
+inductance fit (per coil, mA):
+
+| gap, ms | 0.2 | 0.5 | 0.8 | 1.2 | 1.7 | 2.2 | 3.2 |
+|---|---|---|---|---|---|---|---|
+| after 5.26 ms on | 39.5 | 28.9 | 21.9 | 15.6 | 10.3 | 6.7 | 2.0 |
+| after 0.34 ms on | 10.0 | 5.4 | 2.7 | 0.6 | 0 | 0 | 0 |
+
+These replace the rougher figures of entry 188. The conclusions drawn
+there from them stand: six coils reset down to a few milliamperes per
+diode; three coils reset at about 7 to 16 mA and not at 22 to 40 mA.
+
+Circuit files:
+
+- [sim/coil_driver.cir](sim/coil_driver.cir) for ngspice, written from
+  the fitted values by sim_spice.py. Run in ngspice it reproduces the
+  measured points to 23 mV (long on-time) and 31 mV (short) rms, with
+  the same currents at switch-off as the fitting script's own solver
+  (49.9 and 14.8 mA).
+
+  ![The ngspice circuit against the captures](journal/sim-slow-model-spice.png)
+
+- [sim/coil_driver.asc](sim/coil_driver.asc), the same circuit as an
+  LTspice schematic, written by sim_ltspice.py. LTspice on this Mac
+  cannot be run from the command line to check it, so I checked its
+  wiring another way: asc_netlist.py derives the connections from the
+  schematic using LTspice's own symbol files, and gives exactly the
+  intended circuit. (A first version had the switch's control pins the
+  wrong way round; caught by reading the symbol file.) The rotation
+  rules of that checker were validated on a schematic shipped with
+  LTspice. Not yet opened or run in LTspice itself.
+
+Limits: nothing faster than about 20 us is in the model; the diode
+is the textbook law; the driver's on-voltage is taken as a straight
+line in the current; and the whole fit rests on one probe and on the
+150 ohm.
+
+While the fit ran, a page showed it live at the user's request
+([tools/sim_watch.py](tools/sim_watch.py)): the chart with the best fit
+so far, the error against time, the circuit diagram with current
+values, and one bar per parameter showing where the search had looked.
+Two false starts on the way: the first solver stalled on some settings
+and my time limit for it crashed the run; replaced by a fixed-step
+solver that takes the same 25 ms for any setting.
+
+2026-11-25 14:37 — The user opened sim/coil_driver.asc in LTspice and ran it;
+screenshot of the plot:
+
+![The model run in LTspice by the user](journal/sim-ltspice-run.png)
+
+It opens and runs, and the traces agree with the fit and with ngspice:
+V(out) 0.73 rising to 0.88 V while on; about 9.9 V after switch-off
+with a knee and a tail; knees about 1.4 ms after the short pulse's
+switch-off and about 4.0 ms after the long one's; clamp diode current
+starting at 15 mA and 50 mA and reaching zero at the knee; the current
+in L2 lagging that in L1 and still flowing after the diode has stopped.
+So the LTspice file is now checked by an actual run, not only by my
+wiring checker.
+
+The two inductor currents plot negative in that run: the inductor
+symbols pointed from output to supply. Schematic regenerated with them
+turned round, so that coil current counts positive from supply to
+output; wiring rechecked with asc_netlist.py (same circuit). This
+second version has not been run in LTspice yet.
+
+2026-11-25 18:49 — The user asked whether LTspice can be automated. Tried it:
+LTspice 17.2.4 on this Mac does run in batch mode on a netlist
+("LTspice -b file.net"): it wrote the waveform file and a log in a
+tenth of a second, with the stepped runs and a measurement directive
+honoured (coil current just before the long pulse's switch-off:
+49.9 mA, as in ngspice and the fitting script). What it will not do
+from the command line on a Mac is turn a schematic (.asc) into a
+netlist; [tools/asc_netlist.py](tools/asc_netlist.py) already derives
+the connections from a schematic and could be extended to write the
+complete netlist. So a chain "schematic edited by hand in LTspice ->
+netlist -> batch run -> results read back by a script" is feasible
+here. Not built yet. Test files in the session scratchpad only.
+
+## 205. 2026-11-25 18:52 — LTspice automated: schematic to netlist to background run to results
+
+*Run with: [tools/ltspice_run.py](tools/ltspice_run.py), [tools/asc_netlist.py](tools/asc_netlist.py). No board involved.*
+
+Built at the user's request, after the batch-mode test noted above.
+
+- asc_netlist.py now writes the complete netlist of a schematic
+  (--spice): one line per component with its nets in the symbol's pin
+  order, its value and extra parameters, then the directives typed on
+  the schematic. It fills the one gap: LTspice on a Mac does not
+  convert a schematic from the command line.
+- ltspice_run.py turns a schematic into that netlist (optionally
+  overriding .param values from the command line), runs LTspice on it
+  in the background, reads the waveform file and the log, prints the
+  log's measurements and a summary of chosen traces, and draws them.
+  It can also be used from other scripts: run(schematic, params)
+  returns the waveforms of each stepped run.
+- Files it writes go to sim/build/, which git ignores (as it now does
+  sim/live/).
+
+Checks:
+
+- sim/coil_driver.asc run this way gives, against ngspice on
+  sim/coil_driver.cir: output voltage identical to within a millivolt;
+  coil current within 0.06 mA at worst (median difference 0.005 mA).
+- The coil currents now come out positive, so the turned-round
+  inductors of the last note are read by this chain as intended. That
+  is my converter's reading of the schematic; the regenerated file has
+  still not been reopened in LTspice's own window.
+
+![sim/coil_driver.asc run through LTspice in the background](journal/sim-ltspice-batch.png)
+
+First use, a sweep through the override: coil current after a
+switch-on from rest, with the starting inductance changed and the
+total kept at 228 mH.
+
+| Starting inductance | at 0.1 ms | at 0.5 ms | at switch-off (5.26 ms) |
+|---|---|---|---|
+| 60 mH | 11.2 mA | 29.7 mA | 48.2 mA |
+| 80 mH | 8.8 mA | 26.7 mA | 48.6 mA |
+| 143 mH (best fit) | 5.3 mA | 19.6 mA | 49.9 mA |
+| 170 mH | 4.5 mA | 17.6 mA | 50.4 mA |
+| 228 mH (one inductance) | 3.5 mA | 15.2 mA | 50.9 mA |
+
+These are what the current measurement with the INA180 has to tell
+apart: a factor of three at 0.1 ms across the range the voltage
+captures leave open.
+
+Limits: flat schematics made of LTspice's library symbols; transient
+analyses; the waveform reader handles the binary format LTspice writes
+by default.
