@@ -1,0 +1,396 @@
+{
+ "experiment": "edge",
+ "label": "edge test, machine, 9 V",
+ "rows": [
+  {
+   "bank": "bank 8-15",
+   "pat": 134,
+   "on": 3,
+   "cols": [
+    "off only",
+    "back on ~90us",
+    "~0.3ms",
+    "~1ms",
+    "~3ms",
+    "~10ms",
+    "~30ms"
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "bank": "bank 8-15",
+   "pat": 182,
+   "on": 5,
+   "cols": [
+    "off only",
+    "back on ~90us",
+    "~0.3ms",
+    "~1ms",
+    "~3ms",
+    "~10ms",
+    "~30ms"
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "bank": "bank 8-15",
+   "pat": 246,
+   "on": 6,
+   "cols": [
+    "off only",
+    "back on ~90us",
+    "~0.3ms",
+    "~1ms",
+    "~3ms",
+    "~10ms",
+    "~30ms"
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 20,
+     "other": 0,
+     "wnak": 20,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "bank": "bank 0-7",
+   "pat": 134,
+   "on": 3,
+   "cols": [
+    "off only",
+    "back on ~90us",
+    "~0.3ms",
+    "~1ms",
+    "~3ms",
+    "~10ms",
+    "~30ms"
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "bank": "bank 0-7",
+   "pat": 182,
+   "on": 5,
+   "cols": [
+    "off only",
+    "back on ~90us",
+    "~0.3ms",
+    "~1ms",
+    "~3ms",
+    "~10ms",
+    "~30ms"
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  },
+  {
+   "bank": "bank 0-7",
+   "pat": 246,
+   "on": 6,
+   "cols": [
+    "off only",
+    "back on ~90us",
+    "~0.3ms",
+    "~1ms",
+    "~3ms",
+    "~10ms",
+    "~30ms"
+   ],
+   "cells": [
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    },
+    {
+     "resets": 0,
+     "other": 0,
+     "wnak": 0,
+     "dirty": 0,
+     "n": 20
+    }
+   ]
+  }
+ ]
+}

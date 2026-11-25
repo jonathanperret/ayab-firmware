@@ -1,0 +1,158 @@
+{
+ "label": "which outputs, machine, 9 V",
+ "rows": [
+  {
+   "desc": "4 off, same 4 back on",
+   "pat": 15,
+   "off": 0,
+   "back": 15,
+   "resets": 20,
+   "other": 0,
+   "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+  },
+  {
+   "desc": "4 off, other 4 on",
+   "pat": 15,
+   "off": 0,
+   "back": 240,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "4 off, 1 back on",
+   "pat": 15,
+   "off": 0,
+   "back": 1,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "4 off, 2 back on",
+   "pat": 15,
+   "off": 0,
+   "back": 3,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "4 off, 3 back on",
+   "pat": 15,
+   "off": 0,
+   "back": 7,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "4 off, 5 on (4 same + 1 new)",
+   "pat": 15,
+   "off": 0,
+   "back": 31,
+   "resets": 20,
+   "other": 0,
+   "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+  },
+  {
+   "desc": "7 off, 4 back on",
+   "pat": 127,
+   "off": 0,
+   "back": 15,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "7 off, 3 back on",
+   "pat": 127,
+   "off": 0,
+   "back": 7,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "3 toggled, 3 held on",
+   "pat": 126,
+   "off": 112,
+   "back": 126,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "3 toggled, 4 held on",
+   "pat": 127,
+   "off": 120,
+   "back": 127,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "4 toggled, 3 held on",
+   "pat": 127,
+   "off": 112,
+   "back": 127,
+   "resets": 20,
+   "other": 0,
+   "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+  },
+  {
+   "desc": "2 toggled, 5 held on",
+   "pat": 127,
+   "off": 124,
+   "back": 127,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "1 toggled, 6 held on",
+   "pat": 127,
+   "off": 126,
+   "back": 127,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "from cold: 4 on",
+   "pat": 0,
+   "off": 0,
+   "back": 15,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "from cold: 7 on",
+   "pat": 0,
+   "off": 0,
+   "back": 127,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "one write: 4 off + other 4 on",
+   "pat": 15,
+   "off": 240,
+   "back": null,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  },
+  {
+   "desc": "one write: 4 on, 3 more added",
+   "pat": 15,
+   "off": 127,
+   "back": null,
+   "resets": 0,
+   "other": 0,
+   "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+  }
+ ]
+}

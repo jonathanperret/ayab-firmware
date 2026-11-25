@@ -1,0 +1,21 @@
+#!/bin/sh
+# Control the bench supply through the Raspberry Pi it is plugged into.
+#
+# usage: psu status | set <volts> <amps> | on | off | watch [<seconds> [<interval seconds>]]
+#
+#   status              print the supply's state (also what happens with no argument)
+#   set <volts> <amps>  change the set voltage and the current limit, then print the state
+#   on | off            switch the output, then print the state
+#   watch [s [step]]    print "<seconds since start> <volts> <amps>" every <step> seconds
+#                       (default 0.1) for <s> seconds (default 10)
+#
+# All arguments are passed unchanged to dp100_hidraw.py (see that file for the details),
+# which is run as root on the Pi; its output and exit status come back through ssh.
+#
+# Needs: key-based ssh login to the account and host named in the command below (BatchMode
+# makes ssh fail rather than ask for a password; the connection attempt is given up after
+# 8 seconds), sudo without a password there, and a copy of dp100_hidraw.py in a folder
+# named dp100 in that account's home folder. No environment variables are read.
+#
+# "exec" replaces this shell by ssh, so no shell process is left waiting.
+exec ssh -o BatchMode=yes -o ConnectTimeout=8 jonathan@raspberrypi.local sudo python3 dp100/dp100_hidraw.py "$@"

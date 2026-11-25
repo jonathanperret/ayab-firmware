@@ -1,0 +1,90 @@
+[
+ {
+  "desc": "4 toggled, no extras",
+  "pat": 15,
+  "off": 0,
+  "back": 15,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ },
+ {
+  "desc": "4 toggled, 1 extra switched off",
+  "pat": 31,
+  "off": 0,
+  "back": 15,
+  "resets": 0,
+  "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+ },
+ {
+  "desc": "4 toggled, 2 extras switched off",
+  "pat": 63,
+  "off": 0,
+  "back": 15,
+  "resets": 0,
+  "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+ },
+ {
+  "desc": "4 toggled, 3 extras switched off",
+  "pat": 127,
+  "off": 0,
+  "back": 15,
+  "resets": 0,
+  "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+ },
+ {
+  "desc": "4 toggled, 1 extra held on",
+  "pat": 31,
+  "off": 16,
+  "back": 31,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ },
+ {
+  "desc": "4 toggled, 2 extras held on",
+  "pat": 63,
+  "off": 48,
+  "back": 63,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ },
+ {
+  "desc": "4 toggled, 3 extras held on",
+  "pat": 127,
+  "off": 112,
+  "back": 127,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ },
+ {
+  "desc": "5 toggled, 2 extras switched off",
+  "pat": 127,
+  "off": 0,
+  "back": 31,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ },
+ {
+  "desc": "6 toggled, 1 extra switched off",
+  "pat": 127,
+  "off": 0,
+  "back": 63,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ },
+ {
+  "desc": "4 toggled (high four), no extras",
+  "pat": 240,
+  "off": 0,
+  "back": 240,
+  "resets": 0,
+  "raw": "OK t resets 0 other 0 wnak 0 dirty 0"
+ },
+ {
+  "desc": "4 toggled, no extras (repeat)",
+  "pat": 15,
+  "off": 0,
+  "back": 15,
+  "resets": 20,
+  "raw": "OK t resets 20 other 0 wnak 20 dirty 0"
+ }
+]
