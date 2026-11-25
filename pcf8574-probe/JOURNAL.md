@@ -7286,3 +7286,53 @@ left as written; this entry is the correction.
 Reminder recorded for the next bench session, at the user's request:
 run the high-speed mode comparison of entry 210 (flash edgetest, then
 tools/hs_session.py).
+
+## 212. 2026-11-25 20:34 — Characterising the driver's clamp diodes: plan, and where the 9 V track can be cut
+
+*Run with: [tools/pcb_paths.py](tools/pcb_paths.py). No board involved.*
+
+The user asked whether the diodes inside the driver could be
+characterised. Proposed three measurements: (1) with a steady forward
+current in a diode, how much leaves by the clamp pin and how much by
+the ground pin (in a chip of this kind part of a clamp diode's current
+can go to the chip's ground); (2) forward voltage against current;
+(3) the reverse recovery itself, by a small resistor in the clamp
+pin's lead, where only diode current flows, while a coil discharges
+and its output is switched back on: peak, duration, charge, and how
+abruptly it ends, at several coil currents.
+
+There are no spare UMW drivers, so it has to be done on a board. The
+user proposes cutting the 9 V track close to the clamp pin. The layout
+allows it cleanly:
+
+![U5's clamp pin and its 9 V feed](journal/layout-u5-clamp-pin.png)
+
+From U5 pin 10 a single top-layer track, 40 mil (1 mm) wide, goes
+2 mm to the right, then about 11 mm straight down, then diagonally to
+a via (70 mil pad) that joins the wide 9 V track on the bottom layer.
+Nothing else is connected along it; the tracks it crosses in the
+picture are on the other layer. So a cut anywhere on the straight
+top-layer run isolates the clamp pin alone, and a resistor soldered
+across the cut puts it back in circuit through that resistor.
+
+Points for doing it:
+
+- About 1 ohm across the cut (50 mV for one coil's 50 mA; 0.5 V for a
+  0.5 A recovery peak). It can stay in afterwards: it only carries
+  clamp diode current.
+- The board must never be powered with the cut open while coils are
+  connected: without the clamp path a switch-off would put the coil's
+  full voltage kick on the driver's output.
+- Both ends of the resistor sit at 9 V, and the 9 V at the driver
+  moves by volts during the event. So the reading has to be the
+  difference between its two ends: either two probes and a
+  subtraction, or the new scope left floating (network connection
+  only, no earth cable) with its ground clip on the supply side of
+  the resistor. In the second case the scope's chassis and every other
+  probe ground are at 9 V against the board and the Mac.
+- With the current-sense amplifier in the coils' supply wire as well,
+  the slow part answers measurement (1) on the board: while a coil
+  discharges, coil current minus clamp pin current is what goes
+  elsewhere.
+- The fast part (the recovery) needs the new scope and short
+  connections.

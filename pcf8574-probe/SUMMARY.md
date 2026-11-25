@@ -75,6 +75,7 @@ In order, each followed by a rerun of the threshold table, which takes about a m
 6. Tell a real disturbance on the expander's supply pin from pickup in the probe leads. Three coils are switched off, then back on after a gap; the run repeats this for seven gaps from 0.2 to 3.2 ms while the scope watches the supply pin. With three coils the short gaps (large coil current) never reset and the middle gaps (small current) always do (entry 188). Pickup should shrink as the current shrinks; if the burst is instead largest at the gaps that reset, it is real and tied to the reset (entry 191).
 7. Re-measure, after a fixed rest, the earlier observation that coils left off make a reset less likely.
 8. Compare reset rates with the expander in its high-speed mode, where its bus input filters are at their fast setting (entry 210). Needs no parts; firmware and script are ready. More resets in that mode would implicate the bus inputs.
+9. Characterise the driver's clamp diodes on the bench board: cut the 9 V track to its clamp pin (a single 1 mm track, entry 212), bridge the cut with about 1 Ω, and measure the diode current there while a coil discharges and is switched back on. Gives the reverse recovery that the simulations have to assume; the fast part needs the new scope.
 
 Waiting on, all ordered: through-hole ceramic capacitors, Schottky diodes (1N5819) and the faster oscilloscope.
 
